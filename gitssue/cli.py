@@ -1,13 +1,14 @@
 """ CLI module (the main module of the app, since it's a CLI app). """
 
 from cement.core.foundation import CementApp
-from cement.core.controller import CementBaseController, expose
+from cement.ext.ext_argparse import ArgparseController, expose
+
 import git_wrapper
 import github
 import printer
 
 
-class BaseController(CementBaseController):
+class BaseController(ArgparseController):
     """
     Base Cement controller class.
     """
@@ -27,13 +28,19 @@ class BaseController(CementBaseController):
         self.app.log.info('Inside BaseController.default()')
 
     @expose(
+        help='List opened issues',
         aliases=['l'],
-        help='List opened issues'
+        arguments=[(
+            ['-a', '--all'],
+            dict(
+                help='Show all the issues (also closed ones).',
+                action='store_true'
+            ),
+        )],
     )
     def list(self):
         """
         The method that lists the issues.
-        :return:
         """
         self.app.log.info('Inside BaseController.list()')
 
@@ -41,8 +48,12 @@ class BaseController(CementBaseController):
 
         self.app.log.info('Github username: {0}; repo name: {1}'.format(username, repo))
 
+        show_all = False
+        if self.app.pargs.all:
+            show_all = True
+
         try:
-            issue_list = github.get_issue_list(username, repo)
+            issue_list = github.get_issue_list(username, repo, show_all)
         except TypeError:
             issue_list = False
 
