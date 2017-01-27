@@ -19,16 +19,18 @@ class BaseController(ArgparseController):
         label = 'base'
         description = 'Gitssue - Manage your issues from the command line'
 
+
     @expose(hide=True)
     def default(self):
         """
-        The accessed method if no command has been specified.
+        The accessed method if no command has been specified. Displays the help.
         :return:
         """
-        self.app.log.info('Inside BaseController.default()')
+        self.app.args.parse_args(['--help'])
+
 
     @expose(
-        help='List opened issues',
+        help='List open issues.',
         aliases=['l'],
         arguments=[(
             ['-a', '--all'],
@@ -42,15 +44,8 @@ class BaseController(ArgparseController):
         """
         The method that lists the issues.
         """
-        self.app.log.info('Inside BaseController.list()')
-
         username, repo = git_wrapper.get_username_and_repo()
-
-        self.app.log.info('Github username: {0}; repo name: {1}'.format(username, repo))
-
-        show_all = False
-        if self.app.pargs.all:
-            show_all = True
+        show_all = self.app.pargs.all
 
         try:
             issue_list = github.get_issue_list(username, repo, show_all)
@@ -58,6 +53,31 @@ class BaseController(ArgparseController):
             issue_list = False
 
         printer.print_issue_list(issue_list)
+
+
+    @expose(
+        help='Get description of the given issue.',
+        aliases=['d'],
+        arguments=[
+            (['issue_numbers'], dict(action='store', nargs='*')),
+        ]
+    )
+    def desc(self):
+        """
+        Get description of the given issue.
+        """
+        username, repo = git_wrapper.get_username_and_repo()
+
+        if self.app.pargs.issue_numbers:
+            issues = github.get_issues_description(
+                username,
+                repo,
+                self.app.pargs.issue_numbers,
+            )
+
+            printer.print_issue_list_with_desc(issues)
+        else:
+            self.app.args.parse_args(['desc', '--help'])
 
 
 class Gitssue(CementApp):
