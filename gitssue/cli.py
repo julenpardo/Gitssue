@@ -67,12 +67,15 @@ class BaseController(ArgparseController):
         Get description of the given issue.
         """
         username, repo = git_wrapper.get_username_and_repo()
+        issue_numbers = self.app.pargs.issue_numbers
 
-        if self.app.pargs.issue_numbers:
+        if not all(number.isdigit() for number in issue_numbers):
+            print('Issue numbers must be numbers.')
+        elif issue_numbers:
             issues = github.get_issues_description(
                 username,
                 repo,
-                self.app.pargs.issue_numbers,
+                issue_numbers,
             )
 
             printer.print_issue_list_with_desc(issues)
