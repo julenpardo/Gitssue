@@ -1,1 +1,10 @@
-env/*
+env/
+reports/
+__pycache__/
+gitssue/__pycache__/
+.idea/
+*.swp
+*.swo
+*.log
+*~
+.Trash-*
