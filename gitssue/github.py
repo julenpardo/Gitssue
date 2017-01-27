@@ -9,6 +9,7 @@ API_URL = 'https://api.github.com'
 def get_request(request):
     """
     Executes a GET request.
+
     :param request: the GET request to execute.
     :return: response JSON object; False if the HTTP status code distinct to 200.
     """
@@ -21,8 +22,8 @@ def get_request(request):
 
 def get_issue_list(username, repository, show_all=False):
     """
-    Gets the open issue list of the given repository of the
-    given user.
+    Gets the open issue list of the given repository of the given user.
+
     :param username: the user owning the repository.
     :param repository: the repository to look the issues at.
     :param all: show also closed issues.
@@ -38,3 +39,32 @@ def get_issue_list(username, repository, show_all=False):
     return {
         issue['number']: issue['title'] for issue in issues
     }
+
+
+def get_issues_description(username, repository, issue_numbers):
+    """
+    Gets the specified issues, with the descriptions.
+
+    :param username: the user owning the repository.
+    :param repository: the repository to look the issues at.
+    :param issue_numbers: the issue identifier(s).
+    :return: a dictionary with the title and the body message of each issue id.
+    """
+    issues_descriptions = []
+
+    for issue_number in issue_numbers:
+        request = '/repos/{0}/{1}/issues/{2}'.format(username, repository, issue_number)
+
+        full_issue = get_request(request)
+
+        issue_description = {
+            'number': issue_number,
+            'description': {
+                'title': full_issue['title'],
+                'body': full_issue['body'],
+            }
+        }
+
+        issues_descriptions.append(issue_description)
+
+    return issues_descriptions
