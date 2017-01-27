@@ -19,15 +19,19 @@ def get_request(request):
     return response_object
 
 
-def get_issue_list(username, repository):
+def get_issue_list(username, repository, show_all=False):
     """
     Gets the open issue list of the given repository of the
     given user.
     :param username: the user owning the repository.
     :param repository: the repository to look the issues at.
+    :param all: show also closed issues.
     :return: a dictionary id:label format.
     """
     request = '/repos/{0}/{1}/issues'.format(username, repository)
+
+    if show_all:
+        request += '?state=all'
 
     issues = get_request(request)
 
