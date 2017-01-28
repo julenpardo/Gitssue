@@ -6,6 +6,7 @@ from cement.ext.ext_argparse import ArgparseController, expose
 import git_wrapper
 import github
 import printer
+from shell_wrapper import ShellWrapper
 
 
 class BaseController(ArgparseController):
@@ -44,7 +45,7 @@ class BaseController(ArgparseController):
         """
         The method that lists the issues.
         """
-        username, repo = git_wrapper.get_username_and_repo()
+        username, repo = git_wrapper.get_username_and_repo(ShellWrapper())
         show_all = self.app.pargs.all
 
         try:
@@ -66,7 +67,7 @@ class BaseController(ArgparseController):
         """
         Get description of the given issue.
         """
-        username, repo = git_wrapper.get_username_and_repo()
+        username, repo = git_wrapper.get_username_and_repo(ShellWrapper())
         issue_numbers = self.app.pargs.issue_numbers
 
         if not all(number.isdigit() for number in issue_numbers):
