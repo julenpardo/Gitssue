@@ -17,12 +17,21 @@ class ShellWrapper():
         """
         arguments = shlex.split(command)
 
-        process = subprocess.Popen(
-            arguments,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
+        try:
+            process = subprocess.Popen(
+                arguments,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
 
-        output, error = process.communicate()
+            output, error = process.communicate()
 
-        return output.decode('utf-8')
+            if error or not output:
+                returned_value = False
+            else:
+                returned_value = output.decode('utf-8')
+
+        except Exception:
+            returned_value = False
+
+        return returned_value
