@@ -7,7 +7,7 @@ import subprocess
 import shlex
 
 
-class ShellWrapper():
+class ShellWrapper:
 
     def execute_command(self, command):
         """
