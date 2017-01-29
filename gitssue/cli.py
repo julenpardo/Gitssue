@@ -6,7 +6,6 @@ from cement.ext.ext_argparse import ArgparseController, expose
 from dependencies import Dependencies
 
 import git_wrapper
-import printer
 
 
 class BaseController(ArgparseController):
@@ -29,7 +28,6 @@ class BaseController(ArgparseController):
         :return:
         """
         self.app.args.parse_args(['--help'])
-
 
     @expose(
         help='List open issues.',
@@ -54,8 +52,7 @@ class BaseController(ArgparseController):
         except TypeError:
             issue_list = False
 
-        printer.print_issue_list(issue_list)
-
+        self.deps.printer.print_issue_list(issue_list)
 
     @expose(
         help='Get description of the given issue.',
@@ -75,12 +72,12 @@ class BaseController(ArgparseController):
             print('Issue numbers must be numbers.')
         elif issue_numbers:
             issues = self.deps.remote.get_issues_description(
-                username,
-                repo,
+                'julenpardo',
+                'db-connection-watcher',
                 issue_numbers,
             )
 
-            printer.print_issue_list_with_desc(issues)
+            self.deps.printer.print_issue_list_with_desc(issues)
         else:
             self.app.args.parse_args(['desc', '--help'])
 

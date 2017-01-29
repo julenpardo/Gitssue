@@ -1,6 +1,7 @@
 """ Dependency injection. """
-from github import Github
+from remote.github import Github
 from shell_wrapper import ShellWrapper
+from printer.printer import Printer
 
 
 class Dependencies:
@@ -8,3 +9,5 @@ class Dependencies:
     remote = Github()
 
     shell = ShellWrapper()
+
+    printer = Printer()

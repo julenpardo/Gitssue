@@ -1,8 +1,10 @@
 """ Github module. """
 
 import json
+
 import requests
-from remote_repo_interface import RemoteRepoInterface
+
+from remote.remote_repo_interface import RemoteRepoInterface
 
 
 class Github(RemoteRepoInterface):
