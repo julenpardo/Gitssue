@@ -8,6 +8,9 @@ import shlex
 
 
 class ShellWrapper:
+    """
+    Wrapper for executing shell commands, for Git module.
+    """
 
     def execute_command(self, command):
         """

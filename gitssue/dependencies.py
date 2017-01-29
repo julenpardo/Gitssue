@@ -5,6 +5,9 @@ from printer.printer import Printer
 
 
 class Dependencies:
+    """
+    Dependency injection, later accessed in cli.py.
+    """
 
     remote = Github()
 
