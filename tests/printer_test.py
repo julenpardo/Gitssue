@@ -3,10 +3,13 @@ import sys, os
 sys.path.append(os.path.abspath('..'))
 import contextlib
 from io import StringIO
-from gitssue.printer import *
+from printer.printer import Printer
 
 
 class PrinterTest(unittest.TestCase):
+
+    def setUp(self):
+        self.printer = Printer()
 
     def test_print_issue_list(self):
         issues_input = {
@@ -24,7 +27,7 @@ class PrinterTest(unittest.TestCase):
 
         temp_stdout = StringIO()
         with contextlib.redirect_stdout(temp_stdout):
-            print_issue_list(issues_input)
+            self.printer.print_issue_list(issues_input)
 
         actual = temp_stdout.getvalue().strip()
 
@@ -35,7 +38,7 @@ class PrinterTest(unittest.TestCase):
 
         temp_stdout = StringIO()
         with contextlib.redirect_stdout(temp_stdout):
-            print_issue_list({})
+            self.printer.print_issue_list({})
 
         actual = temp_stdout.getvalue().strip()
 
@@ -65,7 +68,7 @@ class PrinterTest(unittest.TestCase):
 
         temp_stdout = StringIO()
         with contextlib.redirect_stdout(temp_stdout):
-            print_issue_list_with_desc(issues_input)
+            self.printer.print_issue_list_with_desc(issues_input)
 
         actual = temp_stdout.getvalue().strip()
 
@@ -76,7 +79,7 @@ class PrinterTest(unittest.TestCase):
 
         temp_stdout = StringIO()
         with contextlib.redirect_stdout(temp_stdout):
-            print_issue_list_with_desc({})
+            self.printer.print_issue_list_with_desc({})
 
         actual = temp_stdout.getvalue().strip()
 
