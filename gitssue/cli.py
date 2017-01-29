@@ -3,10 +3,10 @@
 from cement.core.foundation import CementApp
 from cement.ext.ext_argparse import ArgparseController, expose
 
+from dependencies import Dependencies
+
 import git_wrapper
-import github
 import printer
-from shell_wrapper import ShellWrapper
 
 
 class BaseController(ArgparseController):
@@ -20,6 +20,7 @@ class BaseController(ArgparseController):
         label = 'base'
         description = 'Gitssue - Manage your issues from the command line'
 
+    deps = Dependencies()
 
     @expose(hide=True)
     def default(self):
@@ -45,11 +46,11 @@ class BaseController(ArgparseController):
         """
         The method that lists the issues.
         """
-        username, repo = git_wrapper.get_username_and_repo(ShellWrapper())
+        username, repo = git_wrapper.get_username_and_repo(self.deps.shell)
         show_all = self.app.pargs.all
 
         try:
-            issue_list = github.get_issue_list(username, repo, show_all)
+            issue_list = self.deps.remote.get_issue_list(username, repo, show_all)
         except TypeError:
             issue_list = False
 
@@ -67,13 +68,13 @@ class BaseController(ArgparseController):
         """
         Get description of the given issue.
         """
-        username, repo = git_wrapper.get_username_and_repo(ShellWrapper())
+        username, repo = git_wrapper.get_username_and_repo(self.deps.shell)
         issue_numbers = self.app.pargs.issue_numbers
 
         if not all(number.isdigit() for number in issue_numbers):
             print('Issue numbers must be numbers.')
         elif issue_numbers:
-            issues = github.get_issues_description(
+            issues = self.deps.remote.get_issues_description(
                 username,
                 repo,
                 issue_numbers,
