@@ -72,8 +72,8 @@ class BaseController(ArgparseController):
             print('Issue numbers must be numbers.')
         elif issue_numbers:
             issues = self.deps.remote.get_issues_description(
-                'julenpardo',
-                'db-connection-watcher',
+                username,
+                repo,
                 issue_numbers,
             )
 
