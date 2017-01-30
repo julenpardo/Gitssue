@@ -9,8 +9,8 @@ class Printer(PrinterInterface):
         :param issues: The issue dictionary.
         """
         if issues:
-            for issue_number, issue_label in sorted(issues.items()):
-                print('#{0}: {1}'.format(issue_number, issue_label))
+            for issue in issues:
+                print('#{0}: {1}'.format(issue['number'], issue['title']))
         else:
             print('No issue could be found.')
 
@@ -27,5 +27,20 @@ class Printer(PrinterInterface):
                 ))
                 print(issue['description']['body'])
                 print('-----------------------------------\n')
+        else:
+            print('No issue could be found.')
+
+    def print_issue_list_with_labels(self, issues):
+        if issues:
+            for issue in issues:
+                labels = '('
+
+                for label in issue['labels']:
+                    labels += '{0},'.format(label['name'])
+
+                labels = labels[:-1]
+                labels += ')'
+
+                print('#{0}: {1} {2}'.format(issue['number'], issue['title'], labels))
         else:
             print('No issue could be found.')
