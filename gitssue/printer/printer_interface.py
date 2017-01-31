@@ -24,3 +24,10 @@ class PrinterInterface(metaclass=ABCMeta):
         :param issues: the issue list.
         """
         pass
+
+    @abstractmethod
+    def print_issue_list_with_labels(self, issues):
+        """
+        Prints the issue list with labels.
+        :param issues: the issue list.
+        """
