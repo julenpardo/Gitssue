@@ -25,9 +25,10 @@ class BaseController(ArgparseController):
     def default(self):
         """
         The accessed method if no command has been specified. Displays the help.
-        :return:
         """
+        self.app.render({'foo': 'It works!'}, 'foo.m')
         self.app.args.parse_args(['--help'])
+
 
     @expose(
         help='List open issues.',
@@ -107,6 +108,13 @@ class Gitssue(CementApp):
         base_controller = 'base'
         handlers = [
             BaseController,
+        ]
+        extensions = ['mustache']
+        output_handler = 'mustache'
+
+        import os
+        template_dirs = [
+            os.getcwd() + '/gitssue/printer/templates'
         ]
 
 
