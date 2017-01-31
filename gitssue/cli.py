@@ -109,14 +109,6 @@ class Gitssue(CementApp):
         handlers = [
             BaseController,
         ]
-        extensions = ['mustache']
-        output_handler = 'mustache'
-
-        import os
-        template_dirs = [
-            os.getcwd() + '/gitssue/printer/templates'
-        ]
-
 
 with Gitssue() as app:
     app.run()
