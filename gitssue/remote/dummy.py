@@ -31,9 +31,11 @@ class Dummy(RemoteRepoInterface):
                 'labels': (
                     {
                         'name': 'bug',
+                        'color': 'fab444'
                     },
                     {
                         'name': 'dummy',
+                        'color': '000000'
                     },
                 ),
             },

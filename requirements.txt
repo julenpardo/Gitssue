@@ -1,7 +1,7 @@
 appdirs==1.4.0
 astroid==1.4.9
 cement==2.10.2
-colorama==0.3.7
+colorconsole==0.7.2
 isort==4.2.5
 lazy-object-proxy==1.2.2
 mccabe==0.6.1

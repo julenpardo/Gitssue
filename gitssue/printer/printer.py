@@ -3,6 +3,16 @@ from printer.printer_interface import PrinterInterface
 
 
 class Printer(PrinterInterface):
+
+    ISSUE_TITLE_COLOR = 'c3a000'
+
+    def __init__(self, color_printer):
+        """
+        Gets the specific implementation of ColorPrinterInterface.
+        :param color_printer: implementation of ColorPrinterInterface.
+        """
+        self.color_printer = color_printer
+
     def print_issue_list(self, issues):
         """
         Prints the issue list, in "id: label" format.
@@ -33,14 +43,15 @@ class Printer(PrinterInterface):
     def print_issue_list_with_labels(self, issues):
         if issues:
             for issue in issues:
-                labels = '('
+                issue_title = '#{0}: {1}'.format(issue['number'], issue['title'])
+                self.color_printer.print_colored_line(issue_title, self.ISSUE_TITLE_COLOR)
 
-                for label in issue['labels']:
-                    labels += '{0},'.format(label['name'])
-
-                labels = labels[:-1]
-                labels += ')'
-
-                print('#{0}: {1} {2}'.format(issue['number'], issue['title'], labels))
+                if issue['labels']:
+                    print('Labels:')
+                    for label in issue['labels']:
+                        self.color_printer.print_colored_line(
+                            label['name'],
+                            label['color']
+                        )
         else:
             print('No issue could be found.')

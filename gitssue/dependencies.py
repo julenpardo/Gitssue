@@ -1,16 +1,20 @@
 """ Dependency injection. """
 from remote.github import Github
+from remote.dummy import Dummy
 from shell_wrapper import ShellWrapper
 from printer.printer import Printer
+from printer.colorconsole_color_printer import ColorConsoleColorPrinter
 
 
 class Dependencies:
     """
-    Dependency injection, later accessed in cli.py.
+    Dependency injection.
     """
 
-    remote = Github()
+    remote = Dummy()
 
     shell = ShellWrapper()
 
-    printer = Printer()
+    color_printer = ColorConsoleColorPrinter()
+
+    printer = Printer(color_printer)
