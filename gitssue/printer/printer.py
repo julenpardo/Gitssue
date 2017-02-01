@@ -31,27 +31,29 @@ class Printer(PrinterInterface):
         """
         if issues:
             for issue in issues:
-                print('#{0}: {1}'.format(
+                issue_title = '#{0}: {1}'.format(
                     issue['number'],
                     issue['description']['title']
-                ))
+                )
+                self.color_printer.print_colored_line(issue_title, self.ISSUE_TITLE_COLOR)
                 print(issue['description']['body'])
-                print('-----------------------------------\n')
+                print('\n')
         else:
             print('No issue could be found.')
 
     def print_issue_list_with_labels(self, issues):
+        """
+        Prints the issue list with labels.
+        :param issues: the issue list.
+        """
         if issues:
             for issue in issues:
                 issue_title = '#{0}: {1}'.format(issue['number'], issue['title'])
                 self.color_printer.print_colored_line(issue_title, self.ISSUE_TITLE_COLOR)
 
                 if issue['labels']:
-                    print('Labels:')
-                    for label in issue['labels']:
-                        self.color_printer.print_colored_line(
-                            label['name'],
-                            label['color']
-                        )
+                    self.color_printer.print_labels(issue['labels'])
+
+                print()
         else:
             print('No issue could be found.')

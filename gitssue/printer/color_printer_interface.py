@@ -18,3 +18,12 @@ class ColorPrinterInterface(metaclass=ABCMeta):
         :param hex_color: The color of the line to print.
         """
         pass
+
+    @abstractmethod
+    def print_labels(self, labels):
+        """
+        Prints the label list. Even if they are printed in the same line, we need
+        another method because labels can have different colors.
+        :param labels: The label dictionary, with the name and the color code.
+        """
+        pass
