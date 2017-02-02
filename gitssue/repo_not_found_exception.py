@@ -2,6 +2,9 @@
 
 
 class RepoNotFoundException(Exception):
+    """
+    Exception for when the local repo can't be found.
+    """
 
     ERROR_MESSAGE = 'An error occurred - is this a git repository?'
 

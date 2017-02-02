@@ -1,5 +1,4 @@
 """ Dependency injection. """
-from remote.github import Github
 from remote.dummy import Dummy
 from shell_wrapper import ShellWrapper
 from printer.printer import Printer
