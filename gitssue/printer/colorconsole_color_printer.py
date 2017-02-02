@@ -2,7 +2,7 @@
 The color printer module, implemented with the 'colorconsole' package.
 """
 from __future__ import print_function
-from printer.color_printer_interface import ColorPrinterInterface
+from gitssue.printer.color_printer_interface import ColorPrinterInterface
 from colorconsole import terminal
 
 

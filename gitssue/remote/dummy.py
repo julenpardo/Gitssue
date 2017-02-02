@@ -1,6 +1,6 @@
 """ Dummy module to simulate """
 
-from remote.remote_repo_interface import RemoteRepoInterface
+from gitssue.remote.remote_repo_interface import RemoteRepoInterface
 
 
 class Dummy(RemoteRepoInterface):

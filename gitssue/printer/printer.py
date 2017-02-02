@@ -1,5 +1,5 @@
 """ CLI printer module. """
-from printer.printer_interface import PrinterInterface
+from gitssue.printer.printer_interface import PrinterInterface
 
 
 class Printer(PrinterInterface):
