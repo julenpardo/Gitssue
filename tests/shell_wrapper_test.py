@@ -14,7 +14,7 @@ class ShellWrapperTest(unittest.TestCase):
         Test the command execution and return of output.
         """
         command = 'git config --get remote.origin.url'
-        expected = 'https://github.com/julenpardo/Gitssue.git'
+        expected = 'https://github.com/julenpardo/Gitssue'
         actual = self.shell_wrapper.execute_command(command).replace('\n', '')
 
         self.assertEqual(expected, actual)
@@ -28,11 +28,3 @@ class ShellWrapperTest(unittest.TestCase):
         expected_false = self.shell_wrapper.execute_command(command)
 
         self.assertFalse(expected_false)
-
-
-def fake_execute_command_with_error(command):
-    """
-    Method to overwrite the shell_wrapper.execute_command method, for mocking,
-    with errored return.
-        """
-    return False

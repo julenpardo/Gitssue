@@ -4,11 +4,18 @@ import sys, os
 sys.path.append(os.path.abspath('..'))
 from gitssue.git_wrapper import *
 from gitssue.shell_wrapper import *
-import shell_wrapper_test
+import tests.shell_wrapper_test
 from gitssue.repo_not_found_exception import RepoNotFoundException
 
 
 class GitWrapperTest(unittest.TestCase):
+
+    def fake_execute_command_with_error(command):
+        """
+        Method to overwrite the shell_wrapper.execute_command method, for mocking,
+        with errored return.
+            """
+        return False
 
     def setUp(self):
         """
@@ -16,14 +23,13 @@ class GitWrapperTest(unittest.TestCase):
         """
         self.shell_wrapper = ShellWrapper()
         self.shell_wrapper_mock = mock.Mock()
-        self.shell_wrapper_mock.execute_command = shell_wrapper_test\
-            .fake_execute_command_with_error
+        self.shell_wrapper_mock.execute_command = self.fake_execute_command_with_error
 
     def test_get_remote_url(self):
         """
         Test getting the remote URL for the current repository.
         """
-        expected = 'https://github.com/julenpardo/Gitssue.git'
+        expected = 'https://github.com/julenpardo/Gitssue'
         actual = get_remote_url(self.shell_wrapper).replace('\n', '')
 
         self.assertEqual(expected, actual)
