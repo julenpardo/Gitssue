@@ -12,7 +12,7 @@ class BaseController(ArgparseController):
     """
     Base Cement controller class.
     """
-    class Meta: # pylint: disable=too-few-public-methods
+    class Meta:
         """
         Meta class of the base Cement controller.
         """
