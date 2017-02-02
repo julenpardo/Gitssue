@@ -25,9 +25,10 @@ class BaseController(ArgparseController):
     def default(self):
         """
         The accessed method if no command has been specified. Displays the help.
-        :return:
         """
+        self.app.render({'foo': 'It works!'}, 'foo.m')
         self.app.args.parse_args(['--help'])
+
 
     @expose(
         help='List open issues.',
@@ -38,12 +39,6 @@ class BaseController(ArgparseController):
                 help='Show all the issues (also closed ones).',
                 action='store_true'
             ),
-        ),(
-            ['-l', '--labels'],
-            dict(
-                help='Show label(s) assigned to the issues.',
-                action='store_true'
-            )
         )],
     )
     def list(self):
@@ -57,15 +52,11 @@ class BaseController(ArgparseController):
                 username,
                 repo,
                 self.app.pargs.all,
-                self.app.pargs.labels,
             )
         except TypeError:
             issue_list = False
 
-        if self.app.pargs.labels:
-            self.deps.printer.print_issue_list_with_labels(issue_list)
-        else:
-            self.deps.printer.print_issue_list(issue_list)
+        self.deps.printer.print_issue_list_with_labels(issue_list)
 
     @expose(
         help='Get description of the given issue.',
@@ -108,7 +99,6 @@ class Gitssue(CementApp):
         handlers = [
             BaseController,
         ]
-
 
 with Gitssue() as app:
     app.run()
