@@ -23,7 +23,7 @@ class Dummy(RemoteRepoInterface):
             },
         )
 
-    def get_issue_list(self, username, repository, show_all=False, show_labels=False):
+    def get_issue_list(self, username, repository, show_all=False):
         return (
             {
                 'number': '1',
@@ -45,6 +45,7 @@ class Dummy(RemoteRepoInterface):
                 'labels': (
                     {
                         'name': 'dummy',
+                        'color': 'ffffff'
                     },
                 ),
             },

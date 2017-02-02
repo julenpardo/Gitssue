@@ -51,8 +51,7 @@ class Printer(PrinterInterface):
                 issue_title = '#{0}: {1}'.format(issue['number'], issue['title'])
                 self.color_printer.print_colored_line(issue_title, self.ISSUE_TITLE_COLOR)
 
-                if issue['labels']:
-                    self.color_printer.print_labels(issue['labels'])
+                self.color_printer.print_labels(issue.get('labels', list()))
 
                 print()
         else:

@@ -10,14 +10,13 @@ class RemoteRepoInterface(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def get_issue_list(self, username, repository, show_all=False, show_labels=False):
+    def get_issue_list(self, username, repository, show_all=False):
         """
         Gets the open issue list of the given repository of the given user.
 
         :param username: the user owning the repository.
         :param repository: the repository to look the issues at.
         :param show_all: show also closed issues.
-        :param show_labels: show also labels of the issue.
         :return: a dictionary id:label format.
         """
         pass

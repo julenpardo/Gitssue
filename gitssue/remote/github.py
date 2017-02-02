@@ -27,14 +27,13 @@ class Github(RemoteRepoInterface):
 
         return response_object
 
-    def get_issue_list(self, username, repository, show_all=False, show_labels=False):
+    def get_issue_list(self, username, repository, show_all=False):
         """
         Gets the open issue list of the given repository of the given user.
 
         :param username: the user owning the repository.
         :param repository: the repository to look the issues at.
         :param show_all: show also closed issues.
-        :param show_labels: show also labels of the issue.
         :return: a dictionary id:label format.
         """
         request = '/repos/{0}/{1}/issues'.format(username, repository)
@@ -45,19 +44,13 @@ class Github(RemoteRepoInterface):
         issues = self.get_request(request)
         issue_list = []
 
-        if show_labels:
-            for issue in issues:
-                issue_list.append({
-                    'number': issue['number'],
-                    'title': issue['title'],
-                    'labels': issue['labels'],
-            })
-        else:
-            for issue in issues:
-                issue_list.append({
-                    'number': issue['number'],
-                    'title': issue['title'],
-            })
+        for issue in issues:
+            issue_list.append({
+                'number': issue['number'],
+                'title': issue['title'],
+                'labels': issue['labels'],
+        })
+
 
         return issue_list
 
