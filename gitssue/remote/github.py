@@ -1,10 +1,5 @@
 """ Github module. """
-
-import json
-
-import requests
-
-from remote.remote_repo_interface import RemoteRepoInterface
+from gitssue.remote.remote_repo_interface import RemoteRepoInterface
 
 
 class Github(RemoteRepoInterface):
@@ -14,18 +9,9 @@ class Github(RemoteRepoInterface):
 
     API_URL = 'https://api.github.com'
 
-    def get_request(self, request):
-        """
-        Executes a GET request.
+    def __init__(self, requester):
+        super(Github, self).__init__(requester)
 
-        :param request: the GET request to execute.
-        :return: response JSON object; False if the HTTP status code distinct to 200.
-        """
-        response = requests.get(self.API_URL + request)
-        response_object = json.loads(response.text)
-        response.close()
-
-        return response_object
 
     def get_issue_list(self, username, repository, show_all=False):
         """
@@ -41,16 +27,16 @@ class Github(RemoteRepoInterface):
         if show_all:
             request += '?state=all'
 
-        issues = self.get_request(request)
+        issues = self.requester.get_request(self.API_URL + request)
         issue_list = []
 
-        for issue in issues:
-            issue_list.append({
-                'number': issue['number'],
-                'title': issue['title'],
-                'labels': issue['labels'],
-        })
-
+        if issues:
+            for issue in issues:
+                issue_list.append({
+                    'number': issue['number'],
+                    'title': issue['title'],
+                    'labels': issue['labels'],
+            })
 
         return issue_list
 
@@ -65,23 +51,24 @@ class Github(RemoteRepoInterface):
         """
         issues_descriptions = []
 
-        for issue_number in issue_numbers:
-            request = '/repos/{0}/{1}/issues/{2}'.format(
-                username,
-                repository,
-                issue_number
-            )
+        if issue_numbers:
+            for issue_number in issue_numbers:
+                request = '/repos/{0}/{1}/issues/{2}'.format(
+                    username,
+                    repository,
+                    issue_number
+                )
 
-            full_issue = self.get_request(request)
+                full_issue = self.requester.get_request(self.API_URL + request)
 
-            issue_description = {
-                'number': issue_number,
-                'description': {
-                    'title': full_issue['title'],
-                    'body': full_issue['body'],
+                issue_description = {
+                    'number': issue_number,
+                    'description': {
+                        'title': full_issue['title'],
+                        'body': full_issue['body'],
+                    }
                 }
-            }
 
-            issues_descriptions.append(issue_description)
+                issues_descriptions.append(issue_description)
 
         return issues_descriptions

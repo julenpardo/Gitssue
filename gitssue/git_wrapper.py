@@ -1,5 +1,5 @@
 """ Wrapper for executing Git commands. """
-from repo_not_found_exception import RepoNotFoundException
+from gitssue.repo_not_found_exception import RepoNotFoundException
 
 
 def get_username_and_repo(shell_wrapper):
