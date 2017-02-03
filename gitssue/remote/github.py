@@ -30,12 +30,13 @@ class Github(RemoteRepoInterface):
         issues = self.requester.get_request(self.API_URL + request)
         issue_list = []
 
-        for issue in issues:
-            issue_list.append({
-                'number': issue['number'],
-                'title': issue['title'],
-                'labels': issue['labels'],
-        })
+        if issues:
+            for issue in issues:
+                issue_list.append({
+                    'number': issue['number'],
+                    'title': issue['title'],
+                    'labels': issue['labels'],
+            })
 
         return issue_list
 
