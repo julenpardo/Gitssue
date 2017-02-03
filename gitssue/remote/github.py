@@ -51,23 +51,24 @@ class Github(RemoteRepoInterface):
         """
         issues_descriptions = []
 
-        for issue_number in issue_numbers:
-            request = '/repos/{0}/{1}/issues/{2}'.format(
-                username,
-                repository,
-                issue_number
-            )
+        if issue_numbers:
+            for issue_number in issue_numbers:
+                request = '/repos/{0}/{1}/issues/{2}'.format(
+                    username,
+                    repository,
+                    issue_number
+                )
 
-            full_issue = self.requester.get_request(self.API_URL + request)
+                full_issue = self.requester.get_request(self.API_URL + request)
 
-            issue_description = {
-                'number': issue_number,
-                'description': {
-                    'title': full_issue['title'],
-                    'body': full_issue['body'],
+                issue_description = {
+                    'number': issue_number,
+                    'description': {
+                        'title': full_issue['title'],
+                        'body': full_issue['body'],
+                    }
                 }
-            }
 
-            issues_descriptions.append(issue_description)
+                issues_descriptions.append(issue_description)
 
         return issues_descriptions
