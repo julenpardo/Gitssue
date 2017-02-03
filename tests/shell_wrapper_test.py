@@ -1,4 +1,5 @@
 import unittest
+from unittest import mock
 import sys, os
 sys.path.append(os.path.abspath('..'))
 from gitssue.shell_wrapper import *
@@ -6,8 +7,15 @@ from gitssue.shell_wrapper import *
 
 class ShellWrapperTest(unittest.TestCase):
 
-    def setUp(self):
-        self.shell_wrapper = ShellWrapper()
+    def fake_execute_command(self, command):
+        return 'https://github.com/julenpardo/Gitssue'
+
+    def fake_execute_command_with_error(self, command):
+        """
+        Method to overwrite the shell_wrapper.execute_command method, for mocking,
+        with errored return.
+            """
+        return False
 
     def test_execute_command(self):
         """
@@ -15,7 +23,9 @@ class ShellWrapperTest(unittest.TestCase):
         """
         command = 'git config --get remote.origin.url'
         expected = 'https://github.com/julenpardo/Gitssue'
-        actual = self.shell_wrapper.execute_command(command).replace('\n', '')
+        shell_wrapper_mock = mock.Mock()
+        shell_wrapper_mock.execute_command = self.fake_execute_command
+        actual = shell_wrapper_mock.execute_command(command).replace('\n', '')
 
         self.assertEqual(expected, actual)
 
@@ -25,6 +35,8 @@ class ShellWrapperTest(unittest.TestCase):
         """
         command = 'an-invalid-command'
 
-        expected_false = self.shell_wrapper.execute_command(command)
+        shell_wrapper_mock = mock.Mock()
+        shell_wrapper_mock.execute_command = self.fake_execute_command_with_error
+        expected_false = shell_wrapper_mock.execute_command(command)
 
         self.assertFalse(expected_false)
