@@ -5,6 +5,10 @@ from gitssue.remote.remote_repo_interface import RemoteRepoInterface
 
 class Dummy(RemoteRepoInterface):
 
+    def __init__(self, requester):
+        super(Dummy, self).__init__(requester)
+
+
     def get_issues_description(self, username, repository, issue_numbers):
         return (
             {

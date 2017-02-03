@@ -1,8 +1,10 @@
 """ Dependency injection. """
 from remote.dummy import Dummy
+from remote.github import Github
 from shell_wrapper import ShellWrapper
 from printer.printer import Printer
 from printer.colorconsole_color_printer import ColorConsoleColorPrinter
+from request.requests import Requests
 
 
 class Dependencies:
@@ -10,7 +12,9 @@ class Dependencies:
     Dependency injection.
     """
 
-    remote = Dummy()
+    requester = Requests()
+
+    remote = Dummy(requester)
 
     shell = ShellWrapper()
 
