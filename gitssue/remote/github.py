@@ -1,5 +1,5 @@
 """ Github module. """
-from remote.remote_repo_interface import RemoteRepoInterface
+from gitssue.remote.remote_repo_interface import RemoteRepoInterface
 
 
 class Github(RemoteRepoInterface):
@@ -36,7 +36,6 @@ class Github(RemoteRepoInterface):
                 'title': issue['title'],
                 'labels': issue['labels'],
         })
-
 
         return issue_list
 
