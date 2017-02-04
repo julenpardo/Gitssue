@@ -53,6 +53,9 @@ class Printer(PrinterInterface):
 
                 self.color_printer.print_labels(issue.get('labels', list()))
 
+                if issue['description']:
+                    print(issue['description'])
+
                 print()
         else:
             print('No issue could be found.')
