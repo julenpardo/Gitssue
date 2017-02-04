@@ -91,12 +91,13 @@ class Github(RemoteRepoInterface):
 
         response_comments = self.requester.get_request(request)
 
-        for comment in response_comments:
-            issues_comments.append({
-                'author': comment['user']['login'],
-                'created_at': comment['created_at'],
-                'updated_at': comment['updated_at'],
-                'body': comment['body'],
-            })
+        if response_comments:
+            for comment in response_comments:
+                issues_comments.append({
+                    'author': comment['user']['login'],
+                    'created_at': comment['created_at'],
+                    'updated_at': comment['updated_at'],
+                    'body': comment['body'],
+                })
 
         return issues_comments
