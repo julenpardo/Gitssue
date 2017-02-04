@@ -39,7 +39,14 @@ class BaseController(ArgparseController):
                 help='Show all the issues (also closed ones).',
                 action='store_true'
             ),
-        )],
+        ), (
+            ['-d', '--desc'],
+            dict(
+                help='Get description of the issue.',
+                action='store_true'
+            ),
+        ),
+        ],
     )
     def list(self):
         """
@@ -52,6 +59,7 @@ class BaseController(ArgparseController):
                 username,
                 repo,
                 self.app.pargs.all,
+                self.app.pargs.desc,
             )
         except TypeError:
             issue_list = False
