@@ -35,3 +35,13 @@ class RemoteRepoInterface(metaclass=ABCMeta):
         :return: a dictionary with the title and the body message of each issue id.
         """
         pass
+
+    @abstractmethod
+    def get_issue_comments(self, username, repository, issue_number):
+        """
+        Gets the comments made in the issue ticket.
+        :param username: the user owning the repository.
+        :param repository: the repository to look the issues at.
+        :param issue_number: the issue number to query the comments to.
+        :return: the comments.
+        """

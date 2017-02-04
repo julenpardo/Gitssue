@@ -72,3 +72,32 @@ class Github(RemoteRepoInterface):
                 issues_descriptions.append(issue_description)
 
         return issues_descriptions
+
+    def get_issue_comments(self, username, repository, issue_number):
+        """
+        Gets the comments made in the issue ticket.
+        :param username: the user owning the repository.
+        :param repository: the repository to look the issues at.
+        :param issue_number: the issue number to query the comments to.
+        """
+
+        request = '{0}/repos/{1}/{2}/issues/{3}/comments'.format(
+            self.API_URL,
+            username,
+            repository,
+            issue_number
+        )
+        issues_comments = []
+
+        response_comments = self.requester.get_request(request)
+
+        if response_comments:
+            for comment in response_comments:
+                issues_comments.append({
+                    'author': comment['user']['login'],
+                    'created_at': comment['created_at'],
+                    'updated_at': comment['updated_at'],
+                    'body': comment['body'],
+                })
+
+        return issues_comments
