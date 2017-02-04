@@ -13,7 +13,7 @@ class RemoteRepoInterface(metaclass=ABCMeta):
         self.requester = requester
 
     @abstractmethod
-    def get_issue_list(self, username, repository, show_all=False):
+    def get_issue_list(self, username, repository, show_all=False, get_description=False):
         """
         Gets the open issue list of the given repository of the given user.
 
