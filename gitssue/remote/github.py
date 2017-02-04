@@ -94,8 +94,8 @@ class Github(RemoteRepoInterface):
         for comment in response_comments:
             issues_comments.append({
                 'author': comment['user']['login'],
-                'created': comment['created_at'],
-                'updated': comment['updated_at'],
+                'created_at': comment['created_at'],
+                'updated_at': comment['updated_at'],
                 'body': comment['body'],
             })
 

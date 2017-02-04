@@ -93,3 +93,52 @@ class GithubTest(unittest.TestCase):
         expected_false = github.get_issues_description('a', 'b', [])
 
         self.assertFalse(expected_false)
+
+    def test_get_issue_comments(self):
+        mocked_return = [
+            {
+                'user': {
+                    'login': 'julenpardo'
+                },
+                'created_at': 'now',
+                'updated_at': 'now',
+                'body': 'this is a comment for some issue.',
+            }
+        ]
+        self.mocked_request_response = mocked_return
+        requester_mock = mock.Mock()
+        requester_mock.get_request = self.mock_get_request
+
+        github = Github(requester_mock)
+
+        expected = mocked_return[0]
+        actual = github.get_issue_comments('a', 'b', 1)[0]
+
+        self.assertEqual(
+            expected['user']['login'],
+            actual['author']
+        )
+        self.assertEqual(
+            expected['created_at'],
+            actual['created_at']
+        )
+        self.assertEqual(
+            expected['updated_at'],
+            actual['updated_at']
+        )
+        self.assertEqual(
+            expected['body'],
+            actual['body']
+        )
+
+    def test_get_issue_comments_no_comments(self):
+        mocked_return = []
+        self.mocked_request_response = mocked_return
+        requester_mock = mock.Mock()
+        requester_mock.get_request = self.mock_get_request
+
+        github = Github(requester_mock)
+
+        actual_expected_empty_list = github.get_issue_comments('a', 'b', 1)
+
+        self.assertFalse(actual_expected_empty_list)
