@@ -57,7 +57,7 @@ class Printer(PrinterInterface):
 
                 self.color_printer.print_labels(issue.get('labels', list()))
 
-                if issue['description']:
+                if issue.get('description'):
                     print(issue['description'])
 
                 print()
