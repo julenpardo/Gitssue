@@ -35,3 +35,33 @@ def get_remote_url(shell_wrapper):
         raise RepoNotFoundException
 
     return url
+
+
+def get_remotes_urls(shell_wrapper):
+    """
+    Gets the remotes list with the 'git remote --verbose' command.
+    The command returns two URLs for each remote, for fetching and pushing, so
+    after creating the list, we have to remove the duplicates.
+    :param shell_wrapper: the wrapper to execute the command with.
+    :return: list of remote name with its URL.
+    """
+    command = 'git remote --verbose'
+
+    remotes_info = shell_wrapper.execute_command(command)
+
+    if not remotes_info:
+        raise RepoNotFoundException
+
+    duplicated_remotes_list = []
+
+    for remote_info in remotes_info.splitlines():
+        remote_name, url = remote_info.split()[:2]
+        duplicated_remotes_list.append([remote_name, url])
+
+    remotes_list = []
+
+    for remote in duplicated_remotes_list:
+        if remote not in remotes_list:
+            remotes_list.append(remote)
+
+    return remotes_list
