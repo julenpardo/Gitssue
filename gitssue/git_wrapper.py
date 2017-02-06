@@ -1,6 +1,26 @@
 """ Wrapper for executing Git commands. """
 from gitssue.repo_not_found_exception import RepoNotFoundException
 
+SUPPORTED_REMOTES = ['github']
+
+
+def discard_not_supported_remotes(remotes_url):
+    """
+    Discards the not supported remotes. For the moment, only Github is supported.
+    :param remotes_url: List of remotes names with its URL, e.g.:
+    [['origin', 'git@github.com:julenpardo/Gitssue.git]]
+    :return: The list in the same format as received, but discarding the not supported
+    origins.
+    """
+    for remote in remotes_url:
+        remote_url = remote[1]
+        is_supported = any(supported_remote in remote_url.lower() for supported_remote in SUPPORTED_REMOTES)
+
+        if not is_supported:
+            remotes_url.remove(remote)
+
+    return remotes_url
+
 
 def get_username_and_repo(shell_wrapper):
     """
