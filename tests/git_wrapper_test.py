@@ -99,3 +99,33 @@ class GitWrapperTest(unittest.TestCase):
 
         with self.assertRaises(RepoNotFoundException):
             get_remotes_urls(shell_wrapper_mock)
+
+    def test_discard_not_supported_remotes(self):
+        """
+        In the current version, only "Github" is supported.
+        :return:
+        """
+        input = [
+            ['origin1', 'foo@GiThUb.foo'],
+            ['origin2', 'foo@gitlab.foo'],
+            ['origin3', 'github.com/foo/bar'],
+            ['origin4', 'foo@bitbucket.foo'],
+        ]
+        expected = [
+            ['origin1', 'foo@GiThUb.foo'],
+            ['origin3', 'github.com/foo/bar'],
+        ]
+        actual = discard_not_supported_remotes(input)
+
+        self.assertEqual(expected, actual)
+
+    def test_discard_not_supported_remotes_empty_list(self):
+        """
+        In the current version, only "Github" is supported.
+        :return:
+        """
+        input = []
+        expected = []
+        actual = discard_not_supported_remotes(input)
+
+        self.assertEqual(expected, actual)
