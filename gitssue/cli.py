@@ -52,19 +52,23 @@ class BaseController(ArgparseController):
         """
         The method that lists the issues.
         """
-        username, repo = git_wrapper.get_username_and_repo(self.deps.shell)
+        usernames_and_repo = git_wrapper.get_username_and_repo(self.deps.shell)
 
-        try:
-            issue_list = self.deps.remote.get_issue_list(
-                username,
-                repo,
-                self.app.pargs.all,
-                self.app.pargs.desc,
-            )
-        except TypeError:
-            issue_list = False
+        if len(usernames_and_repo) == 1:
+            try:
+                username, repo = usernames_and_repo[0]
+                issue_list = self.deps.remote.get_issue_list(
+                    username,
+                    repo,
+                    self.app.pargs.all,
+                    self.app.pargs.desc,
+                )
+            except TypeError:
+                issue_list = False
 
-        self.deps.printer.print_issue_list_with_labels(issue_list)
+            self.deps.printer.print_issue_list_with_labels(issue_list)
+        else:
+            print('More than one remote was detected. Gitssue does not offer support for this yet.')
 
     @expose(
         help='Get description of the given issue.',

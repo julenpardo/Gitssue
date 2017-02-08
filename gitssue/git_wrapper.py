@@ -29,14 +29,18 @@ def get_username_and_repo(shell_wrapper):
     :return: username and repository name.
     """
     try:
-        remote_url = get_remote_url(shell_wrapper)
+        usernames_and_repos = []
+        for remote in discard_not_supported_remotes(get_remotes_urls(shell_wrapper)):
+            remote_url = remote[1]
+            username_and_repo = remote_url.replace('https://github.com/', '')
+            username_and_repo = username_and_repo.replace('git@github.com:', '')
+            username_and_repo = username_and_repo.replace('.git', '')
+            username_and_repo = username_and_repo.replace('\n', '')
+            username, repo = username_and_repo.split('/')
 
-        username_and_repo = remote_url.replace('https://github.com/', '')
-        username_and_repo = username_and_repo.replace('.git', '')
-        username_and_repo = username_and_repo.replace('\n', '')
-        username_and_repo = username_and_repo.split('/')
+            usernames_and_repos.append([username, repo])
 
-        return username_and_repo[0], username_and_repo[1]
+        return usernames_and_repos
     except RepoNotFoundException:
         raise
 
