@@ -1,10 +1,11 @@
+import os
+import sys
 import unittest
 from unittest import mock
-import sys, os
+
 sys.path.append(os.path.abspath('..'))
-from gitssue.git_wrapper import *
-from gitssue.shell_wrapper import *
-from gitssue.repo_not_found_exception import RepoNotFoundException
+from gitssue.git.git_wrapper import *
+from gitssue.git.repo_not_found_exception import RepoNotFoundException
 
 
 class GitWrapperTest(unittest.TestCase):

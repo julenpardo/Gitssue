@@ -1,10 +1,10 @@
 """ Dependency injection. """
-from remote.dummy import Dummy
-from remote.github import Github
-from shell_wrapper import ShellWrapper
-from printer.printer import Printer
-from printer.colorconsole_color_printer import ColorConsoleColorPrinter
 from request.requests import Requests
+
+from git.shell_wrapper import ShellWrapper
+from printer.colorconsole_color_printer import ColorConsoleColorPrinter
+from printer.printer import Printer
+from remote.dummy import Dummy
 
 
 class Dependencies:

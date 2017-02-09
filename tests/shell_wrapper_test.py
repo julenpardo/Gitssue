@@ -1,8 +1,9 @@
+import os
+import sys
 import unittest
 from unittest import mock
-import sys, os
+
 sys.path.append(os.path.abspath('..'))
-from gitssue.shell_wrapper import *
 
 
 class ShellWrapperTest(unittest.TestCase):

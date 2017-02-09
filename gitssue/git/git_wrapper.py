@@ -1,5 +1,6 @@
 """ Wrapper for executing Git commands. """
-from gitssue.repo_not_found_exception import RepoNotFoundException
+from gitssue.git.repo_not_found_exception import RepoNotFoundException
+
 
 SUPPORTED_REMOTES = ['github']
 

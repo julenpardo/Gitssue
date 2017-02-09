@@ -4,8 +4,7 @@ from cement.core.foundation import CementApp
 from cement.ext.ext_argparse import ArgparseController, expose
 
 from dependencies import Dependencies
-
-import git_wrapper
+from git import git_wrapper
 
 
 class BaseController(ArgparseController):
