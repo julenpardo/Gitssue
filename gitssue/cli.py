@@ -45,7 +45,7 @@ class BaseController(ArgparseController):
                 action='store_true'
             ),
         ),
-        ],
+                  ],
     )
     def list(self):
         """
