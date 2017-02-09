@@ -51,10 +51,11 @@ class GitWrapperTest(unittest.TestCase):
         """
         Test getting the username and repository name for the current repository.
         """
-        expected = ('julenpardo', 'Gitssue')
-
+        mocked_return = "origin git@github.com:julenpardo/Gitssue.git (fetch)"
         shell_wrapper_mock = mock.Mock()
-        shell_wrapper_mock.execute_command = self.fake_execute_command
+        self.mock_response = mocked_return
+        shell_wrapper_mock.execute_command = self.mock_execute_command
+        expected = [['julenpardo', 'Gitssue']]
 
         actual = get_username_and_repo(shell_wrapper_mock)
 

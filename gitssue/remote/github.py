@@ -69,11 +69,10 @@ class Github(RemoteRepoInterface):
                 )
 
                 full_issue = self.requester.get_request(request)
-                print(request)
 
                 issue_description = {
                     'number': issue_number,
-                    'labels': full_issue['labels'],
+                    'labels': full_issue.get('labels'),
                     'description': {
                         'title': full_issue['title'],
                         'body': full_issue['body'],

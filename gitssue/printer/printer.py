@@ -37,7 +37,7 @@ class Printer(PrinterInterface):
                 )
                 self.color_printer.print_colored_line(issue_title, self.ISSUE_TITLE_COLOR)
 
-                if issue['labels']:
+                if issue.get('labels'):
                     self.color_printer.print_labels(issue['labels'])
 
                 print(issue['description']['body'])
