@@ -80,21 +80,26 @@ class BaseController(ArgparseController):
         """
         Get description of the given issue.
         """
-        username, repo = git_wrapper.get_username_and_repo(self.deps.shell)
-        issue_numbers = self.app.pargs.issue_numbers
+        usernames_and_repo = git_wrapper.get_username_and_repo(self.deps.shell)
 
-        if not all(number.isdigit() for number in issue_numbers):
-            print('Issue numbers must be numbers.')
-        elif issue_numbers:
-            issues = self.deps.remote.get_issues_description(
-                username,
-                repo,
-                issue_numbers,
-            )
+        if len(usernames_and_repo) == 1:
+            username, repo = usernames_and_repo[0]
+            issue_numbers = self.app.pargs.issue_numbers
 
-            self.deps.printer.print_issue_list_with_desc(issues)
+            if not all(number.isdigit() for number in issue_numbers):
+                print('Issue numbers must be numbers.')
+            elif issue_numbers:
+                issues = self.deps.remote.get_issues_description(
+                    username,
+                    repo,
+                    issue_numbers,
+                )
+
+                self.deps.printer.print_issue_list_with_desc(issues)
+            else:
+                self.app.args.parse_args(['desc', '--help'])
         else:
-            self.app.args.parse_args(['desc', '--help'])
+            print('More than one remote was detected. Gitssue does not offer support for this yet.')
 
 
 class Gitssue(CementApp):
