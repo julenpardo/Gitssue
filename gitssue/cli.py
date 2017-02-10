@@ -101,6 +101,38 @@ class BaseController(ArgparseController):
         else:
             print('More than one remote was detected. Gitssue does not offer support for this yet.')
 
+    @expose(
+        help='Get the comment thread of the given issue.',
+        aliases=['t'],
+        arguments=[
+            (['issue_number'], dict(action='store', nargs=1)),
+        ]
+    )
+    def thread(self):
+        """
+        Get comment thread the given issue.
+        """
+        usernames_and_repo = git_wrapper.get_username_and_repo(self.deps.shell)
+
+        if len(usernames_and_repo) == 1:
+            username, repo = usernames_and_repo[0]
+            issue_number = self.app.pargs.issue_number[0]
+
+            if not issue_number.isdigit():
+                print('Issue number must be a number.')
+            elif issue_number:
+                comment_thread = self.deps.remote.get_issue_comments(
+                    username,
+                    repo,
+                    issue_number,
+                )
+
+                self.deps.printer.print_issue_comment_thread(comment_thread)
+            else:
+                self.app.args.parse_args(['desc', '--help'])
+        else:
+            print('More than one remote was detected. Gitssue does not offer support for this yet.')
+
 
 class Gitssue(CementApp):
     """
