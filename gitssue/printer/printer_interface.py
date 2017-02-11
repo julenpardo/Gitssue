@@ -31,3 +31,11 @@ class PrinterInterface(metaclass=ABCMeta):
         Prints the issue list with labels.
         :param issues: the issue list.
         """
+
+    @abstractmethod
+    def print_issue_comment_thread(self, comment_thread):
+        """
+        Prints the given comment thread belonging to the issue.
+        :param comment_thread: the thread of comments.
+        """
+        pass

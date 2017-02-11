@@ -5,6 +5,8 @@ from gitssue.printer.printer_interface import PrinterInterface
 class Printer(PrinterInterface):
 
     ISSUE_TITLE_COLOR = 'c3a000'
+    COMMENT_AUTHOR_COLOR = 'c3a000'
+    COMMENT_DATE_COLOR = 'c3a000'
 
     def __init__(self, color_printer):
         """
@@ -63,3 +65,21 @@ class Printer(PrinterInterface):
                 print()
         else:
             print('No issue could be found.')
+
+    def print_issue_comment_thread(self, comment_thread):
+        """
+        Prints the given comment thread belonging to the issue.
+        :param comment_thread: the thread of comments.
+        """
+        if comment_thread:
+            for comment in comment_thread:
+                author = '\n\nAuthor: {0}'.format(comment['author'])
+                self.color_printer.print_colored_line(author, self.COMMENT_AUTHOR_COLOR)
+
+                date = 'Date: {0}'.format(comment['created_at'])
+                self.color_printer.print_colored_line(date, self.COMMENT_DATE_COLOR)
+
+                print('\n{0}'.format(comment['body']))
+
+        else:
+            print('No comment could be found.')
