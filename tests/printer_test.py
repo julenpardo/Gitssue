@@ -104,3 +104,43 @@ class PrinterTest(unittest.TestCase):
         actual = temp_stdout.getvalue().strip()
 
         self.assertEqual(expected, actual)
+
+    def test_print_issue_comment_thread(self):
+        comments_input = [
+            {
+                'author': 'Julen Pardo',
+                'created_at': 'Right now',
+                'updated_at': 'never',
+                'body': 'this is the first comment'
+            }, {
+                'author': 'Pardo, Julen',
+                'created_at': 'A bit later',
+                'updated_at': 'never',
+                'body': 'this is the second and last comment'
+            },
+        ]
+        expected = 'Author: Julen Pardo\n'
+        expected += 'Date: Right now\n'
+        expected += '\nthis is the first comment\n'
+        expected += '\n\nAuthor: Pardo, Julen\n'
+        expected += 'Date: A bit later\n'
+        expected += '\nthis is the second and last comment'
+
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            self.printer.print_issue_comment_thread(comments_input)
+
+        actual = temp_stdout.getvalue().strip()
+
+        self.assertEqual(expected, actual)
+
+    def test_print_issue_comment_thread_no_comment(self):
+        expected = 'No comment could be found.'
+
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            self.printer.print_issue_comment_thread(())
+
+        actual = temp_stdout.getvalue().strip()
+
+        self.assertEqual(expected, actual)
