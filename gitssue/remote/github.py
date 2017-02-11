@@ -1,5 +1,6 @@
 """ Github module. """
 from gitssue.remote.remote_repo_interface import RemoteRepoInterface
+from gitssue.request.unsuccessful_request_exception import UnsuccessfulRequestException
 
 
 class Github(RemoteRepoInterface):
@@ -26,27 +27,31 @@ class Github(RemoteRepoInterface):
         if show_all:
             request += '?state=all'
 
-        response_issues = self.requester.get_request(request)
-        issue_list = []
-        description = ''
+        try:
+            response_issues = self.requester.get_request(request)
+        except UnsuccessfulRequestException as unsuccessful_request:
+            raise self.handle_request_exception(unsuccessful_request)
+        else:
+            issue_list = []
+            description = ''
 
-        if response_issues:
-            for issue in response_issues:
-                if get_description:
-                    description = self.get_issues_description(
-                        username,
-                        repository,
-                        [issue['number']]
-                    )[0]['description']['body']
+            if response_issues:
+                for issue in response_issues:
+                    if get_description:
+                        description = self.get_issues_description(
+                            username,
+                            repository,
+                            [issue['number']]
+                        )[0]['description']['body']
 
-                issue_list.append({
-                    'number': issue['number'],
-                    'title': issue['title'],
-                    'labels': issue['labels'],
-                    'description': description
-            })
+                    issue_list.append({
+                        'number': issue['number'],
+                        'title': issue['title'],
+                        'labels': issue['labels'],
+                        'description': description
+                })
 
-        return issue_list
+            return issue_list
 
     def get_issues_description(self, username, repository, issue_numbers):
         """
@@ -111,3 +116,12 @@ class Github(RemoteRepoInterface):
                 })
 
         return issues_comments
+
+    def handle_request_exception(self, exception):
+        rate_limit_hit = exception.code == 403\
+                         and exception.headers['X-RateLimit-Remainig'] <= 0
+
+        if rate_limit_hit:
+            exception.message = '<rate limit hit>'
+
+        raise exception
