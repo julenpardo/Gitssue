@@ -45,3 +45,12 @@ class RemoteRepoInterface(metaclass=ABCMeta):
         :param issue_number: the issue number to query the comments to.
         :return: the comments.
         """
+
+    @abstractmethod
+    def parse_request_exception(self, exception):
+        """
+        Handles the error occurred during the request.
+        :param exception:
+        :return:
+        """
+        pass

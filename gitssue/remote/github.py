@@ -1,5 +1,6 @@
 """ Github module. """
 from gitssue.remote.remote_repo_interface import RemoteRepoInterface
+from gitssue.request.unsuccessful_request_exception import UnsuccessfulRequestException
 
 
 class Github(RemoteRepoInterface):
@@ -27,6 +28,7 @@ class Github(RemoteRepoInterface):
             request += '?state=all'
 
         response_issues = self.requester.get_request(request)
+
         issue_list = []
         description = ''
 
@@ -100,7 +102,6 @@ class Github(RemoteRepoInterface):
         issues_comments = []
 
         response_comments = self.requester.get_request(request)
-
         if response_comments:
             for comment in response_comments:
                 issues_comments.append({
@@ -111,3 +112,22 @@ class Github(RemoteRepoInterface):
                 })
 
         return issues_comments
+
+    def parse_request_exception(self, exception):
+        """
+        Parses the generated exception during the request, necessary for special cases,
+        e.g., when the API limit is hit.
+
+        @TODO: make messages more specific.
+        :param exception: (UnsuccessfulRequestException) The exception object generated in the request.
+        :return: The error message that will be displayed to the user.
+        """
+        message = 'An error occurred in the request.'
+
+        rate_limit_hit = exception.code == 403\
+            and exception.headers['X-RateLimit-Remaining'] == 0
+
+        if rate_limit_hit:
+            message = 'API limit hit.'
+
+        return message

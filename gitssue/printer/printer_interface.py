@@ -39,3 +39,10 @@ class PrinterInterface(metaclass=ABCMeta):
         :param comment_thread: the thread of comments.
         """
         pass
+
+    @abstractmethod
+    def print_error(self, error):
+        """
+        Prints an error.
+        :param error: The error to print.
+        """

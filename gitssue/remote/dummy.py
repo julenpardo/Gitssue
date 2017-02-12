@@ -85,3 +85,6 @@ class Dummy(RemoteRepoInterface):
                 'body': 'another comment',
             }
         )
+
+    def parse_request_exception(self, exception):
+        pass

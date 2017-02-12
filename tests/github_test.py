@@ -3,6 +3,7 @@ from unittest import mock
 import sys, os
 sys.path.append(os.path.abspath('..'))
 from gitssue.remote.github import Github
+from gitssue.request.unsuccessful_request_exception import UnsuccessfulRequestException
 
 
 class GithubTest(unittest.TestCase):
@@ -142,3 +143,33 @@ class GithubTest(unittest.TestCase):
         actual_expected_empty_list = github.get_issue_comments('a', 'b', 1)
 
         self.assertFalse(actual_expected_empty_list)
+
+    def test_parse_request_exception_api_limit(self):
+        exception_code = 403
+        exception_headers = {
+            'X-RateLimit-Remaining': 0
+        }
+        input_exception = UnsuccessfulRequestException(exception_code, exception_headers)
+
+        requester_mock = mock.Mock()
+        github = Github(requester_mock)
+
+        expected = 'API limit hit.'
+        actual = github.parse_request_exception(input_exception)
+
+        self.assertEqual(expected, actual)
+
+    def test_parse_request_exception_other_exception(self):
+        exception_code = 403
+        exception_headers = {
+            'X-RateLimit-Remaining': 1
+        }
+        input_exception = UnsuccessfulRequestException(exception_code, exception_headers)
+
+        requester_mock = mock.Mock()
+        github = Github(requester_mock)
+
+        expected = 'An error occurred in the request.'
+        actual = github.parse_request_exception(input_exception)
+
+        self.assertEqual(expected, actual)
