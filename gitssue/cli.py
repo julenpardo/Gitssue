@@ -3,10 +3,14 @@
 from cement.core.foundation import CementApp
 from cement.ext.ext_argparse import ArgparseController, expose
 
-import controller
+from dependencies import Dependencies
+from controller import Controller
 
 
 class BaseController(ArgparseController):
+
+    controller = Controller(Dependencies())
+
     """
     Base Cement controller class.
     """
@@ -46,7 +50,7 @@ class BaseController(ArgparseController):
         """
         The method that lists the issues.
         """
-        controller.list(self.app.pargs.all, self.app.pargs.desc)
+        self.controller.list(self.app.pargs.all, self.app.pargs.desc)
 
     @expose(
         help='Get description of the given issue.',
@@ -59,7 +63,7 @@ class BaseController(ArgparseController):
         """
         Get description of the given issue.
         """
-        show_help = controller.desc(self.app.pargs.issue_numbers)
+        show_help = self.controller.desc(self.app.pargs.issue_numbers)
 
         if show_help:
             self.app.args.parse_args(['desc', '--help'])
@@ -75,7 +79,7 @@ class BaseController(ArgparseController):
         """
         Get comment thread the given issue.
         """
-        show_help = controller.thread(self.app.pargs.issue_number[0])
+        show_help = self.controller.thread(self.app.pargs.issue_number[0])
 
         if show_help:
             self.app.args.parse_args(['desc', '--help'])
