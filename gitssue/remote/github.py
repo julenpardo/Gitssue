@@ -114,12 +114,20 @@ class Github(RemoteRepoInterface):
         return issues_comments
 
     def parse_request_exception(self, exception):
-        message = '<generic error>'
+        """
+        Parses the generated exception during the request, necessary for special cases,
+        e.g., when the API limit is hit.
+
+        @TODO: make messages more specific.
+        :param exception: (UnsuccessfulRequestException) The exception object generated in the request.
+        :return: The error message that will be displayed to the user.
+        """
+        message = 'An error occurred in the request.'
 
         rate_limit_hit = exception.code == 403\
-                         and exception.headers['X-RateLimit-Remaining'] == 0
+            and exception.headers['X-RateLimit-Remaining'] == 0
 
         if rate_limit_hit:
-            message = '<rate limit hit>'
+            message = 'API limit hit.'
 
         return message

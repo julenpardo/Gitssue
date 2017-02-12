@@ -144,3 +144,16 @@ class PrinterTest(unittest.TestCase):
         actual = temp_stdout.getvalue().strip()
 
         self.assertEqual(expected, actual)
+
+    def test_print_error(self):
+        input = 'this is an error.'
+        expected = 'Error\n'
+        expected += 'this is an error.'
+
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            self.printer.print_error(input)
+
+        actual = temp_stdout.getvalue().strip()
+
+        self.assertEqual(expected, actual)
