@@ -47,7 +47,7 @@ class RemoteRepoInterface(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def handle_request_exception(self, exception):
+    def parse_request_exception(self, exception):
         """
         Handles the error occurred during the request.
         :param exception:

@@ -7,6 +7,7 @@ class Printer(PrinterInterface):
     ISSUE_TITLE_COLOR = 'c3a000'
     COMMENT_AUTHOR_COLOR = 'c3a000'
     COMMENT_DATE_COLOR = 'c3a000'
+    ERROR_COLOR = 'ff0000'
 
     def __init__(self, color_printer):
         """
@@ -83,3 +84,11 @@ class Printer(PrinterInterface):
 
         else:
             print('No comment could be found.')
+
+    def print_error(self, error):
+        """
+        Prints an error.
+        :param error: The error to print.
+        """
+        self.color_printer.print_colored_line('Error', self.ERROR_COLOR)
+        print(error + '\n')

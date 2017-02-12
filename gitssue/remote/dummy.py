@@ -86,5 +86,5 @@ class Dummy(RemoteRepoInterface):
             }
         )
 
-    def handle_request_exception(self, exception):
+    def parse_request_exception(self, exception):
         pass

@@ -113,11 +113,13 @@ class Github(RemoteRepoInterface):
 
         return issues_comments
 
-    def handle_request_exception(self, exception):
+    def parse_request_exception(self, exception):
+        message = '<generic error>'
+
         rate_limit_hit = exception.code == 403\
                          and exception.headers['X-RateLimit-Remaining'] == 0
 
         if rate_limit_hit:
-            exception.message = '<rate limit hit>'
+            message = '<rate limit hit>'
 
-        raise exception
+        return message
