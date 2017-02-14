@@ -172,7 +172,40 @@ class ControllerTest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_desc(self):
-        pass
+        mocked_return = [{
+            'number': '1',
+            'description': {
+                'title': 'first issue',
+                'body': 'body of first issue',
+            }},
+            {
+            'number': '2',
+            'description': {
+                'title': 'second issue',
+                'body': 'body of second issue',
+            }
+        }]
+
+        self.mocked_remote_get_issues_description_return = mocked_return
+        remote_mock = mock.Mock()
+        remote_mock.get_issues_description = self.mock_remote_get_issues_description
+        self.controller.deps.remote = remote_mock
+
+        expected = ''
+        for issue in mocked_return:
+            expected += '#{0}: {1}\n'.format(issue['number'], issue['description']['title'])
+            expected += '{0}\n'.format(issue['description']['body'])
+            expected += '\n\n'
+
+        expected = expected[:-3]
+
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            self.controller.desc('1')  # We need a number to pass the condition.
+
+        actual = temp_stdout.getvalue().strip()
+
+        self.assertEqual(expected, actual)
 
     def test_desc_request_error(self):
         expected = 'Mocked exception'
@@ -237,7 +270,39 @@ class ControllerTest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_thread(self):
-        pass
+        mocked_return = [
+            {
+                'author': 'Julen Pardo',
+                'created_at': 'Right now',
+                'updated_at': 'never',
+                'body': 'this is the first comment'
+            }, {
+                'author': 'Pardo, Julen',
+                'created_at': 'A bit later',
+                'updated_at': 'never',
+                'body': 'this is the second and last comment'
+            },
+        ]
+
+        self.mocked_remote_get_issue_comments_return = mocked_return
+        remote_mock = mock.Mock()
+        remote_mock.get_issue_comments = self.mock_remote_get_issue_comments
+        self.controller.deps.remote = remote_mock
+
+        expected = 'Author: Julen Pardo\n'
+        expected += 'Date: Right now\n'
+        expected += '\nthis is the first comment\n'
+        expected += '\n\nAuthor: Pardo, Julen\n'
+        expected += 'Date: A bit later\n'
+        expected += '\nthis is the second and last comment'
+
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            self.controller.thread('1')  # We need a number to pass the condition.
+
+        actual = temp_stdout.getvalue().strip()
+
+        self.assertEqual(expected, actual)
 
     def test_thread_invalid_issue_number(self):
         input = 'This is not a number, I think.'
