@@ -16,14 +16,29 @@ class Printer(PrinterInterface):
         """
         self.color_printer = color_printer
 
-    def print_issue_list(self, issues):
+    def print_issue_list(self, issues, show_description=False):
         """
-        Prints the issue list, in "id: label" format.
-        :param issues: The issue dictionary.
+        Prints the issue list with labels, if any, these ones with colors.
+        The issue title is printed with colors only if the descriptions for these are going
+        to be displayed.
+        :param issues: the issue list.
+        :param show_description: if show also the descriptions or not.
         """
         if issues:
             for issue in issues:
-                print('#{0}: {1}'.format(issue['number'], issue['title']))
+                issue_title = '#{0}: {1}'.format(issue['number'], issue['title'])
+
+                if show_description:
+                    self.color_printer.print_colored_line(issue_title, self.ISSUE_TITLE_COLOR)
+                else:
+                    print(issue_title)
+
+                self.color_printer.print_labels(issue.get('labels', list()))
+
+                if show_description and issue.get('description'):
+                    print(issue['description'])
+
+                print()
         else:
             print('No issue could be found.')
 
@@ -48,25 +63,6 @@ class Printer(PrinterInterface):
         else:
             print('No issue could be found.')
 
-    def print_issue_list_with_labels(self, issues):
-        """
-        Prints the issue list with labels.
-        :param issues: the issue list.
-        """
-        if issues:
-            for issue in issues:
-                issue_title = '#{0}: {1}'.format(issue['number'], issue['title'])
-                self.color_printer.print_colored_line(issue_title, self.ISSUE_TITLE_COLOR)
-
-                self.color_printer.print_labels(issue.get('labels', list()))
-
-                if issue.get('description'):
-                    print(issue['description'])
-
-                print()
-        else:
-            print('No issue could be found.')
-
     def print_issue_comment_thread(self, comment_thread):
         """
         Prints the given comment thread belonging to the issue.
@@ -74,13 +70,13 @@ class Printer(PrinterInterface):
         """
         if comment_thread:
             for comment in comment_thread:
-                author = '\n\nAuthor: {0}'.format(comment['author'])
+                author = 'Author: {0}'.format(comment['author'])
                 self.color_printer.print_colored_line(author, self.COMMENT_AUTHOR_COLOR)
 
                 date = 'Date: {0}'.format(comment['created_at'])
                 self.color_printer.print_colored_line(date, self.COMMENT_DATE_COLOR)
 
-                print('\n{0}'.format(comment['body']))
+                print('\n{0}\n\n'.format(comment['body']))
 
         else:
             print('No comment could be found.')

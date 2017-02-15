@@ -21,37 +21,6 @@ class PrinterTest(unittest.TestCase):
         color_printer = DummyColorPrinter()
         self.printer = Printer(color_printer)
 
-    def test_print_issue_list(self):
-        issues_input = (
-            {
-                'number': '1',
-                'title': 'first issue',
-            },
-            {
-                'number': '2',
-                'title': 'second issue',
-            },
-            {
-                'number': '3',
-                'title': 'third and last issue',
-            },
-        )
-
-        expected = ''
-
-        for issue in issues_input:
-            expected += '#{0}: {1}\n'.format(issue['number'], issue['title'])
-
-        expected = expected[:-1]
-
-        temp_stdout = StringIO()
-        with contextlib.redirect_stdout(temp_stdout):
-            self.printer.print_issue_list(issues_input)
-
-        actual = temp_stdout.getvalue().strip()
-
-        self.assertEqual(expected, actual)
-
     def test_print_issue_list_empty_dict(self):
         expected = 'No issue could be found.'
 

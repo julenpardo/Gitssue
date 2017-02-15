@@ -27,7 +27,7 @@ class Controller:
                 error = self.deps.remote.parse_request_exception(unsuccessful_request)
 
             if not error:
-                self.deps.printer.print_issue_list_with_labels(issue_list)
+                self.deps.printer.print_issue_list(issue_list, description)
             else:
                 self.deps.printer.print_error(error)
         else:

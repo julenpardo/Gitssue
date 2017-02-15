@@ -10,10 +10,11 @@ class PrinterInterface(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def print_issue_list(self, issues):
+    def print_issue_list(self, issues, show_description=False):
         """
-        Prints the issue list.
-        :param issues: The issue list.
+        Prints the issue list, also with labels, if any.
+        :param issues: the issue list.
+        :param show_description: if show also the descriptions or not.
         """
         pass
 
@@ -24,13 +25,6 @@ class PrinterInterface(metaclass=ABCMeta):
         :param issues: the issue list.
         """
         pass
-
-    @abstractmethod
-    def print_issue_list_with_labels(self, issues):
-        """
-        Prints the issue list with labels.
-        :param issues: the issue list.
-        """
 
     @abstractmethod
     def print_issue_comment_thread(self, comment_thread):
@@ -46,3 +40,4 @@ class PrinterInterface(metaclass=ABCMeta):
         Prints an error.
         :param error: The error to print.
         """
+        pass
