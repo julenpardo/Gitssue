@@ -8,6 +8,9 @@ from controller import Controller
 
 
 class BaseController(ArgparseController):
+    """
+    CLI module (the main module of the app, since it's a CLI app).
+    """
 
     controller = Controller(Dependencies())
 

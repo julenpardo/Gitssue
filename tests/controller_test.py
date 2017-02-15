@@ -158,7 +158,8 @@ class ControllerTest(unittest.TestCase):
         original_shell = self.controller.deps.shell
         self.controller.deps.shell = shell_wrapper_mock
 
-        expected = 'More than one remote was detected. Gitssue does not offer support for this yet.'
+        expected = 'Error\n'
+        expected += 'More than one remote was detected. Gitssue does not offer support for this yet.'
 
         temp_stdout = StringIO()
         with contextlib.redirect_stdout(temp_stdout):
@@ -243,7 +244,8 @@ class ControllerTest(unittest.TestCase):
         original_shell = self.controller.deps.shell
         self.controller.deps.shell = shell_wrapper_mock
 
-        expected = 'More than one remote was detected. Gitssue does not offer support for this yet.'
+        expected = 'Error\n'
+        expected += 'More than one remote was detected. Gitssue does not offer support for this yet.'
 
         temp_stdout = StringIO()
         with contextlib.redirect_stdout(temp_stdout):
@@ -264,7 +266,8 @@ class ControllerTest(unittest.TestCase):
             self.controller.desc(input)
             pass
 
-        expected = 'Issue numbers must be numbers.'
+        expected = 'Error\n'
+        expected += 'Issue number(s) must be number(s).'
         actual = temp_stdout.getvalue().strip()
 
         self.assertEqual(expected, actual)
@@ -312,7 +315,8 @@ class ControllerTest(unittest.TestCase):
             self.controller.thread(input)
             pass
 
-        expected = 'Issue number must be a number.'
+        expected = 'Error\n'
+        expected += 'Issue number(s) must be number(s).'
         actual = temp_stdout.getvalue().strip()
 
         self.assertEqual(expected, actual)
@@ -327,7 +331,8 @@ class ControllerTest(unittest.TestCase):
         original_shell = self.controller.deps.shell
         self.controller.deps.shell = shell_wrapper_mock
 
-        expected = 'More than one remote was detected. Gitssue does not offer support for this yet.'
+        expected = 'Error\n'
+        expected += 'More than one remote was detected. Gitssue does not offer support for this yet.'
 
         temp_stdout = StringIO()
         with contextlib.redirect_stdout(temp_stdout):
