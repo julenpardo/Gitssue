@@ -9,6 +9,8 @@ from gitssue.request.unsuccessful_request_exception import UnsuccessfulRequestEx
 
 class Requests(RequestInterface):
 
+    TIMEOUT = 0.0000001
+
     def get_request(self, request):
         """
         Executes a GET request.
@@ -16,7 +18,7 @@ class Requests(RequestInterface):
         :param request: the GET request to execute.
         :return: response JSON object; False if the HTTP status code distinct to 200.
         """
-        response = requests.get(request)
+        response = requests.get(request, timeout=self.TIMEOUT)
 
         if response.status_code != 200:
             raise UnsuccessfulRequestException(request.status_code, request.headers)
