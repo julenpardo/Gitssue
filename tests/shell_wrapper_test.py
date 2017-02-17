@@ -5,6 +5,8 @@ from unittest import mock
 
 sys.path.insert(0, os.path.abspath('.'))
 
+from gitssue.git.shell_wrapper import ShellWrapper
+
 
 class ShellWrapperTest(unittest.TestCase):
 
@@ -41,3 +43,29 @@ class ShellWrapperTest(unittest.TestCase):
         expected_false = shell_wrapper_mock.execute_command(command)
 
         self.assertFalse(expected_false)
+
+    @mock.patch('subprocess.Popen')
+    def test_execute_command_error(self, subprocess_popen_mock):
+        process_mock = mock.Mock()
+        attributes = {
+            'communicate.return_value': ('output', 'error')
+        }
+        process_mock.configure_mock(**attributes)
+        subprocess_popen_mock.return_value = process_mock
+
+        shell_wrapper = ShellWrapper()
+
+        expected_false = shell_wrapper.execute_command('some command')
+
+        self.assertFalse(expected_false)
+
+    @mock.patch('subprocess.Popen')
+    def test_execute_command_exception(self, subprocess_popen_mock):
+        subprocess_popen_mock.side_effect = Exception('Mocked exception.')
+
+        shell_wrapper = ShellWrapper()
+
+        expected_false = shell_wrapper.execute_command('some command')
+
+        self.assertFalse(expected_false)
+        pass

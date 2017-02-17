@@ -3,12 +3,12 @@ from unittest import mock
 import sys, os
 sys.path.insert(0, os.path.abspath('.'))
 from gitssue.remote.github import Github
-from gitssue.request.unsuccessful_request_exception import UnsuccessfulRequestException
+from gitssue.request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
 
 
 class GithubTest(unittest.TestCase):
 
-    mocked_request_response = []
+    mocked_request_response = None
 
     def mock_get_request(self, request):
         return self.mocked_request_response
@@ -38,7 +38,7 @@ class GithubTest(unittest.TestCase):
         github = Github(requester_mock)
 
         expected = self.mocked_request_response
-        actual = github.get_issue_list('a', 'b')
+        actual = github.get_issue_list('a', 'b', True)
 
         for index, element in enumerate(expected):
             expected_element = expected[index]
@@ -149,7 +149,7 @@ class GithubTest(unittest.TestCase):
         exception_headers = {
             'X-RateLimit-Remaining': 0
         }
-        input_exception = UnsuccessfulRequestException(exception_code, exception_headers)
+        input_exception = UnsuccessfulHttpRequestException(exception_code, exception_headers)
 
         requester_mock = mock.Mock()
         github = Github(requester_mock)
@@ -164,7 +164,7 @@ class GithubTest(unittest.TestCase):
         exception_headers = {
             'X-RateLimit-Remaining': 1
         }
-        input_exception = UnsuccessfulRequestException(exception_code, exception_headers)
+        input_exception = UnsuccessfulHttpRequestException(exception_code, exception_headers)
 
         requester_mock = mock.Mock()
         github = Github(requester_mock)

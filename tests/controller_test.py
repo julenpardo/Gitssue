@@ -4,6 +4,7 @@ import unittest
 import contextlib
 from io import StringIO
 from unittest import mock
+from requests.exceptions import RequestException
 
 sys.path.append(os.path.abspath('.'))
 sys.path.append(os.path.abspath('./gitssue'))
@@ -11,7 +12,7 @@ sys.path.append(os.path.abspath('./gitssue'))
 from gitssue.controller import Controller
 from gitssue.dependencies import Dependencies
 from gitssue.printer.color_printer_interface import ColorPrinterInterface
-from gitssue.request.unsuccessful_request_exception import UnsuccessfulRequestException
+from gitssue.request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
 
 class DummyColorPrinter(ColorPrinterInterface):
     def print_colored_line(self, line, hex_color='ffffff'):
@@ -132,7 +133,7 @@ class ControllerTest(unittest.TestCase):
         remote_mock.parse_request_exception = self.mock_remote_parse_request_exception
         self.controller.deps.remote = remote_mock
         requester_mock = mock.Mock()
-        requester_mock.get_request.side_effect = UnsuccessfulRequestException(400, expected)
+        requester_mock.get_request.side_effect = UnsuccessfulHttpRequestException(400, expected)
         self.requester_mock = requester_mock
 
         original_requester = self.controller.deps.requester
@@ -146,6 +147,21 @@ class ControllerTest(unittest.TestCase):
         actual = temp_stdout.getvalue().strip().splitlines()[1]
 
         self.controller.deps.remote.requester = original_requester
+
+        self.assertEqual(expected, actual)
+
+    def test_list_connection_error(self):
+        remote_mock = mock.Mock()
+        remote_mock.get_issue_list.side_effect = RequestException
+        self.controller.deps.remote = remote_mock
+
+        temp_stdout = StringIO()
+
+        with contextlib.redirect_stdout(temp_stdout):
+            self.controller.list()
+
+        expected = 'A connection error occurred:'
+        actual = temp_stdout.getvalue().strip().splitlines()[1]
 
         self.assertEqual(expected, actual)
 
@@ -218,7 +234,7 @@ class ControllerTest(unittest.TestCase):
         remote_mock.parse_request_exception = self.mock_remote_parse_request_exception
         self.controller.deps.remote = remote_mock
         requester_mock = mock.Mock()
-        requester_mock.get_request.side_effect = UnsuccessfulRequestException(400, expected)
+        requester_mock.get_request.side_effect = UnsuccessfulHttpRequestException(400, expected)
         self.requester_mock = requester_mock
 
         original_requester = self.controller.deps.requester
@@ -232,6 +248,21 @@ class ControllerTest(unittest.TestCase):
         actual = temp_stdout.getvalue().strip().splitlines()[1]
 
         self.controller.deps.remote.requester = original_requester
+
+        self.assertEqual(expected, actual)
+
+    def test_desc_connection_error(self):
+        remote_mock = mock.Mock()
+        remote_mock.get_issues_description.side_effect = RequestException
+        self.controller.deps.remote = remote_mock
+
+        temp_stdout = StringIO()
+
+        with contextlib.redirect_stdout(temp_stdout):
+            self.controller.desc('1')
+
+        expected = 'A connection error occurred:'
+        actual = temp_stdout.getvalue().strip().splitlines()[1]
 
         self.assertEqual(expected, actual)
 
@@ -272,6 +303,13 @@ class ControllerTest(unittest.TestCase):
         actual = temp_stdout.getvalue().strip()
 
         self.assertEqual(expected, actual)
+
+    def test_desc_no_issue_number(self):
+        input = []
+
+        expected_true = self.controller.desc(input)
+
+        self.assertTrue(expected_true)
 
     def test_thread(self):
         mocked_return = [
@@ -355,7 +393,7 @@ class ControllerTest(unittest.TestCase):
         remote_mock.parse_request_exception = self.mock_remote_parse_request_exception
         self.controller.deps.remote = remote_mock
         requester_mock = mock.Mock()
-        requester_mock.get_request.side_effect = UnsuccessfulRequestException(400, expected)
+        requester_mock.get_request.side_effect = UnsuccessfulHttpRequestException(400, expected)
         self.requester_mock = requester_mock
 
         original_requester = self.controller.deps.requester
@@ -369,5 +407,20 @@ class ControllerTest(unittest.TestCase):
         actual = temp_stdout.getvalue().strip().splitlines()[1]
 
         self.controller.deps.remote.requester = original_requester
+
+        self.assertEqual(expected, actual)
+
+    def test_thread_connection_error(self):
+        remote_mock = mock.Mock()
+        remote_mock.get_issue_comments.side_effect = RequestException
+        self.controller.deps.remote = remote_mock
+
+        temp_stdout = StringIO()
+
+        with contextlib.redirect_stdout(temp_stdout):
+            self.controller.thread('1')
+
+        expected = 'A connection error occurred:'
+        actual = temp_stdout.getvalue().strip().splitlines()[1]
 
         self.assertEqual(expected, actual)

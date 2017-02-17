@@ -1,7 +1,6 @@
 env/
 reports/
-__pycache__/
-gitssue/__pycache__/
+*.pyc
 .idea/
 *.swp
 *.swo

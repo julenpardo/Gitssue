@@ -1,7 +1,7 @@
 """ Application controller; the one that executes the actions from the CLI. """
-from requests.exceptions import ConnectionError
+from requests.exceptions import RequestException
 from git import git_wrapper
-from gitssue.request.unsuccessful_request_exception import UnsuccessfulRequestException
+from gitssue.request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
 
 
 class Controller:
@@ -37,11 +37,11 @@ class Controller:
                 )
             except TypeError:
                 error = 'No issue could be found.'
-            except UnsuccessfulRequestException as unsuccessful_request:
-                error = self.deps.remote.parse_request_exception(unsuccessful_request)
-            except ConnectionError as connection_error:
+            except UnsuccessfulHttpRequestException as unsuccessful_http_request:
+                error = self.deps.remote.parse_request_exception(unsuccessful_http_request)
+            except RequestException as request_exception:
                 error = 'A connection error occurred:\n'
-                error += str(connection_error)
+                error += str(request_exception)
 
             if not error:
                 self.deps.printer.print_issue_list(issue_list, description)
@@ -71,11 +71,11 @@ class Controller:
                         repo,
                         issue_numbers,
                     )
-                except UnsuccessfulRequestException as unsuccessful_request:
-                    error = self.deps.remote.parse_request_exception(unsuccessful_request)
-                except ConnectionError as connection_error:
+                except UnsuccessfulHttpRequestException as unsuccessful_http_request:
+                    error = self.deps.remote.parse_request_exception(unsuccessful_http_request)
+                except RequestException as request_exception:
                     error = 'A connection error occurred:\n'
-                    error += str(connection_error)
+                    error += str(request_exception)
 
                 if not error:
                     self.deps.printer.print_issue_list_with_desc(issues)
@@ -91,37 +91,36 @@ class Controller:
     def thread(self, issue_number):
         """
         Prints the comment thread of the given issue.
+        It's not necessary to check if the "issue_number" is given because in this case will
+        be done by Cement, because when the exact number of arguments is specified, it does the
+        check itself.
         :param issue_number: the issue to print the comment thread of.
         """
         usernames_and_repo = git_wrapper.get_username_and_repo(self.deps.shell)
         error = ''
-        show_help = False
 
         if len(usernames_and_repo) == 1:
             username, repo = usernames_and_repo[0]
 
             if not issue_number.isdigit():
                 self.deps.printer.print_error(self.ISSUE_NUMBER_FORMAT_ERROR)
-            elif issue_number:
+            else:
                 try:
                     comment_thread = self.deps.remote.get_issue_comments(
                         username,
                         repo,
                         issue_number,
                     )
-                except UnsuccessfulRequestException as unsuccessful_request:
-                    error = self.deps.remote.parse_request_exception(unsuccessful_request)
-                except ConnectionError as connection_error:
+                except UnsuccessfulHttpRequestException as unsuccessful_http_request:
+                    error = self.deps.remote.parse_request_exception(unsuccessful_http_request)
+                except RequestException as request_exception:
                     error = 'A connection error occurred:\n'
-                    error += str(connection_error)
+                    error += str(request_exception)
 
                 if not error:
                     self.deps.printer.print_issue_comment_thread(comment_thread)
                 else:
                     self.deps.printer.print_error(error)
-            else:
-                show_help = True
+
         else:
             self.deps.printer.print_error(self.MANY_ORIGINS_ERROR)
-
-        return show_help

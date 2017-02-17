@@ -1,6 +1,6 @@
 """ Github module. """
 from gitssue.remote.remote_repo_interface import RemoteRepoInterface
-from gitssue.request.unsuccessful_request_exception import UnsuccessfulRequestException
+from gitssue.request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
 
 
 class Github(RemoteRepoInterface):

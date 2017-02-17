@@ -1,10 +1,11 @@
 """
 Concrete implementation requests_interface, using "requests" module.
 """
-from request.request_interface import RequestInterface
 import requests
+from requests.exceptions import RequestException
 import json
-from gitssue.request.unsuccessful_request_exception import UnsuccessfulRequestException
+from request.request_interface import RequestInterface
+from gitssue.request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
 
 
 class Requests(RequestInterface):
@@ -18,10 +19,13 @@ class Requests(RequestInterface):
         :param request: the GET request to execute.
         :return: response JSON object; False if the HTTP status code distinct to 200.
         """
-        response = requests.get(request, timeout=self.TIMEOUT)
+        try:
+            response = requests.get(request, timeout=self.TIMEOUT)
+        except RequestException:
+            raise
 
         if response.status_code != 200:
-            raise UnsuccessfulRequestException(request.status_code, request.headers)
+            raise UnsuccessfulHttpRequestException(response.status_code, response.headers)
 
         response_object = json.loads(response.text)
         response.close()

@@ -1,7 +1,7 @@
 """ Exception for when the request code is not 200. """
 
 
-class UnsuccessfulRequestException(Exception):
+class UnsuccessfulHttpRequestException(Exception):
     """
     Exception for when the request code is not 200. The request code and headers
     are also saved, because each remote (Github, Gitlab, etc.) may handle "special"

@@ -12,7 +12,12 @@ class DummyColorPrinter(ColorPrinterInterface):
         print(line)
 
     def print_labels(self, labels):
-        print(' '.join(labels))
+        label_string = ''
+        for label in labels:
+            label_string += '{0} '.format(label['name'])
+
+        label_string = label_string[:-1]
+        print(label_string)
 
 
 class PrinterTest(unittest.TestCase):
@@ -32,24 +37,107 @@ class PrinterTest(unittest.TestCase):
 
         self.assertEqual(expected, actual)
 
-    def test_print_issue_list_with_desc(self):
-        issues_input = [{
-            'number': '1',
-            'description': {
-                'title': 'first issue',
-                'body': 'body of first issue',
-            }},
+    def test_print_issue_list_no_description(self):
+        issues_input = [
             {
-            'number': '2',
-            'description': {
-                'title': 'second issue',
-                'body': 'body of second issue',
+                'number': '1',
+                'title': 'First issue title',
+            },
+            {
+                'number': '2',
+                'title': 'Second issue title',
             }
-        }]
+        ]
+
+        expected = ''
+        for issue in issues_input:
+            expected += '#{0}: {1}\n'.format(issue['number'], issue['title'])
+            expected += '\n\n'
+
+        expected = expected[:-3]
+
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            self.printer.print_issue_list(issues_input)
+
+        actual = temp_stdout.getvalue().strip()
+
+        self.assertEqual(expected, actual)
+
+    def test_print_issue_list_passing_description(self):
+        issues_input = [
+            {
+                'number': '1',
+                'title': 'First issue title',
+                'description': 'Description of first issue',
+            },
+            {
+                'number': '2',
+                'title': 'Second issue title',
+                'description': 'Description of second issue',
+            }
+        ]
+
+        expected = ''
+        for issue in issues_input:
+            expected += '#{0}: {1}\n\n'.format(issue['number'], issue['title'])
+            expected += '{0}\n'.format(issue['description'])
+            expected += '\n'
+
+        expected = expected[:-2]
+
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            self.printer.print_issue_list(issues_input, True)
+
+        actual = temp_stdout.getvalue().strip()
+
+        self.assertEqual(expected, actual)
+
+    def test_print_issue_list_with_desc_empty_dict(self):
+        expected = 'No issue could be found.'
+
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            self.printer.print_issue_list_with_desc({})
+
+        actual = temp_stdout.getvalue().strip()
+
+        self.assertEqual(expected, actual)
+
+    def test_print_issue_list_with_desc(self):
+        issues_input = [
+            {
+                'number': '1',
+                'description': {
+                    'title': 'first issue',
+                    'body': 'body of first issue',
+                },
+                'labels': [
+                    {
+                        'name': 'some label',
+                    }
+                ]
+            },
+            {
+                'number': '2',
+                'description': {
+                    'title': 'second issue',
+                    'body': 'body of second issue',
+                }
+            }
+        ]
 
         expected = ''
         for issue in issues_input:
             expected += '#{0}: {1}\n'.format(issue['number'], issue['description']['title'])
+            if issue.get('labels'):
+
+                for label in issue.get('labels'):
+                    expected += '{0} '.format(label['name'])
+                expected = expected[:-1]
+                expected += '\n'
+
             expected += '{0}\n'.format(issue['description']['body'])
             expected += '\n\n'
 
@@ -58,17 +146,6 @@ class PrinterTest(unittest.TestCase):
         temp_stdout = StringIO()
         with contextlib.redirect_stdout(temp_stdout):
             self.printer.print_issue_list_with_desc(issues_input)
-
-        actual = temp_stdout.getvalue().strip()
-
-        self.assertEqual(expected, actual)
-
-    def test_print_issue_list_empty_dict(self):
-        expected = 'No issue could be found.'
-
-        temp_stdout = StringIO()
-        with contextlib.redirect_stdout(temp_stdout):
-            self.printer.print_issue_list_with_desc({})
 
         actual = temp_stdout.getvalue().strip()
 

@@ -81,11 +81,11 @@ class BaseController(ArgparseController):
     def thread(self):
         """
         Get comment thread the given issue.
+        It's not necessary to check if the "issue_number" is given because in this case will
+        be done by Cement, because when the exact number of arguments is specified, it does the
+        check itself.
         """
-        show_help = self.controller.thread(self.app.pargs.issue_number[0])
-
-        if show_help:
-            self.app.args.parse_args(['desc', '--help'])
+        self.controller.thread(self.app.pargs.issue_number[0])
 
 
 class Gitssue(CementApp):
