@@ -1,4 +1,5 @@
 """ Application controller; the one that executes the actions from the CLI. """
+from requests.exceptions import ConnectionError
 from git import git_wrapper
 from gitssue.request.unsuccessful_request_exception import UnsuccessfulRequestException
 
@@ -38,6 +39,9 @@ class Controller:
                 error = 'No issue could be found.'
             except UnsuccessfulRequestException as unsuccessful_request:
                 error = self.deps.remote.parse_request_exception(unsuccessful_request)
+            except ConnectionError as connection_error:
+                error = 'A connection error occurred:\n'
+                error += str(connection_error)
 
             if not error:
                 self.deps.printer.print_issue_list(issue_list, description)
@@ -69,6 +73,9 @@ class Controller:
                     )
                 except UnsuccessfulRequestException as unsuccessful_request:
                     error = self.deps.remote.parse_request_exception(unsuccessful_request)
+                except ConnectionError as connection_error:
+                    error = 'A connection error occurred:\n'
+                    error += str(connection_error)
 
                 if not error:
                     self.deps.printer.print_issue_list_with_desc(issues)
@@ -104,6 +111,9 @@ class Controller:
                     )
                 except UnsuccessfulRequestException as unsuccessful_request:
                     error = self.deps.remote.parse_request_exception(unsuccessful_request)
+                except ConnectionError as connection_error:
+                    error = 'A connection error occurred:\n'
+                    error += str(connection_error)
 
                 if not error:
                     self.deps.printer.print_issue_comment_thread(comment_thread)
