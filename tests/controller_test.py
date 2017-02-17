@@ -5,6 +5,7 @@ import contextlib
 from io import StringIO
 from unittest import mock
 
+sys.path.append(os.path.abspath('.'))
 sys.path.append(os.path.abspath('./gitssue'))
 
 from gitssue.controller import Controller

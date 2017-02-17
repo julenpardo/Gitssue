@@ -3,7 +3,7 @@ import sys
 import unittest
 from unittest import mock
 
-sys.path.append(os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('.'))
 
 
 class ShellWrapperTest(unittest.TestCase):

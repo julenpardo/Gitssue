@@ -9,7 +9,7 @@ from gitssue.request.unsuccessful_request_exception import UnsuccessfulRequestEx
 
 class Requests(RequestInterface):
 
-    TIMEOUT = 0.0000001
+    TIMEOUT = 2.0
 
     def get_request(self, request):
         """

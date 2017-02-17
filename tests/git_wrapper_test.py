@@ -3,7 +3,7 @@ import sys
 import unittest
 from unittest import mock
 
-sys.path.append(os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('.'))
 from gitssue.git.git_wrapper import *
 from gitssue.git.repo_not_found_exception import RepoNotFoundException
 
