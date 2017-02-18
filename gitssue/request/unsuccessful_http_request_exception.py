@@ -16,5 +16,6 @@ class UnsuccessfulHttpRequestException(Exception):
         :param code: The error code for the request.
         :param headers: The headers sent for the error request.
         """
+        super(UnsuccessfulHttpRequestException, self).__init__()
         self.code = code
         self.headers = headers

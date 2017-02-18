@@ -3,6 +3,9 @@ from gitssue.printer.printer_interface import PrinterInterface
 
 
 class Printer(PrinterInterface):
+    """
+    CLI printer module for printing the output.
+    """
 
     ISSUE_TITLE_COLOR = 'c3a000'
     COMMENT_AUTHOR_COLOR = 'c3a000'

@@ -1,6 +1,5 @@
 """ Github module. """
 from gitssue.remote.remote_repo_interface import RemoteRepoInterface
-from gitssue.request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
 
 
 class Github(RemoteRepoInterface):
@@ -46,7 +45,7 @@ class Github(RemoteRepoInterface):
                     'title': issue['title'],
                     'labels': issue['labels'],
                     'description': description
-            })
+                })
 
         return issue_list
 
@@ -119,7 +118,8 @@ class Github(RemoteRepoInterface):
         e.g., when the API limit is hit.
 
         @TODO: make messages more specific.
-        :param exception: (UnsuccessfulRequestException) The exception object generated in the request.
+        :param exception: (UnsuccessfulRequestException) The exception object generated in the
+            request.
         :return: The error message that will be displayed to the user.
         """
         message = 'An error occurred in the request.'

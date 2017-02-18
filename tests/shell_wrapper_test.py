@@ -57,7 +57,7 @@ class ShellWrapperTest(unittest.TestCase):
 
     @mock.patch('subprocess.Popen')
     def test_execute_command_exception(self, subprocess_popen_mock):
-        subprocess_popen_mock.side_effect = Exception('Mocked exception.')
+        subprocess_popen_mock.side_effect = OSError('Mocked exception.')
 
         shell_wrapper = ShellWrapper()
 

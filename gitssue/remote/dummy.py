@@ -4,6 +4,9 @@ from gitssue.remote.remote_repo_interface import RemoteRepoInterface
 
 
 class Dummy(RemoteRepoInterface):
+    """
+    Dummy remote implementation with hardcoded values for testing purposes.
+    """
 
     def __init__(self, requester):
         super(Dummy, self).__init__(requester)

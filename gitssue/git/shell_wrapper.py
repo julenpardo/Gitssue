@@ -12,7 +12,7 @@ class ShellWrapper:
     Wrapper for executing shell commands, for Git module.
     """
 
-    def execute_command(self, command):
+    def execute_command(self, command):  # pylint: disable=no-self-use
         """
         Executes the given command (a Git command).
         :param command: the Git command to execute.
@@ -30,11 +30,9 @@ class ShellWrapper:
             output, error = process.communicate()
 
             if error or not output:
-                returned_value = False
+                return False
             else:
-                returned_value = output.decode('utf-8')
+                return output.decode('utf-8')
 
-        except Exception:
-            returned_value = False
-
-        return returned_value
+        except OSError:
+            return False

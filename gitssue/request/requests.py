@@ -1,14 +1,17 @@
 """
 Concrete implementation requests_interface, using "requests" module.
 """
+import json
 import requests
 from requests.exceptions import RequestException
-import json
 from request.request_interface import RequestInterface
 from gitssue.request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
 
 
 class Requests(RequestInterface):
+    """
+    Concrete implementation requests_interface, using "requests" module.
+    """
 
     TIMEOUT = 2.0
 
