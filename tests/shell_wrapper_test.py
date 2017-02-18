@@ -1,9 +1,5 @@
-import os
-import sys
 import unittest
 from unittest import mock
-
-sys.path.insert(0, os.path.abspath('.'))
 
 from gitssue.git.shell_wrapper import ShellWrapper
 

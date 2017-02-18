@@ -1,5 +1,3 @@
-import sys, os
-sys.path.append(os.path.abspath('..'))
 import unittest
 
 from controller_test import ControllerTest

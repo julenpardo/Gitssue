@@ -1,11 +1,6 @@
-import os
-import sys
 import unittest
 from unittest import mock
 from requests.exceptions import RequestException
-
-sys.path.insert(0, os.path.abspath('.'))
-
 from gitssue.request.requests import Requests
 from gitssue.request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
 

@@ -1,7 +1,5 @@
 import unittest
 from unittest import mock
-import sys, os
-sys.path.insert(0, os.path.abspath('.'))
 from gitssue.remote.github import Github
 from gitssue.request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
 
