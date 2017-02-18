@@ -1,7 +1,5 @@
 import unittest
 from unittest import mock
-import sys, os
-sys.path.insert(0, os.path.abspath('.'))
 import contextlib
 from io import StringIO
 from gitssue.printer.colorconsole_color_printer import ColorConsoleColorPrinter
