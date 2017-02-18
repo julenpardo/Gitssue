@@ -58,6 +58,7 @@ class Controller:
         usernames_and_repo = git_wrapper.get_username_and_repo(self.deps.shell)
         error = ''
         show_help = False
+        issues = False
 
         if len(usernames_and_repo) == 1:
             username, repo = usernames_and_repo[0]
