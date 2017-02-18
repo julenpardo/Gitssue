@@ -1,5 +1,6 @@
 """ Github module. """
 from gitssue.remote.remote_repo_interface import RemoteRepoInterface
+from gitssue.request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
 
 
 class Github(RemoteRepoInterface):
@@ -59,6 +60,7 @@ class Github(RemoteRepoInterface):
         :return: a dictionary with the title and the body message of each issue id.
         """
         issues_descriptions = []
+        not_found_issues = []
 
         if issue_numbers:
             for issue_number in issue_numbers:
@@ -69,20 +71,24 @@ class Github(RemoteRepoInterface):
                     issue_number
                 )
 
-                full_issue = self.requester.get_request(request)
+                try:
+                    full_issue = self.requester.get_request(request)
 
-                issue_description = {
-                    'number': issue_number,
-                    'labels': full_issue.get('labels'),
-                    'description': {
-                        'title': full_issue['title'],
-                        'body': full_issue['body'],
+                    issue_description = {
+                        'number': issue_number,
+                        'labels': full_issue.get('labels'),
+                        'description': {
+                            'title': full_issue['title'],
+                            'body': full_issue['body'],
+                        }
                     }
-                }
 
-                issues_descriptions.append(issue_description)
+                    issues_descriptions.append(issue_description)
+                except UnsuccessfulHttpRequestException as unsuccessful_request:
+                    if unsuccessful_request.code == 404:
+                        not_found_issues.append(issue_number)
 
-        return issues_descriptions
+        return issues_descriptions, not_found_issues
 
     def get_issue_comments(self, username, repository, issue_number):
         """
@@ -112,7 +118,7 @@ class Github(RemoteRepoInterface):
 
         return issues_comments
 
-    def parse_request_exception(self, exception):
+    def parse_request_exception(self, exception, issue_numbers=()):
         """
         Parses the generated exception during the request, necessary for special cases,
         e.g., when the API limit is hit.
@@ -120,6 +126,7 @@ class Github(RemoteRepoInterface):
         @TODO: make messages more specific.
         :param exception: (UnsuccessfulRequestException) The exception object generated in the
             request.
+        :param issue_numbers: the issue number(s) that weren't found in the request.
         :return: The error message that will be displayed to the user.
         """
         message = 'An error occurred in the request.'
@@ -129,5 +136,8 @@ class Github(RemoteRepoInterface):
 
         if rate_limit_hit:
             message = 'API limit hit.'
+        elif exception.code == 404 and issue_numbers:
+            message = "The following issue(s) couldn't be found: {0}".\
+                format(', '.join(issue_numbers))
 
         return message
