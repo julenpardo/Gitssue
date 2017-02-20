@@ -68,7 +68,7 @@ class GithubTest(unittest.TestCase):
         github = Github(requester_mock)
 
         expected = self.mocked_request_response
-        actual = github.get_issues_description('a', 'b', ['1'])
+        actual, errors_empty = github.get_issues_description('a', 'b', ['1'])
 
         self.assertEqual(
             expected['number'],
@@ -89,9 +89,34 @@ class GithubTest(unittest.TestCase):
 
         github = Github(requester_mock)
 
-        expected_false = github.get_issues_description('a', 'b', [])
+        expected = [], []
+        actual = github.get_issues_description('a', 'b', [])
 
-        self.assertFalse(expected_false)
+        self.assertEqual(expected, actual)
+
+    def test_get_issues_description_not_found_issue(self):
+        requester_mock = mock.Mock()
+        requester_mock.get_request.side_effect = UnsuccessfulHttpRequestException(404, {})
+
+        github = Github(requester_mock)
+
+        issues = ['1', '2', '3']
+        expected = [], issues
+        actual = github.get_issues_description('username', 'repo', issues)
+
+        self.assertEqual(expected, actual)
+
+    def test_get_issues_description_other_error(self):
+        requester_mock = mock.Mock()
+        requester_mock.get_request.side_effect = UnsuccessfulHttpRequestException(500, {})
+
+        github = Github(requester_mock)
+
+        issues = ['1']
+        expected = [], []
+        actual = github.get_issues_description('username', 'repo', issues)
+
+        self.assertEqual(expected, actual)
 
     def test_get_issue_comments(self):
         mocked_return = [
@@ -154,6 +179,24 @@ class GithubTest(unittest.TestCase):
 
         expected = 'API limit hit.'
         actual = github.parse_request_exception(input_exception)
+
+        self.assertEqual(expected, actual)
+
+    def test_parse_request_exception_404(self):
+        exception_code = 404
+        exception_headers = {
+            'X-RateLimit-Remaining': 100
+        }
+        input_exception = UnsuccessfulHttpRequestException(exception_code, exception_headers)
+        not_found_issues = ['1', '2', '3']
+
+        requester_mock = mock.Mock()
+        github = Github(requester_mock)
+
+        expected = "The following issue(s) couldn't be found: {0}".\
+            format(', '.join(not_found_issues))
+
+        actual = github.parse_request_exception(input_exception, not_found_issues)
 
         self.assertEqual(expected, actual)
 

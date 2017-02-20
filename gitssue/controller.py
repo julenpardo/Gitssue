@@ -58,6 +58,7 @@ class Controller:
         usernames_and_repo = git_wrapper.get_username_and_repo(self.deps.shell)
         error = ''
         show_help = False
+        issues = False
 
         if len(usernames_and_repo) == 1:
             username, repo = usernames_and_repo[0]
@@ -66,20 +67,24 @@ class Controller:
                 self.deps.printer.print_error(self.ISSUE_NUMBER_FORMAT_ERROR)
             elif issue_numbers:
                 try:
-                    issues = self.deps.remote.get_issues_description(
+                    issues, not_found_issues = self.deps.remote.get_issues_description(
                         username,
                         repo,
                         issue_numbers,
                     )
+
+                    if not_found_issues:
+                        error = "The following issues couldn't be found: {0}".\
+                            format(', '.join(not_found_issues))
                 except UnsuccessfulHttpRequestException as unsuccessful_http_request:
                     error = self.deps.remote.parse_request_exception(unsuccessful_http_request)
                 except RequestException as request_exception:
                     error = 'A connection error occurred:\n'
                     error += str(request_exception)
 
-                if not error:
+                if issues:
                     self.deps.printer.print_issue_list_with_desc(issues)
-                else:
+                if error:
                     self.deps.printer.print_error(error)
             else:
                 show_help = True
@@ -112,7 +117,10 @@ class Controller:
                         issue_number,
                     )
                 except UnsuccessfulHttpRequestException as unsuccessful_http_request:
-                    error = self.deps.remote.parse_request_exception(unsuccessful_http_request)
+                    error = self.deps.remote.parse_request_exception(
+                        unsuccessful_http_request,
+                        [issue_number],
+                    )
                 except RequestException as request_exception:
                     error = 'A connection error occurred:\n'
                     error += str(request_exception)
