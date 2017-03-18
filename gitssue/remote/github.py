@@ -35,11 +35,13 @@ class Github(RemoteRepoInterface):
         if response_issues:
             for issue in response_issues:
                 if get_description:
-                    description = self.get_issues_description(
+                    full_description = self.get_issues_description(
                         username,
                         repository,
                         [issue['number']]
-                    )[0]['description']['body']
+                    )
+
+                    description = full_description[0][0]['description']['body']
 
                 issue_list.append({
                     'number': issue['number'],
