@@ -132,7 +132,7 @@ class Github(RemoteRepoInterface):
         message = 'An error occurred in the request.'
 
         rate_limit_hit = exception.code == 403\
-            and exception.headers['X-RateLimit-Remaining'] == 0
+            and exception.headers['X-RateLimit-Remaining'] == '0'
 
         if rate_limit_hit:
             message = 'API limit hit.'

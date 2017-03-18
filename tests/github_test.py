@@ -170,7 +170,7 @@ class GithubTest(unittest.TestCase):
     def test_parse_request_exception_api_limit(self):
         exception_code = 403
         exception_headers = {
-            'X-RateLimit-Remaining': 0
+            'X-RateLimit-Remaining': '0'
         }
         input_exception = UnsuccessfulHttpRequestException(exception_code, exception_headers)
 
