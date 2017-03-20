@@ -37,8 +37,9 @@ Upcoming features
 -  Look at `limitations <#limitations>`__ :)
 
 .. |Release| image:: https://img.shields.io/badge/release-v1.0.0-brightgreen.svg
-.. |Build Status| image:: https://travis-ci.org/julenpardo/Gitssue.svg?branch=dev
+.. |Build Status| image:: https://api.travis-ci.org/julenpardo/Gitssue.svg?branch=dev
    :target: https://travis-ci.org/julenpardo/Gitssue
 .. |Coverage| image:: https://img.shields.io/badge/coverage-99%25-brightgreen.svg
 .. |Python versions| image:: https://img.shields.io/badge/python-3.4%2C%203.5%2C%203.6-blue.svg
 .. |License| image:: https://img.shields.io/badge/license-GPLv3-blue.svg
+

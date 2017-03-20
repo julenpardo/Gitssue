@@ -8,5 +8,4 @@ reports/
 *~
 .Trash-*
 .coverage
-Gitssue.egg-info/
 build/
