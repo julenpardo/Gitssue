@@ -1,3 +1,4 @@
+# The output of 'pip freeze'.
 appdirs==1.4.0
 astroid==1.4.9
 cement==2.10.2
