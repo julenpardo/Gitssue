@@ -36,5 +36,7 @@ setup(
     extras_require={},
     package_data={},
     data_files={},
-    entry_points={}
+    entry_points={
+        'console_scripts': ['gitssue = gitssue.gitssue:main']
+    }
 )
