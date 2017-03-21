@@ -1,7 +1,7 @@
 """ Application controller; the one that executes the actions from the CLI. """
 from requests.exceptions import RequestException
 from git import git_wrapper
-from gitssue.request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
+from request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
 
 
 class Controller:
