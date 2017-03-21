@@ -9,8 +9,8 @@ from requests.exceptions import RequestException
 sys.path.append(os.path.abspath('.'))
 sys.path.append(os.path.abspath('./gitssue'))
 
-from gitssue.controller import Controller
-from gitssue.dependencies import Dependencies
+from gitssue.controller.controller import Controller
+from gitssue.dependencies.dependencies import Dependencies
 from gitssue.printer.color_printer_interface import ColorPrinterInterface
 from gitssue.request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
 
