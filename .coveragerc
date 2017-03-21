@@ -1,0 +1,10 @@
+[run]
+branch = True
+source = gitssue/
+omit =
+    gitssue/cli.py
+    *_interface.py
+    gitssue/remote/dummy.py
+
+[html]
+directory = reports/coverage/

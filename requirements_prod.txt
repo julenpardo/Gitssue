@@ -1,0 +1,4 @@
+# Just the 'top' dependencies, without sub-dependencies, and also test dependencies.
+cement==2.10.2
+colorconsole==0.7.2
+requests==2.13.0

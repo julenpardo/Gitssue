@@ -1,1 +1,12 @@
-env/*
+env/
+reports/
+*.pyc
+.idea/
+*.swp
+*.swo
+*.log
+*~
+.Trash-*
+.coverage
+build/
+setup.py
