@@ -108,5 +108,6 @@ class Gitssue(CementApp):
             BaseController,
         ]
 
-with Gitssue() as app:
-    app.run()
+def main():
+    with Gitssue() as app:
+        app.run()
