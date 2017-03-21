@@ -29,7 +29,11 @@ Limitations
 Installation
 ============
 
+Just with ``pip``:
+
 ``pip install gitssue``
+
+That's it! You can already execute ``gitssue`` in your shell.
 
 Upcoming features
 =================
@@ -42,4 +46,3 @@ Upcoming features
 .. |Coverage| image:: https://img.shields.io/badge/coverage-99%25-brightgreen.svg
 .. |Python versions| image:: https://img.shields.io/badge/python-3.4%2C%203.5%2C%203.6-blue.svg
 .. |License| image:: https://img.shields.io/badge/license-GPLv3-blue.svg
-

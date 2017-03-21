@@ -9,3 +9,4 @@ reports/
 .Trash-*
 .coverage
 build/
+setup.py

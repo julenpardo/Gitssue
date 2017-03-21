@@ -27,9 +27,13 @@ Manage your issues from the command line.
 
 # Installation
 
+Just with `pip`:
+
  ```
  pip install gitssue
  ```
+
+ That's it! You can already execute `gitssue` in your shell.
 
 # Upcoming features
 
