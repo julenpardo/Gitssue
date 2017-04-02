@@ -1,8 +1,8 @@
-Gitssue ![Release](https://img.shields.io/badge/release-v1.0.0-brightgreen.svg)
+Gitssue [![PyPI version](https://badge.fury.io/py/Gitssue.svg)](https://badge.fury.io/py/Gitssue)
 =======
 
 [![Build Status](https://api.travis-ci.org/julenpardo/Gitssue.svg?branch=dev)](https://travis-ci.org/julenpardo/Gitssue)
-![Coverage](https://img.shields.io/badge/coverage-99%25-brightgreen.svg)
+[![Coverage Status](https://coveralls.io/repos/github/julenpardo/Gitssue/badge.svg?branch=dev)](https://coveralls.io/github/julenpardo/Gitssue?branch=dev)
 ![Python versions](https://img.shields.io/badge/python-3.4%2C%203.5%2C%203.6-blue.svg)
 ![License](https://img.shields.io/badge/license-GPLv3-blue.svg)
 
