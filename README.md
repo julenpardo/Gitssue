@@ -27,10 +27,10 @@ Manage your issues from the command line.
 
 # Installation
 
-Just with `pip`:
+Just with `pip3`:
 
  ```
- pip install gitssue
+ pip3 install gitssue
  ```
 
  That's it! You can already execute `gitssue` in your shell.
