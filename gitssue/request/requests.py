@@ -15,7 +15,7 @@ class Requests(RequestInterface):
 
     TIMEOUT = 2.0
 
-    def get_request(self, request, credentials={}):
+    def get_request(self, request, credentials=None):
         """
         Executes a GET request.
 
@@ -23,7 +23,7 @@ class Requests(RequestInterface):
         :return: response JSON object; False if the HTTP status code distinct to 200.
         """
         authentication = ()
-        if 'username' in credentials and 'password' in credentials:
+        if credentials is not None and 'username' in credentials and 'password' in credentials:
             authentication = (credentials['username'], credentials['password'])
 
         try:
