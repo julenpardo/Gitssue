@@ -15,15 +15,19 @@ class Requests(RequestInterface):
 
     TIMEOUT = 2.0
 
-    def get_request(self, request):
+    def get_request(self, request, credentials={}):
         """
         Executes a GET request.
 
         :param request: the GET request to execute.
         :return: response JSON object; False if the HTTP status code distinct to 200.
         """
+        authentication = ()
+        if 'username' in credentials and 'password' in credentials:
+            authentication = (credentials['username'], credentials['password'])
+
         try:
-            response = requests.get(request, timeout=self.TIMEOUT)
+            response = requests.get(request, auth=authentication, timeout=self.TIMEOUT)
         except RequestException:
             raise
 
