@@ -8,10 +8,13 @@ Gitssue [![PyPI version](https://badge.fury.io/py/Gitssue.svg)](https://badge.fu
 
 Manage your issues from the command line.
 
+Built on [Cement Framework](http://builtoncement.com/).
+
 ![img/demo.gif](img/demo.gif)
 
 # Features
 
+ - Authentication.
  - List the issues (also closed ones, if specified).
  - Get issues descriptions.
  - Get comment thread of the issue.
@@ -20,9 +23,6 @@ Manage your issues from the command line.
 # Limitations
 
  - Just for repositories hosted on GitHub.
- - No support for authentication.
- - Because of the previous one, there's no support for private repositories.
- - GitHub API limitation: also related to the authentication; for non authenticated requests, GitHub has a limit of 60 requests/hour to the API.
  - No "write" operations (i.e. make a comment, open or close issues, etc.).
 
 # Installation
@@ -34,6 +34,17 @@ Just with `pip3`:
  ```
 
  That's it! You can already execute `gitssue` in your shell.
+
+# Configuration
+
+This is optional, just if you want to use authentication (necessary for private repositories).
+
+Take a look to the [.gitssuerc.example](.gitssuerc.example) file, and follow these steps:
+
+ - Change the values of the example file with the real ones.
+ - Rename it to `.gitssuerc`.
+ - Place it in your home directory (`~/.gitssuerc`), or in `/etc/`. **If a config file exists in both directories, the one of the home directory will be the one used.**
+ - Check the permissions! The config file stores your credentials, so you will probably want to have permissions like `500` (read and write permissions for the owner, and no permissions for any  other) or similar.
 
 # Upcoming features
 
