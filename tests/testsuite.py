@@ -7,6 +7,7 @@ from printer_test import PrinterTest
 from shell_wrapper_test import ShellWrapperTest
 from requests_test import RequestsTest
 from colorconsole_color_printer_test import ColorConsoleColorPrinterTest
+from config_reader_test import ConfigReaderTest
 
 
 def suite():
@@ -18,6 +19,7 @@ def suite():
     suite.addTest(ShellWrapperTest)
     suite.addTest(RequestsTest)
     suite.addTest(ColorConsoleColorPrinterTest)
+    suite.addTest(ConfigReaderTest)
 
     return suite
 
