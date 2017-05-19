@@ -8,10 +8,10 @@ class GithubTest(unittest.TestCase):
 
     mocked_request_response = None
 
-    def mock_get_request(self, request):
+    def mock_get_request(self, request, credentials={}):
         return self.mocked_request_response
 
-    def mock_get_request_with_error(self, request):
+    def mock_get_request_with_error(self, request, credentials={}):
         return False
 
     def test_get_issue_list(self):
@@ -33,7 +33,7 @@ class GithubTest(unittest.TestCase):
         self.mocked_request_response = mocked_return
         requester_mock = mock.Mock()
         requester_mock.get_request = self.mock_get_request
-        github = Github(requester_mock)
+        github = Github(requester_mock, credentials={})
 
         expected = self.mocked_request_response
         actual = github.get_issue_list('a', 'b', True)
@@ -50,7 +50,7 @@ class GithubTest(unittest.TestCase):
         requester_mock = mock.Mock()
         requester_mock.get_request = self.mock_get_request_with_error
 
-        github = Github(requester_mock)
+        github = Github(requester_mock, credentials={})
 
         expected_false = github.get_issue_list('a', 'b')
 
@@ -65,7 +65,7 @@ class GithubTest(unittest.TestCase):
         self.mocked_request_response = mocked_return
         requester_mock = mock.Mock()
         requester_mock.get_request = self.mock_get_request
-        github = Github(requester_mock)
+        github = Github(requester_mock, credentials={})
 
         expected = self.mocked_request_response
         actual, errors_empty = github.get_issues_description('a', 'b', ['1'])
@@ -87,7 +87,7 @@ class GithubTest(unittest.TestCase):
         requester_mock = mock.Mock()
         requester_mock.get_request = self.mock_get_request_with_error
 
-        github = Github(requester_mock)
+        github = Github(requester_mock, credentials={})
 
         expected = [], []
         actual = github.get_issues_description('a', 'b', [])
@@ -98,7 +98,7 @@ class GithubTest(unittest.TestCase):
         requester_mock = mock.Mock()
         requester_mock.get_request.side_effect = UnsuccessfulHttpRequestException(404, {})
 
-        github = Github(requester_mock)
+        github = Github(requester_mock, credentials={})
 
         issues = ['1', '2', '3']
         expected = [], issues
@@ -110,7 +110,7 @@ class GithubTest(unittest.TestCase):
         requester_mock = mock.Mock()
         requester_mock.get_request.side_effect = UnsuccessfulHttpRequestException(500, {})
 
-        github = Github(requester_mock)
+        github = Github(requester_mock, credentials={})
 
         issues = ['1']
         expected = [], []
@@ -133,7 +133,7 @@ class GithubTest(unittest.TestCase):
         requester_mock = mock.Mock()
         requester_mock.get_request = self.mock_get_request
 
-        github = Github(requester_mock)
+        github = Github(requester_mock, credentials={})
 
         expected = mocked_return[0]
         actual = github.get_issue_comments('a', 'b', 1)[0]
@@ -161,7 +161,7 @@ class GithubTest(unittest.TestCase):
         requester_mock = mock.Mock()
         requester_mock.get_request = self.mock_get_request
 
-        github = Github(requester_mock)
+        github = Github(requester_mock, credentials={})
 
         actual_expected_empty_list = github.get_issue_comments('a', 'b', 1)
 
@@ -175,7 +175,7 @@ class GithubTest(unittest.TestCase):
         input_exception = UnsuccessfulHttpRequestException(exception_code, exception_headers)
 
         requester_mock = mock.Mock()
-        github = Github(requester_mock)
+        github = Github(requester_mock, credentials={})
 
         expected = 'API limit hit.'
         actual = github.parse_request_exception(input_exception)
@@ -191,7 +191,7 @@ class GithubTest(unittest.TestCase):
         not_found_issues = ['1', '2', '3']
 
         requester_mock = mock.Mock()
-        github = Github(requester_mock)
+        github = Github(requester_mock, credentials={})
 
         expected = "The following issue(s) couldn't be found: {0}".\
             format(', '.join(not_found_issues))
@@ -208,7 +208,7 @@ class GithubTest(unittest.TestCase):
         input_exception = UnsuccessfulHttpRequestException(exception_code, exception_headers)
 
         requester_mock = mock.Mock()
-        github = Github(requester_mock)
+        github = Github(requester_mock, credentials={})
 
         expected = 'An error occurred in the request.'
         actual = github.parse_request_exception(input_exception)

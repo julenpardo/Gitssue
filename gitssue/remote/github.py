@@ -10,8 +10,8 @@ class Github(RemoteRepoInterface):
 
     API_URL = 'https://api.github.com'
 
-    def __init__(self, requester):
-        super(Github, self).__init__(requester)
+    def __init__(self, requester, credentials):
+        super(Github, self).__init__(requester, credentials.get('github', {}))
 
     def get_issue_list(self, username, repository, show_all=False, get_description=False):
         """
@@ -27,7 +27,7 @@ class Github(RemoteRepoInterface):
         if show_all:
             request += '?state=all'
 
-        response_issues = self.requester.get_request(request)
+        response_issues = self.requester.get_request(request, self.credentials)
 
         issue_list = []
         description = ''
