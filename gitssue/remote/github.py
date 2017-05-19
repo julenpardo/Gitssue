@@ -137,9 +137,16 @@ class Github(RemoteRepoInterface):
             and exception.headers['X-RateLimit-Remaining'] == '0'
 
         if rate_limit_hit:
-            message = 'API limit hit.'
+            message = 'GitHub API limit was reached. Read more about this at '\
+                      + 'https://developer.github.com/v3/#rate-limiting'
+        elif exception.code == 401:
+            message = "Invalid credentials. Check your '.gitssuerc' config file."
         elif exception.code == 404 and issue_numbers:
             message = "The following issue(s) couldn't be found: {0}".\
                 format(', '.join(issue_numbers))
+        elif exception.code == 404:
+            message = "The repository doesn't exist; or exists but it's private, and the "\
+                      + "credentials haven't been set in the config file. Check the README "\
+                      + "for more information."
 
         return message

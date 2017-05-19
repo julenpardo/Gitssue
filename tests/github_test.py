@@ -177,7 +177,8 @@ class GithubTest(unittest.TestCase):
         requester_mock = mock.Mock()
         github = Github(requester_mock, credentials={})
 
-        expected = 'API limit hit.'
+        expected = 'GitHub API limit was reached. Read more about this at '\
+                    + 'https://developer.github.com/v3/#rate-limiting'
         actual = github.parse_request_exception(input_exception)
 
         self.assertEqual(expected, actual)
@@ -211,6 +212,33 @@ class GithubTest(unittest.TestCase):
         github = Github(requester_mock, credentials={})
 
         expected = 'An error occurred in the request.'
+        actual = github.parse_request_exception(input_exception)
+
+        self.assertEqual(expected, actual)
+
+    def test_parse_request_exception_invalid_credentials(self):
+        exception_code = 401
+        input_exception = UnsuccessfulHttpRequestException(exception_code, {})
+
+        requester_mock = mock.Mock()
+        github = Github(requester_mock, credentials={})
+
+        expected = "Invalid credentials. Check your '.gitssuerc' config file."
+        actual = github.parse_request_exception(input_exception)
+
+        self.assertEqual(expected, actual)
+
+
+    def test_parse_request_repo_not_found(self):
+        exception_code = 404
+        input_exception = UnsuccessfulHttpRequestException(exception_code, {})
+
+        requester_mock = mock.Mock()
+        github = Github(requester_mock, credentials={})
+
+        expected = "The repository doesn't exist; or exists but it's private, and the "\
+                      + "credentials haven't been set in the config file. Check the README "\
+                      + "for more information."
         actual = github.parse_request_exception(input_exception)
 
         self.assertEqual(expected, actual)
