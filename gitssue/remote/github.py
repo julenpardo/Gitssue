@@ -138,8 +138,14 @@ class Github(RemoteRepoInterface):
 
         if rate_limit_hit:
             message = 'API limit hit.'
+        elif exception.code == 401:
+            message = 'Invalid credentials.'
         elif exception.code == 404 and issue_numbers:
             message = "The following issue(s) couldn't be found: {0}".\
                 format(', '.join(issue_numbers))
+        elif exception.code == 404:
+            message = "The repository doesn't exist; or exists but it's private, and the "\
+                      + "credentials haven't been set in the config file. Check the README "\
+                      + "for more information."
 
         return message
