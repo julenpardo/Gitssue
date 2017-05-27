@@ -57,3 +57,32 @@ class RequestsTest(unittest.TestCase):
         with self.assertRaises(RequestException):
             self.requests.get_request('some request')
 
+    @mock.patch('requests.get')
+    def test_get_request_with_authentication(self, requests_get_mock):
+        response_mock = mock.Mock()
+        mocked_return = """
+            {
+                "field_1": "value_1",
+                "field_2": "value_2"
+            }
+        """
+        expected = {
+            'field_1': 'value_1',
+            'field_2': 'value_2',
+        }
+
+        attributes = {
+            'status_code': 200,
+            'text': mocked_return,
+            'close.return_value': None,
+        }
+        response_mock.configure_mock(**attributes)
+        requests_get_mock.return_value = response_mock
+
+        credentials = {
+            'username': 'whatever',
+            'password': 'whatever',
+        }
+        actual = self.requests.get_request('some request', credentials)
+
+        self.assertEqual(expected, actual)

@@ -1,3 +1,0 @@
-[console_scripts]
-gitssue = gitssue.gitssue:main
-

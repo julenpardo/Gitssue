@@ -10,8 +10,8 @@ class Github(RemoteRepoInterface):
 
     API_URL = 'https://api.github.com'
 
-    def __init__(self, requester):
-        super(Github, self).__init__(requester)
+    def __init__(self, requester, credentials):
+        super(Github, self).__init__(requester, credentials.get('github', {}))
 
     def get_issue_list(self, username, repository, show_all=False, get_description=False):
         """
@@ -27,7 +27,7 @@ class Github(RemoteRepoInterface):
         if show_all:
             request += '?state=all'
 
-        response_issues = self.requester.get_request(request)
+        response_issues = self.requester.get_request(request, self.credentials)
 
         issue_list = []
         description = ''
@@ -137,9 +137,16 @@ class Github(RemoteRepoInterface):
             and exception.headers['X-RateLimit-Remaining'] == '0'
 
         if rate_limit_hit:
-            message = 'API limit hit.'
+            message = 'GitHub API limit was reached. Read more about this at '\
+                      + 'https://developer.github.com/v3/#rate-limiting'
+        elif exception.code == 401:
+            message = "Invalid credentials. Check your '.gitssuerc' config file."
         elif exception.code == 404 and issue_numbers:
             message = "The following issue(s) couldn't be found: {0}".\
                 format(', '.join(issue_numbers))
+        elif exception.code == 404:
+            message = "The repository doesn't exist; or exists but it's private, and the "\
+                      + "credentials haven't been set in the config file. Check the README "\
+                      + "for more information."
 
         return message

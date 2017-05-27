@@ -5,6 +5,7 @@ from gitssue.git.shell_wrapper import ShellWrapper
 from gitssue.printer.colorconsole_color_printer import ColorConsoleColorPrinter
 from gitssue.printer.printer import Printer
 from gitssue.remote.github import Github
+from gitssue.config import config_reader
 
 
 class Dependencies:
@@ -14,7 +15,7 @@ class Dependencies:
 
     requester = Requests()
 
-    remote = Github(requester)
+    remote = Github(requester, config_reader.get_config())
 
     shell = ShellWrapper()
 

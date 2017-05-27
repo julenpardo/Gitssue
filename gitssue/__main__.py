@@ -1,7 +1,11 @@
 """ The script that makes this directory an executable script. """
 
+import sys
+import os
 
-from gitssue import Gitssue
+sys.path.insert(0, os.getcwd())
+
+from gitssue.gitssue import Gitssue
 
 with Gitssue() as app:
     app.run()
