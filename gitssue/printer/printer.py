@@ -1,4 +1,5 @@
 """ CLI printer module. """
+from datetime import datetime
 from gitssue.printer.printer_interface import PrinterInterface
 
 
@@ -91,3 +92,16 @@ class Printer(PrinterInterface):
         """
         self.color_printer.print_colored_line('Error', self.ERROR_COLOR)
         print(error + '\n')
+
+    def print_rate_information(self, limit, remaining, reset):
+        """
+        Prints the API rate information (remaining requests, reset time, etc.).
+        :param limit: rate total limit.
+        :param remaining: the remaining requests until the limit.
+        :param reset: reset time (Unix timestamp).
+        """
+        reset_date = datetime.fromtimestamp(reset)
+
+        print('Limit: {0}'.format(limit))
+        print('Remaining: {0}'.format(remaining))
+        print('Reset datetime: {0}'.format(reset_date))

@@ -41,3 +41,12 @@ class PrinterInterface(metaclass=ABCMeta):
         :param error: The error to print.
         """
         pass
+
+    @abstractmethod
+    def print_rate_information(self, limit, remaining, reset):
+        """
+        Prints the API rate information (remaining requests, reset time, etc.).
+        :param limit: rate total limit.
+        :param remaining: the remaining requests until the limit.
+        :param reset: reset time (Unix timestamp).
+        """

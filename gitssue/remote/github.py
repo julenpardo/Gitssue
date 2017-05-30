@@ -120,6 +120,20 @@ class Github(RemoteRepoInterface):
 
         return issues_comments
 
+    def get_rate_information(self):
+        """
+        Gets the GitHub API rate information (remaining requests, reset time, etc.).
+        requests, the limit is 60 requests/hour. For authenticated ones, 5000/hour.
+        :return: remaining request number.
+        """
+        request = '{0}/rate_limit'.format(self.API_URL)
+
+        rate_information = self.requester.get_request(request, self.credentials)
+
+        return rate_information['rate']['limit'],\
+            rate_information['rate']['remaining'],\
+            rate_information['rate']['reset']
+
     def parse_request_exception(self, exception, issue_numbers=()):
         """
         Parses the generated exception during the request, necessary for special cases,

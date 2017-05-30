@@ -132,3 +132,16 @@ class Controller:
 
         else:
             self.deps.printer.print_error(self.MANY_ORIGINS_ERROR)
+
+    def rate_information(self):
+        """
+        Prints the API rate information (remaining requests, reset time, etc.).
+        """
+        try:
+            limit, remaining, reset = self.deps.remote.get_rate_information()
+
+            self.deps.printer.print_rate_information(limit, remaining, reset)
+        except RequestException as request_exception:
+            error = 'A connection error occurred:\n'
+            error += str(request_exception)
+            self.deps.printer.print_error(error)
