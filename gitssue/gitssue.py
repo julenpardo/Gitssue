@@ -12,6 +12,8 @@ from cement.ext.ext_argparse import ArgparseController, expose
 from gitssue.dependencies.dependencies import Dependencies
 from gitssue.controller.controller import Controller
 
+GITSSUE_VERSION = '1.1'
+
 
 class BaseController(ArgparseController):
     """
@@ -28,14 +30,30 @@ class BaseController(ArgparseController):
         Meta class of the base Cement controller.
         """
         label = 'base'
-        description = 'Gitssue - Manage your issues from the command line'
+        description = 'Gitssue - Manage your issues from the command line (version {0})'\
+            .format(GITSSUE_VERSION)
+        arguments = [
+            (
+                ['--version', '-v'],
+                dict(action='store_true', help='Show version and exit')
+            )
+        ]
 
     @expose(hide=True)
     def default(self):
         """
-        The accessed method if no command has been specified. Displays the help.
+        The default method.
         """
-        self.app.args.parse_args(['--help'])
+        arguments = self.app.pargs
+
+        if arguments.version:
+            print('Gitssue {0}'.format(GITSSUE_VERSION))
+        else:
+            no_option = arguments.command is None and not arguments.debug \
+                        and not arguments.suppress_output and not arguments.version
+
+            if no_option:
+                self.app.args.parse_args(['--help'])
 
     @expose(
         help='List open issues.',
@@ -107,6 +125,7 @@ class Gitssue(CementApp):
         handlers = [
             BaseController,
         ]
+
 
 def main():
     with Gitssue() as app:
