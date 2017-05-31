@@ -111,6 +111,16 @@ class BaseController(ArgparseController):
         """
         self.controller.thread(self.app.pargs.issue_number[0])
 
+    @expose(
+        help='Shows the API rate information (remaining requests, reset time, etc.).',
+        aliases=['ri']
+    )
+    def rate_info(self):
+        """
+        Gets the API rate information (remaining requests, reset time, etc.).
+        """
+        self.controller.rate_information()
+
 
 class Gitssue(CementApp):
     """
@@ -128,5 +138,8 @@ class Gitssue(CementApp):
 
 
 def main():
+    """
+    Main method.
+    """
     with Gitssue() as app:
         app.run()

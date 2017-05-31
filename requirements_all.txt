@@ -1,5 +1,4 @@
-# The output of 'pip freeze'.
-appdirs==1.4.0
+appdirs==1.4.3
 astroid==1.4.9
 cement==2.10.2
 colorconsole==0.7.2

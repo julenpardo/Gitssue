@@ -48,6 +48,14 @@ class RemoteRepoInterface(metaclass=ABCMeta):
         """
 
     @abstractmethod
+    def get_rate_information(self):
+        """
+        Gets the API rate information (remaining requests, reset time, etc.).
+        :return: The remaining requests.
+        """
+        pass
+
+    @abstractmethod
     def parse_request_exception(self, exception):
         """
         Handles the error occurred during the request.
