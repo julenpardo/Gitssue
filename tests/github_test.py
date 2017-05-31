@@ -1,4 +1,5 @@
 import unittest
+import time
 from unittest import mock
 from gitssue.remote.github import Github
 from gitssue.request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
@@ -240,5 +241,29 @@ class GithubTest(unittest.TestCase):
                       + "credentials haven't been set in the config file. Check the README "\
                       + "for more information."
         actual = github.parse_request_exception(input_exception)
+
+        self.assertEqual(expected, actual)
+
+    def test_get_rate_information(self):
+        current_timestamp = time.time()
+        mocked_return = {
+            'rate': {
+                'limit': 60,
+                'remaining': 55,
+                'reset': current_timestamp
+            }
+        }
+
+        self.mocked_request_response = mocked_return
+        requester_mock = mock.Mock()
+        requester_mock.get_request = self.mock_get_request
+
+        github = Github(requester_mock, credentials={})
+
+        expected = mocked_return['rate']['limit'],\
+            mocked_return['rate']['remaining'],\
+            mocked_return['rate']['reset']
+
+        actual = github.get_rate_information()
 
         self.assertEqual(expected, actual)
