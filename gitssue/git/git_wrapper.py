@@ -1,8 +1,9 @@
 """ Wrapper for executing Git commands. """
+import re
 from gitssue.git.repo_not_found_exception import RepoNotFoundException
 
 
-SUPPORTED_REMOTES = ['github']
+SUPPORTED_REMOTES = ['github.com', 'gitlab.com']
 
 
 def discard_not_supported_remotes(remotes_url):
@@ -32,12 +33,25 @@ def get_username_and_repo(shell_wrapper):
     """
     try:
         usernames_and_repos = []
+        print(get_remotes_urls(shell_wrapper))
         for remote in discard_not_supported_remotes(get_remotes_urls(shell_wrapper)):
             remote_url = remote[1]
-            username_and_repo = remote_url.replace('https://github.com/', '')
-            username_and_repo = username_and_repo.replace('git@github.com:', '')
+
+            username_and_repo = re.sub(r"https:\/\/.*@", '', remote_url)
             username_and_repo = username_and_repo.replace('.git', '')
+            username_and_repo = username_and_repo.replace('https://', '')
             username_and_repo = username_and_repo.replace('\n', '')
+
+            for supported_remote in SUPPORTED_REMOTES:
+                username_and_repo = username_and_repo.replace(
+                    '{}/'.format(supported_remote),
+                    ''
+                )
+                username_and_repo = username_and_repo.replace(
+                    'git@{}.com:'.format(supported_remote),
+                    ''
+                )
+
             username, repo = username_and_repo.split('/')
 
             usernames_and_repos.append([username, repo])
