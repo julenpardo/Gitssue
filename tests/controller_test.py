@@ -43,6 +43,12 @@ class ControllerTest(unittest.TestCase):
         self.controller = Controller(Dependencies)
         self.controller.deps.printer.color_printer = DummyColorPrinter()
 
+        mocked_return = "origin git@github.com:julenpardo/Gitssue.git (fetch)"
+        shell_wrapper_mock = mock.Mock()
+        self.mocked_shell_wrapper_execute_command_return = mocked_return
+        shell_wrapper_mock.execute_command = self.mock_shell_wrapper_execute_command
+        self.controller.deps.shell = shell_wrapper_mock
+
     def mock_remote_get_issue_list(self, username, repo, all=False, desc=False):
         if self.requester_mock is not None:
             self.requester_mock.get_request(None)

@@ -105,13 +105,14 @@ class GitWrapperTest(unittest.TestCase):
         :return:
         """
         input = [
-            ['origin1', 'foo@GiThUb.foo'],
-            ['origin2', 'foo@gitlab.foo'],
+            ['origin1', 'foo@GiThUb.com'],
+            ['origin2', 'foo@gitlab.com'],
             ['origin3', 'github.com/foo/bar'],
-            ['origin4', 'foo@bitbucket.foo'],
+            ['origin4', 'foo@bitbucket.com'],
         ]
         expected = [
-            ['origin1', 'foo@GiThUb.foo'],
+            ['origin1', 'foo@GiThUb.com'],
+            ['origin2', 'foo@gitlab.com'],
             ['origin3', 'github.com/foo/bar'],
         ]
         actual = discard_not_supported_remotes(input)

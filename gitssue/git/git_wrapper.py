@@ -33,7 +33,7 @@ def get_username_and_repo(shell_wrapper):
     """
     try:
         usernames_and_repos = []
-        print(get_remotes_urls(shell_wrapper))
+
         for remote in discard_not_supported_remotes(get_remotes_urls(shell_wrapper)):
             remote_url = remote[1]
 
@@ -48,7 +48,7 @@ def get_username_and_repo(shell_wrapper):
                     ''
                 )
                 username_and_repo = username_and_repo.replace(
-                    'git@{}.com:'.format(supported_remote),
+                    'git@{}:'.format(supported_remote),
                     ''
                 )
 
