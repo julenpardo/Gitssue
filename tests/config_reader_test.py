@@ -55,7 +55,8 @@ class ConfigReaderTest(unittest.TestCase):
         expected = {
             'github': {
                 'username': 'whatever',
-                'password': 'whatever'
+                'password': 'whatever',
+                'token': '',
             }
         }
         actual = config_reader.get_config()
