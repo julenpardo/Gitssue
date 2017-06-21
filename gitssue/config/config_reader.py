@@ -9,7 +9,9 @@ FILE_PATHS = (
     '/etc/gitssue/',
 )
 PARSER_DEFAULTS = ({
-    'password': ''
+    'username': '',
+    'password': '',
+    'token': '',
 })
 
 
@@ -37,6 +39,7 @@ def get_config():
             config[remote] = {
                 'username': parser.get(remote, 'username'),
                 'password': parser.get(remote, 'password'),
+                'token': parser.get(remote, 'token'),
             }
 
         break

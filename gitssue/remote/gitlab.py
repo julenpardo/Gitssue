@@ -1,19 +1,24 @@
-""" Github module. """
+""" Gitlab module. """
 from gitssue.remote.remote_repo_interface import RemoteRepoInterface
 from gitssue.request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
 
 
-class Github(RemoteRepoInterface):
+class Gitlab(RemoteRepoInterface):
     """
     Github specific module.
     """
 
-    API_URL = 'https://api.github.com'
+    API_VERSION = 'v4'
+    API_URL = 'https://gitlab.com/api/{0}'.format(API_VERSION)
 
     def __init__(self, requester, credentials):
-        super(Github,self).__init__(requester, credentials.get('github', {}))
+        super(Gitlab, self).__init__(
+            requester,
+            auth_token=credentials['gitlab']['token']
+        )
 
-    def get_issue_list(self, username, repository, show_all=False,get_description=False):
+    def get_issue_list(self, username, repository, show_all=False,
+                       get_description=False):
         """
         Gets the open issue list of the given repository of the given user.
 
@@ -22,32 +27,53 @@ class Github(RemoteRepoInterface):
         :param show_all: show also closed issues.
         :return: a dictionary id:label format.
         """
-        request = '{0}/repos/{1}/{2}/issues'.format(self.API_URL, username, repository)
+        request = '{0}/issues'.format(self.API_URL)
 
         if show_all:
             request += '?state=all'
 
-        response_issues = self.requester.get_request(request, self.credentials)
+        auth_token_header = {'PRIVATE-TOKEN': self.auth_token}
+        response_issues = self.requester.get_request(
+            request,
+            extra_headers=auth_token_header
+        )
 
         issue_list = []
         description = ''
 
         if response_issues:
+            labels_request = '{0}/projects/{1}/labels'.format(
+                self.API_URL,
+                response_issues[0]['project_id']
+            )
+            labels_info = self.requester.get_request(
+                labels_request,
+                extra_headers=auth_token_header
+            )
+
             for issue in response_issues:
                 if get_description:
-                    full_description = self.get_issues_description(
-                        username,
-                        repository,
-                        [issue['number']]
-                    )
+                    description = issue['description']
 
-                    description = full_description[0][0]['description']['body']
+                issue_labels = []
+                for label in issue['labels']:
+                    color = '#ffffff'
+
+                    for label_info in labels_info:
+                        if label_info['name'] == label:
+                            color = label_info['color']
+
+                    issue_labels.append({
+                        'name': label,
+                        'color': color.replace('#', '')
+                    })
+
 
                 issue_list.append({
-                    'number': issue['number'],
+                    'number': issue['iid'],
                     'title': issue['title'],
-                    'labels': issue['labels'],
-                    'description': description
+                    'labels': issue_labels,
+                    'description': description,
                 })
 
         return issue_list
