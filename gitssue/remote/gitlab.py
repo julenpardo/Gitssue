@@ -42,13 +42,15 @@ class Gitlab(RemoteRepoInterface):
         description = ''
 
         if response_issues:
+            project_id = self.get_project_id(username, repository)
+
             for issue in response_issues:
                 if get_description:
                     description = issue['description']
 
                 issue_labels = []
                 labels_info = self.get_labels(
-                    response_issues[0]['project_id'],
+                    project_id,
                     auth_token_header
                 )
 
@@ -85,6 +87,17 @@ class Gitlab(RemoteRepoInterface):
         )
 
         return labels_info
+
+    def get_project_id(self, username, password):
+        project_request = '{0}/projects/{1}%2F{2}'.format(
+            self.API_URL,
+            username,
+            password
+        )
+
+        project = self.requester.get_request(project_request)
+
+        return project['id']
 
     def get_issues_description(self, username, repository, issue_numbers):
         """
