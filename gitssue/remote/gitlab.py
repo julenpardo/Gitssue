@@ -108,36 +108,7 @@ class Gitlab(RemoteRepoInterface):
         :param issue_numbers: the issue identifier(s).
         :return: a dictionary with the title and the body message of each issue id.
         """
-        issues_descriptions = []
-        not_found_issues = []
-
-        if issue_numbers:
-            for issue_number in issue_numbers:
-                request = '{0}/repos/{1}/{2}/issues/{3}'.format(
-                    self.API_URL,
-                    username,
-                    repository,
-                    issue_number
-                )
-
-                try:
-                    full_issue = self.requester.get_request(request)
-
-                    issue_description = {
-                        'number': issue_number,
-                        'labels': full_issue.get('labels'),
-                        'description': {
-                            'title': full_issue['title'],
-                            'body': full_issue['body'],
-                        }
-                    }
-
-                    issues_descriptions.append(issue_description)
-                except UnsuccessfulHttpRequestException as unsuccessful_request:
-                    if unsuccessful_request.code == 404:
-                        not_found_issues.append(issue_number)
-
-        return issues_descriptions, not_found_issues
+        pass
 
     def get_issue_comments(self, username, repository, issue_number):
         """
@@ -146,26 +117,7 @@ class Gitlab(RemoteRepoInterface):
         :param repository: the repository to look the issues at.
         :param issue_number: the issue number to query the comments to.
         """
-
-        request = '{0}/repos/{1}/{2}/issues/{3}/comments'.format(
-            self.API_URL,
-            username,
-            repository,
-            issue_number
-        )
-        issues_comments = []
-
-        response_comments = self.requester.get_request(request)
-        if response_comments:
-            for comment in response_comments:
-                issues_comments.append({
-                    'author': comment['user']['login'],
-                    'created_at': comment['created_at'],
-                    'updated_at': comment['updated_at'],
-                    'body': comment['body'],
-                })
-
-        return issues_comments
+        pass
 
     def get_rate_information(self):
         """
@@ -173,13 +125,7 @@ class Gitlab(RemoteRepoInterface):
         requests, the limit is 60 requests/hour. For authenticated ones, 5000/hour.
         :return: remaining request number.
         """
-        request = '{0}/rate_limit'.format(self.API_URL)
-
-        rate_information = self.requester.get_request(request, self.credentials)
-
-        return rate_information['rate']['limit'],\
-            rate_information['rate']['remaining'],\
-            rate_information['rate']['reset']
+        pass
 
     def parse_request_exception(self, exception, issue_numbers=()):
         """
@@ -194,20 +140,5 @@ class Gitlab(RemoteRepoInterface):
         """
         message = 'An error occurred in the request.'
 
-        rate_limit_hit = exception.code == 403\
-            and exception.headers['X-RateLimit-Remaining'] == '0'
-
-        if rate_limit_hit:
-            message = 'GitHub API limit was reached. Read more about this at '\
-                      + 'https://developer.github.com/v3/#rate-limiting'
-        elif exception.code == 401:
-            message = "Invalid credentials. Check your '.gitssuerc' config file."
-        elif exception.code == 404 and issue_numbers:
-            message = "The following issue(s) couldn't be found: {0}".\
-                format(', '.join(issue_numbers))
-        elif exception.code == 404:
-            message = "The repository doesn't exist; or exists but it's private, and the "\
-                      + "credentials haven't been set in the config file. Check the README "\
-                      + "for more information."
-
         return message
+

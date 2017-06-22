@@ -3,6 +3,7 @@ import unittest
 from controller_test import ControllerTest
 from git_wrapper_test import GitWrapperTest
 from github_test import GithubTest
+from gitlab_test import GitlabTest
 from printer_test import PrinterTest
 from shell_wrapper_test import ShellWrapperTest
 from requests_test import RequestsTest
@@ -15,6 +16,7 @@ def suite():
 
     suite.addTest(GitWrapperTest)
     suite.addTest(GithubTest)
+    suite.addTest(GitlabTest)
     suite.addTest(PrinterTest)
     suite.addTest(ShellWrapperTest)
     suite.addTest(RequestsTest)
