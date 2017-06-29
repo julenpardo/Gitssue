@@ -12,6 +12,7 @@ class GitlabTest(unittest.TestCase):
             'token': SECRET_TOKEN
         }
     }
+    TOKEN_HEADER = {'PRIVATE-TOKEN': SECRET_TOKEN}
 
     mocked_request_response = None
 
@@ -49,10 +50,52 @@ class GitlabTest(unittest.TestCase):
             gitlab.get_project_id('whatever', 'whatever')
 
     def test_get_labels(self):
-        pass
+        mocked_return = [{
+            'id': 1,
+            'name': 'first label',
+            'color': '#ffffff',
+        }, {
+            'id': 2,
+            'name': 'second label',
+            'color': '#000000',
+        }]
+
+        self.mocked_request_response = mocked_return
+        requester_mock = mock.Mock()
+        requester_mock.get_request = self.mock_get_request
+
+        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+
+        expected = mocked_return
+        actual = gitlab.get_labels(
+            project_id=1,
+            auth_token_header=self.TOKEN_HEADER
+        )
+
+        self.assertEqual(expected, actual)
 
     def test_get_labels_auth_token_error(self):
-        pass
+        requester_mock = mock.Mock()
+        requester_mock.get_request.side_effect = UnsuccessfulHttpRequestException(401, {})
+
+        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+
+        with self.assertRaises(UnsuccessfulHttpRequestException):
+            gitlab.get_labels(project_id=1, auth_token_header=self.TOKEN_HEADER)
 
     def test_get_labels_no_label_found(self):
-        pass
+        mocked_return = []
+
+        self.mocked_request_response = mocked_return
+        requester_mock = mock.Mock()
+        requester_mock.get_request = self.mock_get_request
+
+        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+
+        expected = []
+        actual = gitlab.get_labels(
+            project_id=1,
+            auth_token_header=self.TOKEN_HEADER
+        )
+
+        self.assertEqual(expected, actual)
