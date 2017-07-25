@@ -88,11 +88,11 @@ class Gitlab(RemoteRepoInterface):
 
         return labels_info
 
-    def get_project_id(self, username, password):
+    def get_project_id(self, username, repository):
         project_request = '{0}/projects/{1}%2F{2}'.format(
             self.API_URL,
             username,
-            password
+            repository
         )
 
         project = self.requester.get_request(project_request)
