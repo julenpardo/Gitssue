@@ -48,23 +48,11 @@ class Gitlab(RemoteRepoInterface):
                 if get_description:
                     description = issue['description']
 
-                issue_labels = []
-                labels_info = self.get_labels(
+                issue_labels = self.create_label_list(
                     project_id,
-                    auth_token_header
+                    auth_token_header,
+                    issue
                 )
-
-                for label in issue['labels']:
-                    color = '#ffffff'
-
-                    for label_info in labels_info:
-                        if label_info['name'] == label:
-                            color = label_info['color']
-
-                    issue_labels.append({
-                        'name': label,
-                        'color': color.replace('#', '')
-                    })
 
                 issue_list.append({
                     'number': issue['iid'],
@@ -87,6 +75,27 @@ class Gitlab(RemoteRepoInterface):
         )
 
         return labels_info
+
+    def create_label_list(self, project_id, auth_token_header, issue):
+        issue_labels = []
+        labels_info = self.get_labels(
+            project_id,
+            auth_token_header
+        )
+
+        for label in issue['labels']:
+            color = '#ffffff'
+
+            for label_info in labels_info:
+                if label_info['name'] == label:
+                    color = label_info['color']
+
+            issue_labels.append({
+                'name': label,
+                'color': color.replace('#', '')
+            })
+
+        return issue_labels
 
     def get_project_id(self, username, repository):
         project_request = '{0}/projects/{1}%2F{2}'.format(
