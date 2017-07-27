@@ -151,3 +151,47 @@ class GitlabTest(unittest.TestCase):
         )
 
         self.assertEqual(expected, actual)
+
+    def test_create_label_list(self):
+        mocked_return = [
+            {
+                'id': 1,
+                'name': 'first label',
+                'color': '#ffffff',
+            }, {
+                'id': 2,
+                'name': 'second label',
+                'color': '#f0f0f0',
+            }, {
+                'id': 3,
+                'name': 'third label but unassigned to the issue',
+                'color': '#abcdef',
+            }
+        ]
+
+        input_issues = {
+            'name': 'first issue',
+            'labels': [
+                'first label', 'second label'
+            ]
+        }
+
+        self.mocked_request_response = mocked_return
+        requester_mock = mock.Mock()
+        requester_mock.get_request = self.mock_get_request
+
+        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+
+        expected = [
+            {
+                'name': 'first label',
+                'color': 'ffffff',
+            },
+            {
+                'name': 'second label',
+                'color': 'f0f0f0',
+            }
+        ]
+        actual = gitlab.create_label_list(1, {}, input_issues)
+
+        self.assertEqual(expected, actual)
