@@ -117,7 +117,42 @@ class Gitlab(RemoteRepoInterface):
         :param issue_numbers: the issue identifier(s).
         :return: a dictionary with the title and the body message of each issue id.
         """
-        pass
+        request = '{0}/issues'.format(self.API_URL)
+        issues_descriptions = []
+        not_found_issues = []
+
+        if issue_numbers:
+            project_id = self.get_project_id(username, repository)
+            auth_token_header = {'PRIVATE-TOKEN': self.auth_token}
+            response_issues = self.requester.get_request(
+                request,
+                extra_headers=auth_token_header
+            )
+
+            for issue in response_issues:
+                issue_id = str(issue['iid'])
+
+                if issue_id in issue_numbers:
+                    issue_labels = self.create_label_list(
+                        project_id,
+                        auth_token_header,
+                        issue
+                    )
+
+                    issue_description = {
+                        'number': issue_id,
+                        'labels': issue_labels,
+                        'description': {
+                            'title': issue['title'],
+                            'body': issue['description']
+                        }
+                    }
+
+                    issues_descriptions.append(issue_description)
+
+            not_found_issues = [issue_number for issue_number in issue_numbers if issue_number not in [str(issue['iid']) for issue in response_issues]]
+
+        return issues_descriptions, not_found_issues
 
     def get_issue_comments(self, username, repository, issue_number):
         """
