@@ -195,3 +195,130 @@ class GitlabTest(unittest.TestCase):
         actual = gitlab.create_label_list(1, {}, input_issues)
 
         self.assertEqual(expected, actual)
+
+    def test_get_issues_description(self):
+        project_id = {'id': 1}
+        mocked_issue_list = [
+            {
+                'iid': '1',
+                'title': 'first issue',
+                'labels': [
+                    'bug',
+                    'feature'
+                ],
+                'description': 'first issue description',
+            },
+            {
+                'iid': '3',
+                'title': 'third issue',
+                'labels': [
+                    'feature'
+                ],
+                'description': 'third issue description',
+            },
+            {
+                'iid': '4',
+                'title': 'fourth issue',
+                'labels': [
+                    'feature'
+                ],
+                'description': 'fourth but not requested issue',
+            },
+        ]
+
+        def side_effect(*args, **kwargs):
+            labels = [
+                {
+                    'name': 'bug',
+                    'color': '#f0f0f0',
+                }, {
+                    'name': 'feature',
+                    'color': '#ffffff'
+                }
+            ]
+            if args[0] == 'https://gitlab.com/api/v4/issues':
+                return mocked_issue_list
+            elif args[0] == 'https://gitlab.com/api/v4/projects/username%2Frepo':
+                return project_id
+            elif args[0] == 'https://gitlab.com/api/v4/projects/1/labels':
+                return labels
+
+        username = 'username'
+        repo = 'repo'
+        issue_numbers = ['1', '2', '3']
+
+        requester_mock = mock.Mock()
+        requester_mock.get_request.side_effect = side_effect
+
+        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+
+        expected_found_issues = [
+            {
+                'number': '1',
+                'labels': [{
+                    'name': 'bug',
+                    'color': 'f0f0f0',
+                }, {
+                    'name': 'feature',
+                    'color': 'ffffff',
+                }],
+                'description': {
+                    'title': 'first issue',
+                    'body': 'first issue description',
+                }
+            }, {
+                'number': '3',
+                'labels': [{
+                    'name': 'feature',
+                    'color': 'ffffff'
+                }],
+                'description': {
+                    'title': 'third issue',
+                    'body': 'third issue description',
+                }
+            }
+        ]
+        expected_not_found_issues = ['2']
+        expected = expected_found_issues, expected_not_found_issues
+        actual = gitlab.get_issues_description(username, repo, issue_numbers)
+
+        self.assertEqual(expected, actual)
+
+    def test_get_issues_description_not_found_issue(self):
+        project_id = {'id': 1}
+        mocked_issue_list = []
+
+        def side_effect(*args, **kwargs):
+            # Mock for get_project_id
+            if args[0] == 'https://gitlab.com/api/v4/projects/username%2Frepo':
+                return project_id
+            else:
+                return mocked_issue_list
+
+        username = 'username'
+        repo = 'repo'
+        issue_numbers = ['1', '2']
+
+        requester_mock = mock.Mock()
+        requester_mock.get_request.side_effect = side_effect
+
+        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+
+        expected = [], ['1', '2']
+        actual = gitlab.get_issues_description(username, repo, issue_numbers)
+
+        self.assertEqual(expected, actual)
+
+    def test_get_issues_description_not_issue_given(self):
+        username = 'username'
+        repo = 'repo'
+        issue_numbers = []
+
+        requester_mock = mock.Mock()
+
+        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+
+        expected = [], []
+        actual = gitlab.get_issues_description(username, repo, issue_numbers)
+
+        self.assertEqual(expected, actual)
