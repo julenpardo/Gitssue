@@ -161,7 +161,29 @@ class Gitlab(RemoteRepoInterface):
         :param repository: the repository to look the issues at.
         :param issue_number: the issue number to query the comments to.
         """
-        pass
+        request = '{0}/projects/{1}/issues/{2}/notes'
+        issue_comments = []
+
+        if issue_number:
+            project_id = self.get_project_id(username, repository)
+            request = request.format(self.API_URL, project_id, issue_number)
+
+            auth_token_header = {'PRIVATE-TOKEN': self.auth_token}
+            response_comments = self.requester.get_request(
+                request,
+                extra_headers=auth_token_header
+            )
+
+            if response_comments:
+                for comment in response_comments:
+                    issue_comments.append({
+                        'author': comment['author']['username'],
+                        'created_at': comment['created_at'],
+                        'updated_at': comment['updated_at'],
+                        'body': comment['body'],
+                    })
+
+        return issue_comments
 
     def get_rate_information(self):
         """
@@ -176,7 +198,7 @@ class Gitlab(RemoteRepoInterface):
         Parses the generated exception during the request, necessary for special cases,
         e.g., when the API limit is hit.
 
-        @TODO: make messages more specific.
+        TODO: make messages more specific.
         :param exception: (UnsuccessfulRequestException) The exception object generated in the
             request.
         :param issue_numbers: the issue number(s) that weren't found in the request.
