@@ -322,3 +322,91 @@ class GitlabTest(unittest.TestCase):
         actual = gitlab.get_issues_description(username, repo, issue_numbers)
 
         self.assertEqual(expected, actual)
+
+    def test_get_issue_comments(self):
+        project_id = {'id': 1}
+        mocked_issue_comments = [
+            {
+                'author': {'username': 'author 1'},
+                'created_at': 'now',
+                'updated_at': 'later',
+                'body': 'first comment'
+            },
+            {
+                'author': {'username': 'author 1'},
+                'created_at': 'later',
+                'updated_at': 'even later',
+                'body': 'second comment'
+            },
+        ]
+
+        def side_effect(*args, **kwargs):
+            if args[0] == 'https://gitlab.com/api/v4/projects/username%2Frepo':
+                return project_id
+            elif args[0] == 'https://gitlab.com/api/v4/projects/1/issues/1/notes':
+                return mocked_issue_comments
+
+        username = 'username'
+        repo = 'repo'
+        issue_number = 1
+
+        requester_mock = mock.Mock()
+        requester_mock.get_request.side_effect = side_effect
+
+        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+
+        expected = [
+            {
+                'author': 'author 1',
+                'created_at': 'now',
+                'updated_at': 'later',
+                'body': 'first comment'
+            },
+            {
+                'author': 'author 1',
+                'created_at': 'later',
+                'updated_at': 'even later',
+                'body': 'second comment'
+            },
+        ]
+        actual = gitlab.get_issue_comments(username, repo, issue_number)
+
+        self.assertEqual(expected, actual)
+
+    def test_get_issue_comments_not_found_issue(self):
+        project_id = {'id': 1}
+        mocked_issue_comments = []
+
+        def side_effect(*args, **kwargs):
+            # Mock for get_project_id
+            if args[0] == 'https://gitlab.com/api/v4/projects/username%2Frepo':
+                return project_id
+            else:
+                return mocked_issue_comments
+
+        username = 'username'
+        repo = 'repo'
+        issue_number = 1
+
+        requester_mock = mock.Mock()
+        requester_mock.get_request.side_effect = side_effect
+
+        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+
+        expected = []
+        actual = gitlab.get_issue_comments(username, repo, issue_number)
+
+        self.assertEqual(expected, actual)
+
+    def test_get_issue_comments_no_issue_given(self):
+        username = 'username'
+        repo = 'repo'
+        issue_number = None
+
+        requester_mock = mock.Mock()
+        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+
+        expected = []
+        actual = gitlab.get_issue_comments(username, repo, issue_number)
+
+        self.assertEqual(expected, actual)
