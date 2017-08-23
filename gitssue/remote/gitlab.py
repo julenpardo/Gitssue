@@ -187,11 +187,12 @@ class Gitlab(RemoteRepoInterface):
 
     def get_rate_information(self):
         """
-        Gets the GitHub API rate information (remaining requests, reset time, etc.).
-        requests, the limit is 60 requests/hour. For authenticated ones, 5000/hour.
-        :return: remaining request number.
+        The Gitlab API doesn't have a rate limit, so we return everything as
+        -1 (the total limit, the remaining requests, and the reset time), to
+        let the controller know that it's unlimited.
+        :return: everything to -1 to indicate that is unlimited.
         """
-        pass
+        return -1, -1, -1
 
     def parse_request_exception(self, exception, issue_numbers=()):
         """

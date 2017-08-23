@@ -410,3 +410,16 @@ class GitlabTest(unittest.TestCase):
         actual = gitlab.get_issue_comments(username, repo, issue_number)
 
         self.assertEqual(expected, actual)
+
+    def test_get_rate_information(self):
+        """
+        The Gitlab API doesn't have a rate limit, so everything is set to -1.
+        """
+
+        requester_mock = mock.Mock()
+        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+
+        expected = -1, -1, -1
+        actual = gitlab.get_rate_information()
+
+        self.assertEqual(expected, actual)
