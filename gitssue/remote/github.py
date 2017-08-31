@@ -11,9 +11,9 @@ class Github(RemoteRepoInterface):
     API_URL = 'https://api.github.com'
 
     def __init__(self, requester, credentials):
-        super(Github, self).__init__(requester, credentials.get('github', {}))
+        super(Github,self).__init__(requester, credentials.get('github', {}))
 
-    def get_issue_list(self, username, repository, show_all=False, get_description=False):
+    def get_issue_list(self, username, repository, show_all=False,get_description=False):
         """
         Gets the open issue list of the given repository of the given user.
 

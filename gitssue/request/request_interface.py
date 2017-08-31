@@ -10,7 +10,7 @@ class RequestInterface(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def get_request(self, request, credentials={}):
+    def get_request(self, request, credentials={}, extra_headers={}):
         """
         Executes a GET request.
 

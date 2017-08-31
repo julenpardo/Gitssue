@@ -140,7 +140,15 @@ class Controller:
         try:
             limit, remaining, reset = self.deps.remote.get_rate_information()
 
-            self.deps.printer.print_rate_information(limit, remaining, reset)
+            unlimited = True if limit == -1 and remaining == -1 \
+                and reset == -1 else False
+
+            self.deps.printer.print_rate_information(
+                limit,
+                remaining,
+                reset,
+                unlimited
+            )
         except RequestException as request_exception:
             error = 'A connection error occurred:\n'
             error += str(request_exception)

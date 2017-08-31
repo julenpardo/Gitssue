@@ -13,9 +13,9 @@ class Requests(RequestInterface):
     Concrete implementation requests_interface, using "requests" module.
     """
 
-    TIMEOUT = 2.0
+    TIMEOUT = 40.0
 
-    def get_request(self, request, credentials=None):
+    def get_request(self, request, credentials=None, extra_headers=None):
         """
         Executes a GET request.
 
@@ -23,11 +23,21 @@ class Requests(RequestInterface):
         :return: response JSON object; False if the HTTP status code distinct to 200.
         """
         authentication = ()
+        headers = {}
+
+        if extra_headers is not None:
+            headers = extra_headers
+
         if credentials is not None and 'username' in credentials and 'password' in credentials:
             authentication = (credentials['username'], credentials['password'])
 
         try:
-            response = requests.get(request, auth=authentication, timeout=self.TIMEOUT)
+            response = requests.get(
+                request,
+                auth=authentication,
+                headers=headers,
+                timeout=self.TIMEOUT
+            )
         except RequestException:
             raise
 

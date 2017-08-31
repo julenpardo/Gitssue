@@ -9,9 +9,10 @@ class RemoteRepoInterface(metaclass=ABCMeta):
     The interface the concrete repo modules (Github, Gitlab, etc.) will have to implement.
     """
 
-    def __init__(self, requester, credentials):
+    def __init__(self, requester, credentials='', auth_token=''):
         self.requester = requester
         self.credentials = credentials
+        self.auth_token = auth_token
 
     @abstractmethod
     def get_issue_list(self, username, repository, show_all=False, get_description=False):

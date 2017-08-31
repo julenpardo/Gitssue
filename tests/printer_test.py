@@ -220,3 +220,24 @@ class PrinterTest(unittest.TestCase):
         actual = temp_stdout.getvalue().strip()
 
         self.assertEqual(expected, actual)
+
+    def test_print_rate_information_unlimited(self):
+        limit = 60
+        remaining = 55
+        reset = time.time()
+        unlimited = True
+
+        expected = 'There is no rate limit for this API.'
+
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            self.printer.print_rate_information(
+                limit,
+                remaining,
+                reset,
+                unlimited
+            )
+
+        actual = temp_stdout.getvalue().strip()
+
+        self.assertEqual(expected, actual)
