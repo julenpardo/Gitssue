@@ -3,7 +3,7 @@ import re
 from gitssue.git.repo_not_found_exception import RepoNotFoundException
 
 
-SUPPORTED_REMOTES = ['github.com', 'gitlab.com']
+_SUPPORTED_REMOTES = ['github.com', 'gitlab.com']
 
 
 def discard_not_supported_remotes(remotes_url):
@@ -17,7 +17,7 @@ def discard_not_supported_remotes(remotes_url):
     for remote in remotes_url:
         remote_url = remote[1]
         is_supported = any(supported_remote in remote_url.lower()
-                           for supported_remote in SUPPORTED_REMOTES)
+                           for supported_remote in _SUPPORTED_REMOTES)
 
         if not is_supported:
             remotes_url.remove(remote)
@@ -42,7 +42,7 @@ def get_username_and_repo(shell_wrapper):
             username_and_repo = username_and_repo.replace('https://', '')
             username_and_repo = username_and_repo.replace('\n', '')
 
-            for supported_remote in SUPPORTED_REMOTES:
+            for supported_remote in _SUPPORTED_REMOTES:
                 username_and_repo = username_and_repo.replace(
                     '{}/'.format(supported_remote),
                     ''

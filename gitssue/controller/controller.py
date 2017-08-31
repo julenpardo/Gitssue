@@ -10,8 +10,8 @@ class Controller:
     and call the printer to show it.
     """
 
-    ISSUE_NUMBER_FORMAT_ERROR = 'Issue number(s) must be number(s).'
-    MANY_ORIGINS_ERROR = 'More than one remote was detected. Gitssue does not offer ' \
+    _ISSUE_NUMBER_FORMAT_ERROR = 'Issue number(s) must be number(s).'
+    _MANY_ORIGINS_ERROR = 'More than one remote was detected. Gitssue does not offer ' \
                          'support for this yet.'
 
     def __init__(self, dependencies):
@@ -48,7 +48,7 @@ class Controller:
             else:
                 self.deps.printer.print_error(error)
         else:
-            self.deps.printer.print_error(self.MANY_ORIGINS_ERROR)
+            self.deps.printer.print_error(self._MANY_ORIGINS_ERROR)
 
     def desc(self, issue_numbers):
         """
@@ -64,7 +64,7 @@ class Controller:
             username, repo = usernames_and_repo[0]
 
             if not all(number.isdigit() for number in issue_numbers):
-                self.deps.printer.print_error(self.ISSUE_NUMBER_FORMAT_ERROR)
+                self.deps.printer.print_error(self._ISSUE_NUMBER_FORMAT_ERROR)
             elif issue_numbers:
                 try:
                     issues, not_found_issues = self.deps.remote.get_issues_description(
@@ -89,7 +89,7 @@ class Controller:
             else:
                 show_help = True
         else:
-            self.deps.printer.print_error(self.MANY_ORIGINS_ERROR)
+            self.deps.printer.print_error(self._MANY_ORIGINS_ERROR)
 
         return show_help
 
@@ -108,7 +108,7 @@ class Controller:
             username, repo = usernames_and_repo[0]
 
             if not issue_number.isdigit():
-                self.deps.printer.print_error(self.ISSUE_NUMBER_FORMAT_ERROR)
+                self.deps.printer.print_error(self._ISSUE_NUMBER_FORMAT_ERROR)
             else:
                 try:
                     comment_thread = self.deps.remote.get_issue_comments(
@@ -131,7 +131,7 @@ class Controller:
                     self.deps.printer.print_error(error)
 
         else:
-            self.deps.printer.print_error(self.MANY_ORIGINS_ERROR)
+            self.deps.printer.print_error(self._MANY_ORIGINS_ERROR)
 
     def rate_information(self):
         """

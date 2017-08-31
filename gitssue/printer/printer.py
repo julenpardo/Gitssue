@@ -8,10 +8,10 @@ class Printer(PrinterInterface):
     CLI printer module for printing the output.
     """
 
-    ISSUE_TITLE_COLOR = 'c3a000'
-    COMMENT_AUTHOR_COLOR = 'c3a000'
-    COMMENT_DATE_COLOR = 'c3a000'
-    ERROR_COLOR = 'ff0000'
+    _ISSUE_TITLE_COLOR = 'c3a000'
+    _COMMENT_AUTHOR_COLOR = 'c3a000'
+    _COMMENT_DATE_COLOR = 'c3a000'
+    _ERROR_COLOR = 'ff0000'
 
     def __init__(self, color_printer):
         """
@@ -33,7 +33,7 @@ class Printer(PrinterInterface):
                 issue_title = '#{0}: {1}'.format(issue['number'], issue['title'])
 
                 if show_description:
-                    self.color_printer.print_colored_line(issue_title, self.ISSUE_TITLE_COLOR)
+                    self.color_printer.print_colored_line(issue_title, self._ISSUE_TITLE_COLOR)
                 else:
                     print(issue_title)
 
@@ -57,7 +57,7 @@ class Printer(PrinterInterface):
                     issue['number'],
                     issue['description']['title']
                 )
-                self.color_printer.print_colored_line(issue_title, self.ISSUE_TITLE_COLOR)
+                self.color_printer.print_colored_line(issue_title, self._ISSUE_TITLE_COLOR)
 
                 if issue.get('labels'):
                     self.color_printer.print_labels(issue['labels'])
@@ -75,10 +75,10 @@ class Printer(PrinterInterface):
         if comment_thread:
             for comment in comment_thread:
                 author = 'Author: {0}'.format(comment['author'])
-                self.color_printer.print_colored_line(author, self.COMMENT_AUTHOR_COLOR)
+                self.color_printer.print_colored_line(author, self._COMMENT_AUTHOR_COLOR)
 
                 date = 'Date: {0}'.format(comment['created_at'])
-                self.color_printer.print_colored_line(date, self.COMMENT_DATE_COLOR)
+                self.color_printer.print_colored_line(date, self._COMMENT_DATE_COLOR)
 
                 print('\n{0}\n\n'.format(comment['body']))
 
@@ -90,7 +90,7 @@ class Printer(PrinterInterface):
         Prints an error.
         :param error: The error to print.
         """
-        self.color_printer.print_colored_line('Error', self.ERROR_COLOR)
+        self.color_printer.print_colored_line('Error', self._ERROR_COLOR)
         print(error + '\n')
 
     def print_rate_information(self, limit=0, remaining=0, reset=0,
