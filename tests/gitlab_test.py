@@ -88,7 +88,7 @@ class GitlabTest(unittest.TestCase):
         gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
 
         expected = mocked_return['id']
-        actual = gitlab.get_project_id('julenpardo', 'gitssue')
+        actual = gitlab._get_project_id('julenpardo', 'gitssue')
 
         self.assertEqual(expected, actual)
 
@@ -99,7 +99,7 @@ class GitlabTest(unittest.TestCase):
         gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
 
         with self.assertRaises(UnsuccessfulHttpRequestException):
-            gitlab.get_project_id('whatever', 'whatever')
+            gitlab._get_project_id('whatever', 'whatever')
 
     def test_get_labels(self):
         mocked_return = [{
@@ -119,7 +119,7 @@ class GitlabTest(unittest.TestCase):
         gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
 
         expected = mocked_return
-        actual = gitlab.get_labels(
+        actual = gitlab._get_labels(
             project_id=1,
             auth_token_header=self.TOKEN_HEADER
         )
@@ -133,7 +133,7 @@ class GitlabTest(unittest.TestCase):
         gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
 
         with self.assertRaises(UnsuccessfulHttpRequestException):
-            gitlab.get_labels(project_id=1, auth_token_header=self.TOKEN_HEADER)
+            gitlab._get_labels(project_id=1, auth_token_header=self.TOKEN_HEADER)
 
     def test_get_labels_no_label_found(self):
         mocked_return = []
@@ -145,7 +145,7 @@ class GitlabTest(unittest.TestCase):
         gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
 
         expected = []
-        actual = gitlab.get_labels(
+        actual = gitlab._get_labels(
             project_id=1,
             auth_token_header=self.TOKEN_HEADER
         )
@@ -192,7 +192,7 @@ class GitlabTest(unittest.TestCase):
                 'color': 'f0f0f0',
             }
         ]
-        actual = gitlab.create_label_list(1, {}, input_issues)
+        actual = gitlab._create_label_list(1, {}, input_issues)
 
         self.assertEqual(expected, actual)
 

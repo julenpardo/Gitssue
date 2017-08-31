@@ -13,7 +13,7 @@ class Requests(RequestInterface):
     Concrete implementation requests_interface, using "requests" module.
     """
 
-    TIMEOUT = 40.0
+    _TIMEOUT = 40.0
 
     def get_request(self, request, credentials=None, extra_headers=None):
         """
@@ -36,7 +36,7 @@ class Requests(RequestInterface):
                 request,
                 auth=authentication,
                 headers=headers,
-                timeout=self.TIMEOUT
+                timeout=self._TIMEOUT
             )
         except RequestException:
             raise
