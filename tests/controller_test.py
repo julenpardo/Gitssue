@@ -10,6 +10,7 @@ sys.path.append(os.path.abspath('.'))
 sys.path.append(os.path.abspath('./gitssue'))
 
 from gitssue.controller.controller import Controller
+from gitssue.git.git_wrapper import GitWrapper
 from gitssue.dependencies.dependencies import Dependencies
 from gitssue.printer.color_printer_interface import ColorPrinterInterface
 from gitssue.request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
@@ -48,6 +49,7 @@ class ControllerTest(unittest.TestCase):
         self.mocked_shell_wrapper_execute_command_return = mocked_return
         shell_wrapper_mock.execute_command = self.mock_shell_wrapper_execute_command
         self.controller.deps.shell = shell_wrapper_mock
+        self.controller.deps.git_wrapper = GitWrapper(shell_wrapper_mock)
 
     def mock_remote_get_issue_list(self, username, repo, all=False, desc=False):
         if self.requester_mock is not None:

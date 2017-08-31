@@ -1,6 +1,5 @@
 """ Application controller; the one that executes the actions from the CLI. """
 from requests.exceptions import RequestException
-from gitssue.git import git_wrapper
 from gitssue.request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
 
 
@@ -23,7 +22,7 @@ class Controller:
         :param show_all: If show all issues (that is, also closed ones), or not.
         :param description: If show description of the issue or not.
         """
-        usernames_and_repo = git_wrapper.get_username_and_repo(self.deps.shell)
+        usernames_and_repo = self.deps.git_wrapper.get_username_and_repo()
         error = ''
 
         if len(usernames_and_repo) == 1:
@@ -55,7 +54,7 @@ class Controller:
         Prints the description of the given issue numbers.
         :param issue_numbers: the issue number to retrieve the description of.
         """
-        usernames_and_repo = git_wrapper.get_username_and_repo(self.deps.shell)
+        usernames_and_repo = self.deps.git_wrapper.get_username_and_repo()
         error = ''
         show_help = False
         issues = False
@@ -101,7 +100,7 @@ class Controller:
         check itself.
         :param issue_number: the issue to print the comment thread of.
         """
-        usernames_and_repo = git_wrapper.get_username_and_repo(self.deps.shell)
+        usernames_and_repo = self.deps.git_wrapper.get_username_and_repo()
         error = ''
 
         if len(usernames_and_repo) == 1:

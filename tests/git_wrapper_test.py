@@ -1,7 +1,7 @@
 import unittest
 from unittest import mock
 
-from gitssue.git.git_wrapper import *
+from gitssue.git.git_wrapper import GitWrapper
 from gitssue.git.repo_not_found_exception import RepoNotFoundException
 
 
@@ -29,7 +29,10 @@ class GitWrapperTest(unittest.TestCase):
         expected = 'https://github.com/julenpardo/Gitssue'
         shell_wrapper_mock = mock.Mock()
         shell_wrapper_mock.execute_command = self.fake_execute_command
-        actual = get_remote_url(shell_wrapper_mock).replace('\n', '')
+
+        git_wrapper = GitWrapper(shell_wrapper_mock)
+
+        actual = git_wrapper.get_remote_url().replace('\n', '')
 
         self.assertEqual(expected, actual)
 
@@ -41,8 +44,10 @@ class GitWrapperTest(unittest.TestCase):
         shell_wrapper_mock = mock.Mock()
         shell_wrapper_mock.execute_command = self.mock_execute_command_with_error
 
+        git_wrapper = GitWrapper(shell_wrapper_mock)
+
         with self.assertRaises(RepoNotFoundException):
-            get_remote_url(shell_wrapper_mock)
+            git_wrapper.get_remote_url()
 
     def test_get_username_and_repo(self):
         """
@@ -54,7 +59,9 @@ class GitWrapperTest(unittest.TestCase):
         shell_wrapper_mock.execute_command = self.mock_execute_command
         expected = [['julenpardo', 'Gitssue']]
 
-        actual = get_username_and_repo(shell_wrapper_mock)
+        git_wrapper = GitWrapper(shell_wrapper_mock)
+
+        actual = git_wrapper.get_username_and_repo()
 
         self.assertEqual(expected, actual)
 
@@ -66,8 +73,10 @@ class GitWrapperTest(unittest.TestCase):
         shell_wrapper_mock = mock.Mock()
         shell_wrapper_mock.execute_command = self.mock_execute_command_with_error
 
+        git_wrapper = GitWrapper(shell_wrapper_mock)
+
         with self.assertRaises(RepoNotFoundException):
-            get_username_and_repo(shell_wrapper_mock)
+            git_wrapper.get_username_and_repo()
 
     def test_get_remotes_urls(self):
         mocked_return = "origin git@github.com:julenpardo/Gitssue.git (fetch)"\
@@ -79,12 +88,14 @@ class GitWrapperTest(unittest.TestCase):
         self.mock_response = mocked_return
         shell_wrapper_mock.execute_command = self.mock_execute_command
 
+        git_wrapper = GitWrapper(shell_wrapper_mock)
+
         expected = [
             ['origin', 'git@github.com:julenpardo/Gitssue.git'],
             ['other_origin', 'github.com/whatever'],
             ['another_origin', 'github.com/whatever2'],
         ]
-        actual = get_remotes_urls(shell_wrapper_mock)
+        actual = git_wrapper.get_remotes_urls()
 
         self.assertEqual(expected, actual)
 
@@ -96,14 +107,17 @@ class GitWrapperTest(unittest.TestCase):
         shell_wrapper_mock = mock.Mock()
         shell_wrapper_mock.execute_command = self.mock_execute_command_with_error
 
+        git_wrapper = GitWrapper(shell_wrapper_mock)
+
         with self.assertRaises(RepoNotFoundException):
-            get_remotes_urls(shell_wrapper_mock)
+            git_wrapper.get_remotes_urls()
 
     def test_discard_not_supported_remotes(self):
         """
         In the current version, only "Github" is supported.
         :return:
         """
+        git_wrapper = GitWrapper(None)
         input = [
             ['origin1', 'foo@GiThUb.com'],
             ['origin2', 'foo@gitlab.com'],
@@ -115,7 +129,7 @@ class GitWrapperTest(unittest.TestCase):
             ['origin2', 'foo@gitlab.com'],
             ['origin3', 'github.com/foo/bar'],
         ]
-        actual = discard_not_supported_remotes(input)
+        actual = git_wrapper.discard_not_supported_remotes(input)
 
         self.assertEqual(expected, actual)
 
@@ -124,8 +138,10 @@ class GitWrapperTest(unittest.TestCase):
         In the current version, only "Github" is supported.
         :return:
         """
+        git_wrapper = GitWrapper(None)
+
         input = []
         expected = []
-        actual = discard_not_supported_remotes(input)
+        actual = git_wrapper.discard_not_supported_remotes(input)
 
         self.assertEqual(expected, actual)
