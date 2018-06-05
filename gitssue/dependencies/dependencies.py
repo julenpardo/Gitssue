@@ -15,14 +15,19 @@ class Dependencies:
     Dependency injection.
     """
 
-    requester = Requests()
+    def __init__(self):
+        self.inject_dependencies()
 
-    remote = Github(requester, config_reader.get_config())
+    def inject_dependencies(self):
+        self.shell = ShellWrapper()
+        self.git_wrapper = GitWrapper(self.shell)
+        self.requester = Requests()
+        self.color_printer = ColorConsoleColorPrinter()
+        self.printer = Printer(self.color_printer)
 
-    shell = ShellWrapper()
+        remote_url = self.git_wrapper.get_remote_url()
 
-    git_wrapper = GitWrapper(shell)
-
-    color_printer = ColorConsoleColorPrinter()
-
-    printer = Printer(color_printer)
+        if 'github.com' in remote_url:
+            self.remote = Github(self.requester, config_reader.get_config())
+        else:
+            self.remote = Gitlab(self.requester, config_reader.get_config())
