@@ -41,7 +41,7 @@ class ControllerTest(unittest.TestCase):
     requester_mock = None
 
     def setUp(self):
-        self.controller = Controller(Dependencies)
+        self.controller = Controller(Dependencies())
         self.controller.deps.printer.color_printer = DummyColorPrinter()
 
         mocked_return = "origin git@github.com:julenpardo/Gitssue.git (fetch)"
