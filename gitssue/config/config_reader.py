@@ -17,11 +17,12 @@ _PARSER_DEFAULTS = ({
 
 def get_config():
     """
-    Reads the config file defined in the FILE_PATHS tuple, keeping the priority. That is,
-    the config will be set for the first file found, exiting the loop in that moment and
-    returning the value.
+    Reads the config file defined in the FILE_PATHS tuple, keeping the
+    priority. That is, the config will be set for the first file
+    found, exiting the loop in that moment and returning the value.
     If no file was found, an empty dictionary will be returned.
-    :return: A dictionary with the config, in "{'remote':{'username':'...'}..." format.
+    :return: A dictionary with the config, in
+    "{'remote':{'username':'...'}..." format.
     """
     config = {}
     parser = configparser.ConfigParser(_PARSER_DEFAULTS)

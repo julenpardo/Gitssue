@@ -1,17 +1,18 @@
 """ Application controller; the one that executes the actions from the CLI. """
 from requests.exceptions import RequestException
-from gitssue.request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
+from gitssue.request.unsuccessful_http_request_exception \
+    import UnsuccessfulHttpRequestException
 
 
 class Controller:
     """
-    The class that gets the data from the CLI module, uses it for making the request in question,
-    and call the printer to show it.
+    The class that gets the data from the CLI module, uses it for making the
+    request in question, and call the printer to show it.
     """
 
     _ISSUE_NUMBER_FORMAT_ERROR = 'Issue number(s) must be number(s).'
-    _MANY_ORIGINS_ERROR = 'More than one remote was detected. Gitssue does not offer ' \
-                         'support for this yet.'
+    _MANY_ORIGINS_ERROR = 'More than one remote was detected. Gitssue does ' \
+        'not offer support for this yet.'
 
     def __init__(self, dependencies):
         self.deps = dependencies
@@ -19,7 +20,8 @@ class Controller:
     def list(self, show_all=False, description=False):
         """
         Lists the issues, with the labels (if any).
-        :param show_all: If show all issues (that is, also closed ones), or not.
+        :param show_all: If show all issues (that is, also closed ones), or
+            not.
         :param description: If show description of the issue or not.
         """
         usernames_and_repo = self.deps.git_wrapper.get_username_and_repo()
@@ -36,8 +38,10 @@ class Controller:
                 )
             except TypeError:
                 error = 'No issue could be found.'
-            except UnsuccessfulHttpRequestException as unsuccessful_http_request:
-                error = self.deps.remote.parse_request_exception(unsuccessful_http_request)
+            except UnsuccessfulHttpRequestException as \
+                    unsuccessful_http_request:
+                error = self.deps.remote.parse_request_exception(
+                    unsuccessful_http_request)
             except RequestException as request_exception:
                 error = 'A connection error occurred:\n'
                 error += str(request_exception)
@@ -66,17 +70,20 @@ class Controller:
                 self.deps.printer.print_error(self._ISSUE_NUMBER_FORMAT_ERROR)
             elif issue_numbers:
                 try:
-                    issues, not_found_issues = self.deps.remote.get_issues_description(
-                        username,
-                        repo,
-                        issue_numbers,
-                    )
+                    issues, not_found_issues = self.deps.remote\
+                        .get_issues_description(
+                            username,
+                            repo,
+                            issue_numbers,
+                        )
 
                     if not_found_issues:
                         error = "The following issues couldn't be found: {0}".\
                             format(', '.join(not_found_issues))
-                except UnsuccessfulHttpRequestException as unsuccessful_http_request:
-                    error = self.deps.remote.parse_request_exception(unsuccessful_http_request)
+                except UnsuccessfulHttpRequestException as \
+                        unsuccessful_http_request:
+                    error = self.deps.remote.parse_request_exception(
+                        unsuccessful_http_request)
                 except RequestException as request_exception:
                     error = 'A connection error occurred:\n'
                     error += str(request_exception)
@@ -95,9 +102,9 @@ class Controller:
     def thread(self, issue_number):
         """
         Prints the comment thread of the given issue.
-        It's not necessary to check if the "issue_number" is given because in this case will
-        be done by Cement, because when the exact number of arguments is specified, it does the
-        check itself.
+        It's not necessary to check if the "issue_number" is given because in
+        this case will be done by Cement, because when the exact number of
+        arguments is specified, it does the check itself.
         :param issue_number: the issue to print the comment thread of.
         """
         usernames_and_repo = self.deps.git_wrapper.get_username_and_repo()
@@ -115,7 +122,8 @@ class Controller:
                         repo,
                         issue_number,
                     )
-                except UnsuccessfulHttpRequestException as unsuccessful_http_request:
+                except UnsuccessfulHttpRequestException as \
+                        unsuccessful_http_request:
                     error = self.deps.remote.parse_request_exception(
                         unsuccessful_http_request,
                         [issue_number],
@@ -125,7 +133,8 @@ class Controller:
                     error += str(request_exception)
 
                 if not error:
-                    self.deps.printer.print_issue_comment_thread(comment_thread)
+                    self.deps.printer.print_issue_comment_thread(
+                        comment_thread)
                 else:
                     self.deps.printer.print_error(error)
 

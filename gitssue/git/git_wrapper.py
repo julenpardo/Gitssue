@@ -11,11 +11,12 @@ class GitWrapper:
 
     def discard_not_supported_remotes(self, remotes_url):
         """
-        Discards the not supported remotes. For the moment, only Github is supported.
+        Discards the not supported remotes. For the moment, only Github is
+        supported.
         :param remotes_url: List of remotes names with its URL, e.g.:
-        [['origin', 'git@github.com:julenpardo/Gitssue.git]]
-        :return: The list in the same format as received, but discarding the not supported
-        origins.
+            [['origin', 'git@github.com:julenpardo/Gitssue.git]]
+        :return: The list in the same format as received, but discarding the
+            not supported origins.
         """
         for remote in remotes_url:
             remote_url = remote[1]
@@ -79,8 +80,8 @@ class GitWrapper:
     def get_remotes_urls(self):
         """
         Gets the remotes list with the 'git remote --verbose' command.
-        The command returns two URLs for each remote, for fetching and pushing, so
-        after creating the list, we have to remove the duplicates.
+        The command returns two URLs for each remote, for fetching and pushing,
+        so after creating the list, we have to remove the duplicates.
         :return: list of remote name with its URL.
         """
         command = 'git remote --verbose'

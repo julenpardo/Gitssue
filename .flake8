@@ -1,0 +1,10 @@
+[flake8]
+exclude =
+    .git,
+    __pycache__,
+    dist,
+    env,
+    img,
+    reports,
+    tests,
+    setup.py

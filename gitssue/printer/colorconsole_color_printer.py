@@ -19,7 +19,8 @@ class ColorConsoleColorPrinter(ColorPrinterInterface):
 
     def print_colored_line(self, line, hex_color='ffffff'):
         """
-        Prints the given line with the given color, and, then, resetting the color.
+        Prints the given line with the given color, and, then, resetting the
+        color.
         :param line: The line to print.
         :param hex_color: The color of the line to print.
         """

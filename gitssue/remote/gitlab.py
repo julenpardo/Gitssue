@@ -1,6 +1,7 @@
 """ Gitlab module. """
 from gitssue.remote.remote_repo_interface import RemoteRepoInterface
-from gitssue.request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
+from gitssue.request.unsuccessful_http_request_exception \
+    import UnsuccessfulHttpRequestException
 
 
 class Gitlab(RemoteRepoInterface):
@@ -115,7 +116,8 @@ class Gitlab(RemoteRepoInterface):
         :param username: the user owning the repository.
         :param repository: the repository to look the issues at.
         :param issue_numbers: the issue identifier(s).
-        :return: a dictionary with the title and the body message of each issue id.
+        :return: a dictionary with the title and the body message of each issue
+            id.
         """
         request = '{0}/issues'.format(self._API_URL)
         issues_descriptions = []
@@ -150,7 +152,8 @@ class Gitlab(RemoteRepoInterface):
 
                     issues_descriptions.append(issue_description)
 
-            not_found_issues = [issue_number for issue_number in issue_numbers if issue_number not in [str(issue['iid']) for issue in response_issues]]
+            not_found_issues = [issue_number for issue_number in issue_numbers if issue_number not in [
+                str(issue['iid']) for issue in response_issues]]
 
         return issues_descriptions, not_found_issues
 
@@ -196,16 +199,16 @@ class Gitlab(RemoteRepoInterface):
 
     def parse_request_exception(self, exception, issue_numbers=()):
         """
-        Parses the generated exception during the request, necessary for special cases,
-        e.g., when the API limit is hit.
+        Parses the generated exception during the request, necessary for
+        special cases, e.g., when the API limit is hit.
 
         TODO: make messages more specific.
-        :param exception: (UnsuccessfulRequestException) The exception object generated in the
+        :param exception: (UnsuccessfulRequestException) The exception object
+            generated in the request.
+        :param issue_numbers: the issue number(s) that weren't found in the
             request.
-        :param issue_numbers: the issue number(s) that weren't found in the request.
         :return: The error message that will be displayed to the user.
         """
         message = 'An error occurred in the request.'
 
         return message
-

@@ -17,7 +17,7 @@ class Dependencies:
 
     requester = Requests()
 
-    remote = Gitlab(requester, config_reader.get_config())
+    remote = Github(requester, config_reader.get_config())
 
     shell = ShellWrapper()
 

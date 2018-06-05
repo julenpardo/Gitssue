@@ -30,8 +30,8 @@ class BaseController(ArgparseController):
         Meta class of the base Cement controller.
         """
         label = 'base'
-        description = 'Gitssue - Manage your issues from the command line (version {0})'\
-            .format(GITSSUE_VERSION)
+        description = 'Gitssue - Manage your issues from the command line ' \
+            + '(version {0})'.format(GITSSUE_VERSION)
         arguments = [
             (
                 ['--version', '-v'],
@@ -50,7 +50,7 @@ class BaseController(ArgparseController):
             print('Gitssue {0}'.format(GITSSUE_VERSION))
         else:
             no_option = arguments.command is None and not arguments.debug \
-                        and not arguments.suppress_output and not arguments.version
+                and not arguments.suppress_output and not arguments.version
 
             if no_option:
                 self.app.args.parse_args(['--help'])
@@ -105,14 +105,15 @@ class BaseController(ArgparseController):
     def thread(self):
         """
         Get comment thread the given issue.
-        It's not necessary to check if the "issue_number" is given because in this case will
-        be done by Cement, because when the exact number of arguments is specified, it does the
-        check itself.
+        It's not necessary to check if the "issue_number" is given because in
+        this case will be done by Cement, because when the exact number of
+        arguments is specified, it does the check itself.
         """
         self.controller.thread(self.app.pargs.issue_number[0])
 
     @expose(
-        help='Shows the API rate information (remaining requests, reset time, etc.).',
+        help='Shows the API rate information (remaining requests, reset '
+             'time, etc.).',
         aliases=['ri']
     )
     def rate_info(self):

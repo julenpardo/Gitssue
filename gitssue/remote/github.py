@@ -1,6 +1,7 @@
 """ Github module. """
 from gitssue.remote.remote_repo_interface import RemoteRepoInterface
-from gitssue.request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
+from gitssue.request.unsuccessful_http_request_exception \
+    import UnsuccessfulHttpRequestException
 
 
 class Github(RemoteRepoInterface):
@@ -11,9 +12,10 @@ class Github(RemoteRepoInterface):
     API_URL = 'https://api.github.com'
 
     def __init__(self, requester, credentials):
-        super(Github,self).__init__(requester, credentials.get('github', {}))
+        super(Github, self).__init__(requester, credentials.get('github', {}))
 
-    def get_issue_list(self, username, repository, show_all=False,get_description=False):
+    def get_issue_list(self, username, repository, show_all=False,
+                       get_description=False):
         """
         Gets the open issue list of the given repository of the given user.
 
@@ -22,7 +24,8 @@ class Github(RemoteRepoInterface):
         :param show_all: show also closed issues.
         :return: a dictionary id:label format.
         """
-        request = '{0}/repos/{1}/{2}/issues'.format(self.API_URL, username, repository)
+        request = '{0}/repos/{1}/{2}/issues'.format(
+            self.API_URL, username, repository)
 
         if show_all:
             request += '?state=all'
@@ -59,7 +62,8 @@ class Github(RemoteRepoInterface):
         :param username: the user owning the repository.
         :param repository: the repository to look the issues at.
         :param issue_numbers: the issue identifier(s).
-        :return: a dictionary with the title and the body message of each issue id.
+        :return: a dictionary with the title and the body message of each issue
+            id.
         """
         issues_descriptions = []
         not_found_issues = []
@@ -86,7 +90,8 @@ class Github(RemoteRepoInterface):
                     }
 
                     issues_descriptions.append(issue_description)
-                except UnsuccessfulHttpRequestException as unsuccessful_request:
+                except UnsuccessfulHttpRequestException as \
+                        unsuccessful_request:
                     if unsuccessful_request.code == 404:
                         not_found_issues.append(issue_number)
 
@@ -122,13 +127,15 @@ class Github(RemoteRepoInterface):
 
     def get_rate_information(self):
         """
-        Gets the GitHub API rate information (remaining requests, reset time, etc.).
-        requests, the limit is 60 requests/hour. For authenticated ones, 5000/hour.
+        Gets the GitHub API rate information (remaining requests, reset time,
+        etc.) requests, the limit is 60 requests/hour. For authenticated ones,
+        5000/hour.
         :return: remaining request number.
         """
         request = '{0}/rate_limit'.format(self.API_URL)
 
-        rate_information = self.requester.get_request(request, self.credentials)
+        rate_information = self.requester.get_request(
+            request, self.credentials)
 
         return rate_information['rate']['limit'],\
             rate_information['rate']['remaining'],\
@@ -136,13 +143,15 @@ class Github(RemoteRepoInterface):
 
     def parse_request_exception(self, exception, issue_numbers=()):
         """
-        Parses the generated exception during the request, necessary for special cases,
+        Parses the generated exception during the request, necessary for
+        special cases,
         e.g., when the API limit is hit.
 
         @TODO: make messages more specific.
-        :param exception: (UnsuccessfulRequestException) The exception object generated in the
+        :param exception: (UnsuccessfulRequestException) The exception object
+            generated in the request.
+        :param issue_numbers: the issue number(s) that weren't found in the
             request.
-        :param issue_numbers: the issue number(s) that weren't found in the request.
         :return: The error message that will be displayed to the user.
         """
         message = 'An error occurred in the request.'
@@ -154,13 +163,14 @@ class Github(RemoteRepoInterface):
             message = 'GitHub API limit was reached. Read more about this at '\
                       + 'https://developer.github.com/v3/#rate-limiting'
         elif exception.code == 401:
-            message = "Invalid credentials. Check your '.gitssuerc' config file."
+            message = "Invalid credentials. Check your '.gitssuerc' config " \
+                + "file."
         elif exception.code == 404 and issue_numbers:
             message = "The following issue(s) couldn't be found: {0}".\
                 format(', '.join(issue_numbers))
         elif exception.code == 404:
-            message = "The repository doesn't exist; or exists but it's private, and the "\
-                      + "credentials haven't been set in the config file. Check the README "\
-                      + "for more information."
+            message = "The repository doesn't exist; or exists but it's " \
+                + "private, and the credentials haven't been set in the " \
+                + "config file. Check the README for more information."
 
         return message

@@ -5,7 +5,8 @@ import json
 import requests
 from requests.exceptions import RequestException
 from gitssue.request.request_interface import RequestInterface
-from gitssue.request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
+from gitssue.request.unsuccessful_http_request_exception \
+    import UnsuccessfulHttpRequestException
 
 
 class Requests(RequestInterface):
@@ -20,7 +21,8 @@ class Requests(RequestInterface):
         Executes a GET request.
 
         :param request: the GET request to execute.
-        :return: response JSON object; False if the HTTP status code distinct to 200.
+        :return: response JSON object; False if the HTTP status code distinct
+            to 200.
         """
         authentication = ()
         headers = {}
@@ -28,7 +30,8 @@ class Requests(RequestInterface):
         if extra_headers is not None:
             headers = extra_headers
 
-        if credentials is not None and 'username' in credentials and 'password' in credentials:
+        if credentials is not None and 'username' in credentials \
+           and 'password' in credentials:
             authentication = (credentials['username'], credentials['password'])
 
         try:
@@ -42,7 +45,8 @@ class Requests(RequestInterface):
             raise
 
         if response.status_code != 200:
-            raise UnsuccessfulHttpRequestException(response.status_code, response.headers)
+            raise UnsuccessfulHttpRequestException(
+                response.status_code, response.headers)
 
         response_object = json.loads(response.text)
         response.close()
