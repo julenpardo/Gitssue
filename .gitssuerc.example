@@ -1,3 +1,6 @@
 [github]
 username = your-github-username
 password = your-strong-github-password
+
+[gitlab]
+token = access-token

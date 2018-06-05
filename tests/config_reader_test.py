@@ -7,13 +7,13 @@ TESTING_FILE_PATH = TESTING_FILE_PATH.replace('config_reader_test.py', '')
 
 
 def create_file_overwriting(contents):
-    with open(TESTING_FILE_PATH + config_reader.FILENAME, 'w') as file:
+    with open(TESTING_FILE_PATH + config_reader._FILENAME, 'w') as file:
         file.write(contents)
 
 
 def remove_testing_file():
     try:
-        os.remove(TESTING_FILE_PATH + config_reader.FILENAME)
+        os.remove(TESTING_FILE_PATH + config_reader._FILENAME)
     except FileNotFoundError:
         pass
 
@@ -24,7 +24,7 @@ class ConfigReaderTest(unittest.TestCase):
         """
         Replaces the production config files with the testing file path.
         """
-        config_reader.FILE_PATHS = (TESTING_FILE_PATH,)
+        config_reader._FILE_PATHS = (TESTING_FILE_PATH,)
 
     def tearDown(self):
         remove_testing_file()
@@ -55,7 +55,8 @@ class ConfigReaderTest(unittest.TestCase):
         expected = {
             'github': {
                 'username': 'whatever',
-                'password': 'whatever'
+                'password': 'whatever',
+                'token': '',
             }
         }
         actual = config_reader.get_config()

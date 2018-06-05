@@ -1,5 +1,7 @@
 import unittest
 import contextlib
+import time
+from datetime import datetime
 from io import StringIO
 from gitssue.printer.printer import Printer
 from gitssue.printer.color_printer_interface import ColorPrinterInterface
@@ -197,6 +199,44 @@ class PrinterTest(unittest.TestCase):
         temp_stdout = StringIO()
         with contextlib.redirect_stdout(temp_stdout):
             self.printer.print_error(input)
+
+        actual = temp_stdout.getvalue().strip()
+
+        self.assertEqual(expected, actual)
+
+    def test_print_rate_information(self):
+        limit = 60
+        remaining = 55
+        reset = time.time()
+
+        expected = 'Limit: {0}\n'.format(limit)
+        expected += 'Remaining: {0}\n'.format(remaining)
+        expected += 'Reset datetime: {0}'.format(datetime.fromtimestamp(reset))
+
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            self.printer.print_rate_information(limit, remaining, reset)
+
+        actual = temp_stdout.getvalue().strip()
+
+        self.assertEqual(expected, actual)
+
+    def test_print_rate_information_unlimited(self):
+        limit = 60
+        remaining = 55
+        reset = time.time()
+        unlimited = True
+
+        expected = 'There is no rate limit for this API.'
+
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            self.printer.print_rate_information(
+                limit,
+                remaining,
+                reset,
+                unlimited
+            )
 
         actual = temp_stdout.getvalue().strip()
 

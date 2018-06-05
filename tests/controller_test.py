@@ -10,6 +10,7 @@ sys.path.append(os.path.abspath('.'))
 sys.path.append(os.path.abspath('./gitssue'))
 
 from gitssue.controller.controller import Controller
+from gitssue.git.git_wrapper import GitWrapper
 from gitssue.dependencies.dependencies import Dependencies
 from gitssue.printer.color_printer_interface import ColorPrinterInterface
 from gitssue.request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
@@ -40,8 +41,15 @@ class ControllerTest(unittest.TestCase):
     requester_mock = None
 
     def setUp(self):
-        self.controller = Controller(Dependencies)
+        self.controller = Controller(Dependencies())
         self.controller.deps.printer.color_printer = DummyColorPrinter()
+
+        mocked_return = "origin git@github.com:julenpardo/Gitssue.git (fetch)"
+        shell_wrapper_mock = mock.Mock()
+        self.mocked_shell_wrapper_execute_command_return = mocked_return
+        shell_wrapper_mock.execute_command = self.mock_shell_wrapper_execute_command
+        self.controller.deps.shell = shell_wrapper_mock
+        self.controller.deps.git_wrapper = GitWrapper(shell_wrapper_mock)
 
     def mock_remote_get_issue_list(self, username, repo, all=False, desc=False):
         if self.requester_mock is not None:
@@ -69,6 +77,10 @@ class ControllerTest(unittest.TestCase):
 
     def mock_remote_parse_request_exception(self, exception, issue_numbers=()):
         return self.mocked_request_parse_request_exception_return
+
+    def mock_remote_get_rate_information(self):
+        import time
+        return 1, 1, time.time()
 
     def test_list(self):
         mocked_return = [
@@ -439,6 +451,34 @@ class ControllerTest(unittest.TestCase):
 
         with contextlib.redirect_stdout(temp_stdout):
             self.controller.thread('1')
+
+        expected = 'A connection error occurred:'
+        actual = temp_stdout.getvalue().strip().splitlines()[1]
+
+        self.assertEqual(expected, actual)
+
+    def test_rate_information(self):
+        remote_mock = mock.Mock()
+        remote_mock.get_rate_information = self.mock_remote_get_rate_information
+        self.controller.deps.remote = remote_mock
+
+        temp_stdout = StringIO()
+
+        try:
+            with contextlib.redirect_stdout(temp_stdout):
+                self.controller.rate_information()
+        except:
+            self.fail('No exception should be thrown.')
+
+    def test_rate_information_request_exception(self):
+        remote_mock = mock.Mock()
+        remote_mock.get_rate_information.side_effect = RequestException
+        self.controller.deps.remote = remote_mock
+
+        temp_stdout = StringIO()
+
+        with contextlib.redirect_stdout(temp_stdout):
+            self.controller.rate_information()
 
         expected = 'A connection error occurred:'
         actual = temp_stdout.getvalue().strip().splitlines()[1]

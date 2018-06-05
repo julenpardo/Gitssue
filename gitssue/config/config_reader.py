@@ -3,29 +3,32 @@
 import configparser
 import os
 
-FILENAME = '.gitssuerc'
-FILE_PATHS = (
+_FILENAME = '.gitssuerc'
+_FILE_PATHS = (
     os.path.expanduser('~') + '/',
     '/etc/gitssue/',
 )
-PARSER_DEFAULTS = ({
-    'password': ''
+_PARSER_DEFAULTS = ({
+    'username': '',
+    'password': '',
+    'token': '',
 })
 
 
 def get_config():
     """
-    Reads the config file defined in the FILE_PATHS tuple, keeping the priority. That is,
-    the config will be set for the first file found, exiting the loop in that moment and
-    returning the value.
+    Reads the config file defined in the FILE_PATHS tuple, keeping the
+    priority. That is, the config will be set for the first file
+    found, exiting the loop in that moment and returning the value.
     If no file was found, an empty dictionary will be returned.
-    :return: A dictionary with the config, in "{'remote':{'username':'...'}..." format.
+    :return: A dictionary with the config, in
+    "{'remote':{'username':'...'}..." format.
     """
     config = {}
-    parser = configparser.ConfigParser(PARSER_DEFAULTS)
+    parser = configparser.ConfigParser(_PARSER_DEFAULTS)
 
-    for file_path in FILE_PATHS:
-        file = file_path + FILENAME
+    for file_path in _FILE_PATHS:
+        file = file_path + _FILENAME
         exists_and_not_empty = os.path.isfile(file) \
             and os.path.getsize(file) > 0
 
@@ -37,6 +40,7 @@ def get_config():
             config[remote] = {
                 'username': parser.get(remote, 'username'),
                 'password': parser.get(remote, 'password'),
+                'token': parser.get(remote, 'token'),
             }
 
         break

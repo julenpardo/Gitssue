@@ -45,7 +45,8 @@ class Dummy(RemoteRepoInterface):
             },
         )
 
-    def get_issue_list(self, username, repository, show_all=False, get_description=False):
+    def get_issue_list(self, username, repository, show_all=False,
+                       get_description=False):
         return (
             {
                 'number': '1',

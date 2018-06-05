@@ -12,6 +12,8 @@ from cement.ext.ext_argparse import ArgparseController, expose
 from gitssue.dependencies.dependencies import Dependencies
 from gitssue.controller.controller import Controller
 
+GITSSUE_VERSION = '1.2'
+
 
 class BaseController(ArgparseController):
     """
@@ -28,14 +30,30 @@ class BaseController(ArgparseController):
         Meta class of the base Cement controller.
         """
         label = 'base'
-        description = 'Gitssue - Manage your issues from the command line'
+        description = 'Gitssue - Manage your issues from the command line ' \
+            + '(version {0})'.format(GITSSUE_VERSION)
+        arguments = [
+            (
+                ['--version', '-v'],
+                dict(action='store_true', help='Show version and exit')
+            )
+        ]
 
     @expose(hide=True)
     def default(self):
         """
-        The accessed method if no command has been specified. Displays the help.
+        The default method.
         """
-        self.app.args.parse_args(['--help'])
+        arguments = self.app.pargs
+
+        if arguments.version:
+            print('Gitssue {0}'.format(GITSSUE_VERSION))
+        else:
+            no_option = arguments.command is None and not arguments.debug \
+                and not arguments.suppress_output and not arguments.version
+
+            if no_option:
+                self.app.args.parse_args(['--help'])
 
     @expose(
         help='List open issues.',
@@ -53,7 +71,7 @@ class BaseController(ArgparseController):
                 action='store_true'
             ),
         ),
-                  ],
+        ],
     )
     def list(self):
         """
@@ -87,11 +105,22 @@ class BaseController(ArgparseController):
     def thread(self):
         """
         Get comment thread the given issue.
-        It's not necessary to check if the "issue_number" is given because in this case will
-        be done by Cement, because when the exact number of arguments is specified, it does the
-        check itself.
+        It's not necessary to check if the "issue_number" is given because in
+        this case will be done by Cement, because when the exact number of
+        arguments is specified, it does the check itself.
         """
         self.controller.thread(self.app.pargs.issue_number[0])
+
+    @expose(
+        help='Shows the API rate information (remaining requests, reset '
+             'time, etc.).',
+        aliases=['ri']
+    )
+    def rate_info(self):
+        """
+        Gets the API rate information (remaining requests, reset time, etc.).
+        """
+        self.controller.rate_information()
 
 
 class Gitssue(CementApp):
@@ -108,6 +137,10 @@ class Gitssue(CementApp):
             BaseController,
         ]
 
+
 def main():
+    """
+    Main method.
+    """
     with Gitssue() as app:
         app.run()
