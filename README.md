@@ -13,6 +13,7 @@ Built on [Cement Framework](http://builtoncement.com/).
 
 ## Features
 
+* Github and Gitlab (only on [gitlab.com](https://gitlab.com)) hosted repositories.
 * Authentication.
 * List the issues (also closed ones, if specified).
 * Get issues descriptions.
@@ -21,7 +22,6 @@ Built on [Cement Framework](http://builtoncement.com/).
 
 ## Limitations
 
-* Just for repositories hosted on GitHub.
 * No "write" operations (i.e. make a comment, open or close issues, etc.).
 
 ## Installation
@@ -36,7 +36,8 @@ That's it! You can already execute `gitssue` in your shell.
 
 ## Configuration
 
-This is optional, just if you want to use authentication (necessary for private repositories).
+This is optional, just if you want to use authentication (**necessary for Github
+private repositories, and Gitlab repositories**).
 
 Take a look to the [.gitssuerc.example](.gitssuerc.example) file, and follow these
 steps:
@@ -50,6 +51,7 @@ steps:
   probably want to have permissions like `500` (read and write permissions for
   the owner, and no permissions for any other) or similar.
 
-## Upcoming features
+### Gitlab access token
 
-* Look at [limitations](#limitations) :)
+Even if the repository is public, you need an access token. This can be
+generated under Settings/Access Tokens, with the `api` scope.

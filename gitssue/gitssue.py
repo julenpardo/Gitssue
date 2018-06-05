@@ -12,7 +12,7 @@ from cement.ext.ext_argparse import ArgparseController, expose
 from gitssue.dependencies.dependencies import Dependencies
 from gitssue.controller.controller import Controller
 
-GITSSUE_VERSION = '1.1'
+GITSSUE_VERSION = '1.2'
 
 
 class BaseController(ArgparseController):
@@ -71,7 +71,7 @@ class BaseController(ArgparseController):
                 action='store_true'
             ),
         ),
-                  ],
+        ],
     )
     def list(self):
         """
