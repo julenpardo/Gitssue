@@ -4,7 +4,7 @@ from gitssue.git.repo_not_found_exception import RepoNotFoundException
 
 
 class GitWrapper:
-    _SUPPORTED_REMOTES = ['github.com', 'gitlab.com']
+    _SUPPORTED_REMOTES = ['github.com', 'gitlab.com', 'bitbucket.org']
 
     def __init__(self, shell_wrapper):
         self.shell_wrapper = shell_wrapper

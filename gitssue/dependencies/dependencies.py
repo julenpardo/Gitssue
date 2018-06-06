@@ -7,6 +7,7 @@ from gitssue.printer.colorconsole_color_printer import ColorConsoleColorPrinter
 from gitssue.printer.printer import Printer
 from gitssue.remote.github import Github
 from gitssue.remote.gitlab import Gitlab
+from gitssue.remote.bitbucket import Bitbucket
 from gitssue.config import config_reader
 
 
@@ -29,5 +30,7 @@ class Dependencies:
 
         if 'github.com' in remote_url:
             self.remote = Github(self.requester, config_reader.get_config())
-        else:
+        elif 'gitlab.com' in remote_url:
             self.remote = Gitlab(self.requester, config_reader.get_config())
+        else:
+            self.remote = Bitbucket(self.requester, config_reader.get_config())
