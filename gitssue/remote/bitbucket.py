@@ -26,7 +26,8 @@ class Bitbucket(RemoteRepoInterface):
         :return: a dictionary id:label format.
         """
         request = '{0}/repositories/{1}/{2}/issues'.format(
-            self.API_URL, username, repository)
+            self.API_URL, username, repository
+        )
 
         issue_list = []
         response_issues = self.requester.get_request(request)
@@ -59,7 +60,8 @@ class Bitbucket(RemoteRepoInterface):
             id.
         """
         request = '{0}/repositories/{1}/{2}/issues'.format(
-            self.API_URL, username, repository)
+            self.API_URL, username, repository
+        )
 
         issue_list = []
         not_found_issues = []
@@ -98,22 +100,38 @@ class Bitbucket(RemoteRepoInterface):
         :param repository: the repository to look the issues at.
         :param issue_number: the issue number to query the comments to.
         """
-        pass
+        request = '{0}/repositories/{1}/{2}/issues/{3}/comments'.format(
+            self.API_URL, username, repository, issue_number
+        )
+
+        issue_comments = []
+        response_comments = self.requester.get_request(request)
+
+        if response_comments:
+            for comment in response_comments['values']:
+                issue_comments.append({
+                    'author': comment['user']['username'],
+                    'created_at': comment['created_on'],
+                    'updated_at': comment['updated_on'],
+                    'body': comment['content']['raw'],
+                })
+
+        return issue_comments
 
     def get_rate_information(self):
         """
-        Gets the GitHub API rate information (remaining requests, reset time,
-        etc.) requests, the limit is 60 requests/hour. For authenticated ones,
-        5000/hour.
-        :return: remaining request number.
+        The Bitbucket API doesn't have a rate limit for repository queries, so
+        we return everything as -1 (the total limit, the remaining requests,
+        and the reset time), to let the controller know that it's unlimited.
+        :return: everything to -1 to indicate that is unlimited.
         """
-        pass
+        return -1, -1, -1
 
     def parse_request_exception(self, exception, issue_numbers=()):
         """
         Parses the generated exception during the request, necessary for
-        special cases,
-        e.g., when the API limit is hit.
+        special cases, e.g. when we try to get the comments of an issue
+        that doesn't exist.
 
         @TODO: make messages more specific.
         :param exception: (UnsuccessfulRequestException) The exception object
