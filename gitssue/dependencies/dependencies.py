@@ -26,11 +26,11 @@ class Dependencies:
         self.color_printer = ColorConsoleColorPrinter()
         self.printer = Printer(self.color_printer)
 
-        remote_url = self.git_wrapper.get_remote_url()
+        remote_domain = self.git_wrapper.get_remote_domain()
 
-        if 'github.com' in remote_url:
+        if remote_domain == 'github.com':
             self.remote = Github(self.requester, config_reader.get_config())
-        elif 'gitlab.com' in remote_url:
-            self.remote = Gitlab(self.requester, config_reader.get_config())
-        else:
+        elif remote_domain == 'bitbucket.org':
             self.remote = Bitbucket(self.requester, config_reader.get_config())
+        else:
+            self.remote = Gitlab(self.requester, config_reader.get_config())

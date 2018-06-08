@@ -63,10 +63,11 @@ class GitWrapper:
         except RepoNotFoundException:
             raise
 
-    def get_remote_url(self):
+    def get_remote_domain(self):
         """
-        Gets the URL of the remote repository, executing the Git command.
-        :return: the URL of the remote.
+        Gets the domain of the of the repo hoster.
+
+        :return: the domain of the repo hoster.
         """
         command = 'git config --get remote.origin.url'
 
@@ -75,7 +76,12 @@ class GitWrapper:
         if not url:
             raise RepoNotFoundException
 
-        return url
+        if url.startswith('git@'):
+            domain = url.replace('git@', '').split(':')[0]
+        else:
+            domain = url.replace('https://', '').split('/')[0]
+
+        return domain
 
     def get_remotes_urls(self):
         """

@@ -15,6 +15,9 @@ class GitWrapperTest(unittest.TestCase):
     def fake_execute_command(self, command):
         return 'https://github.com/julenpardo/Gitssue'
 
+    def fake_execute_command_ssh(self, command):
+        return 'git@github.com:julenpardo/Gitssue.git'
+
     def mock_execute_command_with_error(self, command):
         """
         Method to overwrite the shell_wrapper.execute_command method, for mocking,
@@ -22,21 +25,21 @@ class GitWrapperTest(unittest.TestCase):
             """
         return False
 
-    def test_get_remote_url(self):
+    def test_get_remote_domain(self):
         """
         Test getting the remote URL for the current repository.
         """
-        expected = 'https://github.com/julenpardo/Gitssue'
+        expected = 'github.com'
         shell_wrapper_mock = mock.Mock()
         shell_wrapper_mock.execute_command = self.fake_execute_command
 
         git_wrapper = GitWrapper(shell_wrapper_mock)
 
-        actual = git_wrapper.get_remote_url().replace('\n', '')
+        actual = git_wrapper.get_remote_domain().replace('\n', '')
 
         self.assertEqual(expected, actual)
 
-    def test_get_remote_url_invalid_repo(self):
+    def test_get_remote_domain_invalid_repo(self):
         """
         Simulate an unexpected return value by the shell wrapper, which would be
         caused by a non existing repository, e.g.
@@ -47,7 +50,7 @@ class GitWrapperTest(unittest.TestCase):
         git_wrapper = GitWrapper(shell_wrapper_mock)
 
         with self.assertRaises(RepoNotFoundException):
-            git_wrapper.get_remote_url()
+            git_wrapper.get_remote_domain()
 
     def test_get_username_and_repo(self):
         """
