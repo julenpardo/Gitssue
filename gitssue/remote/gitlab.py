@@ -13,10 +13,7 @@ class Gitlab(RemoteRepoInterface):
     _API_URL = 'https://gitlab.com/api/{0}'.format(_API_VERSION)
 
     def __init__(self, requester, credentials):
-        super(Gitlab, self).__init__(
-            requester,
-            auth_token=credentials['gitlab']['token']
-        )
+        super(Gitlab, self).__init__(requester,auth_token=credentials)
 
     def get_issue_list(self, username, repository, show_all=False,
                        get_description=False):
