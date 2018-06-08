@@ -140,4 +140,10 @@ class Bitbucket(RemoteRepoInterface):
             request.
         :return: The error message that will be displayed to the user.
         """
-        pass
+        message = 'An error occurred in the request.'
+
+        if exception.code == 404 and issue_numbers:
+            message = "The following issue(s) couldn't be found: {0}".\
+                format(', '.join(issue_numbers))
+
+        return message

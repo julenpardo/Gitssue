@@ -1,7 +1,8 @@
 import unittest
 from unittest import mock
 from gitssue.remote.bitbucket import Bitbucket
-from gitssue.request.unsuccessful_http_request_exception import UnsuccessfulHttpRequestException
+from gitssue.request.unsuccessful_http_request_exception \
+        import UnsuccessfulHttpRequestException
 
 
 class BitbucketTest(unittest.TestCase):
@@ -230,9 +231,34 @@ class BitbucketTest(unittest.TestCase):
         """
 
         requester_mock = mock.Mock()
-        gitlab = Bitbucket(requester_mock, credentials={})
+        bitbucket = Bitbucket(requester_mock, credentials={})
 
         expected = -1, -1, -1
-        actual = gitlab.get_rate_information()
+        actual = bitbucket.get_rate_information()
+
+        self.assertEqual(expected, actual)
+
+    def test_parse_request_exception_issue_not_found(self):
+        exception = UnsuccessfulHttpRequestException(404, {})
+
+        requester_mock = mock.Mock()
+        bitbucket = Bitbucket(requester_mock, credentials={})
+
+        input_issues = ['4', '71']
+
+        expected = "The following issue(s) couldn't be found: {0}".\
+            format(', '.join(input_issues))
+        actual= bitbucket.parse_request_exception(exception, input_issues)
+
+        self.assertEqual(expected, actual)
+
+    def test_parse_request_exception_generic_error(self):
+        exception = UnsuccessfulHttpRequestException(404, {})
+
+        requester_mock = mock.Mock()
+        bitbucket = Bitbucket(requester_mock, credentials={})
+
+        expected = 'An error occurred in the request.'
+        actual= bitbucket.parse_request_exception(exception)
 
         self.assertEqual(expected, actual)
