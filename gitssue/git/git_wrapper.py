@@ -4,29 +4,9 @@ from gitssue.git.repo_not_found_exception import RepoNotFoundException
 
 
 class GitWrapper:
-    _SUPPORTED_REMOTES = ['github.com', 'gitlab.com', 'bitbucket.org']
 
     def __init__(self, shell_wrapper):
         self.shell_wrapper = shell_wrapper
-
-    def discard_not_supported_remotes(self, remotes_url):
-        """
-        Discards the not supported remotes. For the moment, only Github is
-        supported.
-        :param remotes_url: List of remotes names with its URL, e.g.:
-            [['origin', 'git@github.com:julenpardo/Gitssue.git]]
-        :return: The list in the same format as received, but discarding the
-            not supported origins.
-        """
-        for remote in remotes_url:
-            remote_url = remote[1]
-            is_supported = any(supported_remote in remote_url.lower()
-                               for supported_remote in self._SUPPORTED_REMOTES)
-
-            if not is_supported:
-                remotes_url.remove(remote)
-
-        return remotes_url
 
     def get_username_and_repo(self):
         """
@@ -36,24 +16,18 @@ class GitWrapper:
         try:
             usernames_and_repos = []
 
-            for remote in self.discard_not_supported_remotes(
-                    self.get_remotes_urls()):
+            for remote in self.get_remotes_urls():
                 remote_url = remote[1]
 
-                username_and_repo = re.sub(r"https:\/\/.*@", '', remote_url)
-                username_and_repo = username_and_repo.replace('.git', '')
-                username_and_repo = username_and_repo.replace('https://', '')
-                username_and_repo = username_and_repo.replace('\n', '')
+                if remote_url.startswith('git@'):
+                    username_and_repo = remote_url.replace('git@', '')\
+                        .split(':')[1]
+                else:
+                    domain, username, repo = remote_url.replace('https://', '')\
+                        .split('/')
+                    username_and_repo = username + '/' + repo
 
-                for supported_remote in self._SUPPORTED_REMOTES:
-                    username_and_repo = username_and_repo.replace(
-                        '{}/'.format(supported_remote),
-                        ''
-                    )
-                    username_and_repo = username_and_repo.replace(
-                        'git@{}:'.format(supported_remote),
-                        ''
-                    )
+                username_and_repo = username_and_repo.replace('.git', '')
 
                 username, repo = username_and_repo.split('/')
 
