@@ -34,14 +34,14 @@ class Dependencies:
         config = config_reader.get_config()
 
         if remote_domain == 'github.com':
-            credentials = config.get('github', {})
+            credentials = config.get('github.com', {})
             remote = Github(self.requester, credentials=credentials)
 
         elif remote_domain == 'bitbucket.org':
             remote = Bitbucket(self.requester, config_reader.get_config())
 
         else:
-            auth_token = config['gitlab']['token']
-            remote = Gitlab(self.requester, auth_token)
+            auth_token = config[remote_domain]['token']
+            remote = Gitlab(self.requester, auth_token, remote_domain)
 
         return remote

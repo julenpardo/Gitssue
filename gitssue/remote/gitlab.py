@@ -10,10 +10,10 @@ class Gitlab(RemoteRepoInterface):
     """
 
     _API_VERSION = 'v4'
-    _API_URL = 'https://gitlab.com/api/{0}'.format(_API_VERSION)
 
-    def __init__(self, requester, credentials):
-        super(Gitlab, self).__init__(requester,auth_token=credentials)
+    def __init__(self, requester, credentials, domain):
+        super(Gitlab, self).__init__(requester, auth_token=credentials)
+        self.api_url = 'https://{0}/api/{1}'.format(domain, self._API_VERSION)
 
     def get_issue_list(self, username, repository, show_all=False,
                        get_description=False):
@@ -25,7 +25,7 @@ class Gitlab(RemoteRepoInterface):
         :param show_all: show also closed issues.
         :return: a dictionary id:label format.
         """
-        request = '{0}/issues'.format(self._API_URL)
+        request = '{0}/issues'.format(self.api_url)
 
         if show_all:
             request += '?state=all'
@@ -63,7 +63,7 @@ class Gitlab(RemoteRepoInterface):
 
     def _get_labels(self, project_id, auth_token_header):
         labels_request = '{0}/projects/{1}/labels'.format(
-            self._API_URL,
+            self.api_url,
             project_id
         )
 
@@ -96,13 +96,15 @@ class Gitlab(RemoteRepoInterface):
         return issue_labels
 
     def _get_project_id(self, username, repository):
+        auth_token_header = {'PRIVATE-TOKEN': self.auth_token}
         project_request = '{0}/projects/{1}%2F{2}'.format(
-            self._API_URL,
+            self.api_url,
             username,
             repository
         )
 
-        project = self.requester.get_request(project_request)
+        project = self.requester.get_request(project_request,
+                                             extra_headers=auth_token_header)
 
         return project['id']
 
@@ -116,7 +118,7 @@ class Gitlab(RemoteRepoInterface):
         :return: a dictionary with the title and the body message of each issue
             id.
         """
-        request = '{0}/issues'.format(self._API_URL)
+        request = '{0}/issues'.format(self.api_url)
         issues_descriptions = []
         not_found_issues = []
 
@@ -166,7 +168,7 @@ class Gitlab(RemoteRepoInterface):
 
         if issue_number:
             project_id = self._get_project_id(username, repository)
-            request = request.format(self._API_URL, project_id, issue_number)
+            request = request.format(self.api_url, project_id, issue_number)
 
             auth_token_header = {'PRIVATE-TOKEN': self.auth_token}
             response_comments = self.requester.get_request(
