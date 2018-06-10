@@ -31,18 +31,22 @@ class Gitlab(RemoteRepoInterface):
             request += '?state=all'
 
         auth_token_header = {'PRIVATE-TOKEN': self.auth_token}
-        response_issues = self.requester.get_request(
-            request,
-            extra_headers=auth_token_header
-        )
 
         issue_list = []
         description = ''
+        project_id = self._get_project_id(username, repository)
 
-        if response_issues:
-            project_id = self._get_project_id(username, repository)
+        if project_id:
+            response_issues = self.requester.get_request(
+                request,
+                extra_headers=auth_token_header
+            )
 
-            for issue in response_issues:
+            project_issues = list(filter(
+                lambda i: i['project_id'] == project_id, response_issues
+            ))
+
+            for issue in project_issues:
                 if get_description:
                     description = issue['description']
 
@@ -106,7 +110,7 @@ class Gitlab(RemoteRepoInterface):
         project = self.requester.get_request(project_request,
                                              extra_headers=auth_token_header)
 
-        return project['id']
+        return project.get('id')
 
     def get_issues_description(self, username, repository, issue_numbers):
         """
