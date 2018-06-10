@@ -26,11 +26,22 @@ class Dependencies:
         self.color_printer = ColorConsoleColorPrinter()
         self.printer = Printer(self.color_printer)
 
-        remote_url = self.git_wrapper.get_remote_url()
+        remote_domain = self.git_wrapper.get_remote_domain()
 
-        if 'github.com' in remote_url:
-            self.remote = Github(self.requester, config_reader.get_config())
-        elif 'gitlab.com' in remote_url:
-            self.remote = Gitlab(self.requester, config_reader.get_config())
+        self.remote = self.get_remote_instance(remote_domain)
+
+    def get_remote_instance(self, remote_domain):
+        config = config_reader.get_config()
+
+        if remote_domain == 'github.com':
+            credentials = config.get('github.com', {})
+            remote = Github(self.requester, credentials=credentials)
+
+        elif remote_domain == 'bitbucket.org':
+            remote = Bitbucket(self.requester, config_reader.get_config())
+
         else:
-            self.remote = Bitbucket(self.requester, config_reader.get_config())
+            auth_token = config[remote_domain]['token']
+            remote = Gitlab(self.requester, auth_token, remote_domain)
+
+        return remote
