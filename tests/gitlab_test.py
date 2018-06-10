@@ -8,7 +8,7 @@ class GitlabTest(unittest.TestCase):
 
     SECRET_TOKEN = 'SECRET_TOKEN'
     CREDENTIALS = {
-        'gitlab': {
+        'gitlab.com': {
             'token': SECRET_TOKEN
         }
     }
@@ -55,7 +55,7 @@ class GitlabTest(unittest.TestCase):
 
         requester_mock = mock.Mock()
         requester_mock.get_request.side_effect = side_effect
-        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+        gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
         expected = [{
             'number': '1',
@@ -85,7 +85,7 @@ class GitlabTest(unittest.TestCase):
         requester_mock = mock.Mock()
         requester_mock.get_request = self.mock_get_request
 
-        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+        gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
         expected = mocked_return['id']
         actual = gitlab._get_project_id('julenpardo', 'gitssue')
@@ -96,7 +96,7 @@ class GitlabTest(unittest.TestCase):
         requester_mock = mock.Mock()
         requester_mock.get_request.side_effect = UnsuccessfulHttpRequestException(404, {})
 
-        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+        gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
         with self.assertRaises(UnsuccessfulHttpRequestException):
             gitlab._get_project_id('whatever', 'whatever')
@@ -116,7 +116,7 @@ class GitlabTest(unittest.TestCase):
         requester_mock = mock.Mock()
         requester_mock.get_request = self.mock_get_request
 
-        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+        gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
         expected = mocked_return
         actual = gitlab._get_labels(
@@ -130,7 +130,7 @@ class GitlabTest(unittest.TestCase):
         requester_mock = mock.Mock()
         requester_mock.get_request.side_effect = UnsuccessfulHttpRequestException(401, {})
 
-        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+        gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
         with self.assertRaises(UnsuccessfulHttpRequestException):
             gitlab._get_labels(project_id=1, auth_token_header=self.TOKEN_HEADER)
@@ -142,7 +142,7 @@ class GitlabTest(unittest.TestCase):
         requester_mock = mock.Mock()
         requester_mock.get_request = self.mock_get_request
 
-        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+        gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
         expected = []
         actual = gitlab._get_labels(
@@ -180,7 +180,7 @@ class GitlabTest(unittest.TestCase):
         requester_mock = mock.Mock()
         requester_mock.get_request = self.mock_get_request
 
-        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+        gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
         expected = [
             {
@@ -250,7 +250,7 @@ class GitlabTest(unittest.TestCase):
         requester_mock = mock.Mock()
         requester_mock.get_request.side_effect = side_effect
 
-        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+        gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
         expected_found_issues = [
             {
@@ -302,7 +302,7 @@ class GitlabTest(unittest.TestCase):
         requester_mock = mock.Mock()
         requester_mock.get_request.side_effect = side_effect
 
-        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+        gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
         expected = [], ['1', '2']
         actual = gitlab.get_issues_description(username, repo, issue_numbers)
@@ -316,7 +316,7 @@ class GitlabTest(unittest.TestCase):
 
         requester_mock = mock.Mock()
 
-        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+        gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
         expected = [], []
         actual = gitlab.get_issues_description(username, repo, issue_numbers)
@@ -353,7 +353,7 @@ class GitlabTest(unittest.TestCase):
         requester_mock = mock.Mock()
         requester_mock.get_request.side_effect = side_effect
 
-        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+        gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
         expected = [
             {
@@ -391,7 +391,7 @@ class GitlabTest(unittest.TestCase):
         requester_mock = mock.Mock()
         requester_mock.get_request.side_effect = side_effect
 
-        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+        gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
         expected = []
         actual = gitlab.get_issue_comments(username, repo, issue_number)
@@ -404,7 +404,7 @@ class GitlabTest(unittest.TestCase):
         issue_number = None
 
         requester_mock = mock.Mock()
-        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+        gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
         expected = []
         actual = gitlab.get_issue_comments(username, repo, issue_number)
@@ -417,7 +417,7 @@ class GitlabTest(unittest.TestCase):
         """
 
         requester_mock = mock.Mock()
-        gitlab = Gitlab(requester_mock, credentials=self.CREDENTIALS)
+        gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
         expected = -1, -1, -1
         actual = gitlab.get_rate_information()
