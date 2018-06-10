@@ -33,6 +33,16 @@ class GitlabTest(unittest.TestCase):
                     'feature'
                 ],
                 'body': 'body 1',
+                'project_id': 1,
+            },
+            {
+                'iid': '2',
+                'title': 'first issue of another project',
+                'labels': [
+                    'feature'
+                ],
+                'body': 'body 2',
+                'project_id': 2,
             },
         ]
 
