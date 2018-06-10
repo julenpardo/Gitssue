@@ -56,7 +56,7 @@ class GitlabTest(unittest.TestCase):
                     'color': '#ffffff'
                 }
             ]
-            if args[0] == 'https://gitlab.com/api/v4/issues':
+            if args[0].startswith('https://gitlab.com/api/v4/issues'):
                 return mocked_issue_list
             elif args[0] == 'https://gitlab.com/api/v4/projects/username%2Frepo':
                 return project_id
