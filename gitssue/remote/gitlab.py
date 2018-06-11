@@ -28,7 +28,8 @@ class Gitlab(RemoteRepoInterface):
         request = '{0}/issues'.format(self.api_url)
 
         state = '?state=all' if show_all else '?state=opened'
-        request += state
+        user_scope = 'scope=all'
+        request += state + '&' + user_scope
 
         auth_token_header = {'PRIVATE-TOKEN': self.auth_token}
 
