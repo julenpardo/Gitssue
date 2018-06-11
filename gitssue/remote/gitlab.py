@@ -25,12 +25,6 @@ class Gitlab(RemoteRepoInterface):
         :param show_all: show also closed issues.
         :return: a dictionary id:label format.
         """
-        request = '{0}/issues'.format(self.api_url)
-
-        state = '?state=all' if show_all else '?state=opened'
-        user_scope = 'scope=all'
-        request += state + '&' + user_scope
-
         auth_token_header = {'PRIVATE-TOKEN': self.auth_token}
 
         issue_list = []
@@ -38,17 +32,19 @@ class Gitlab(RemoteRepoInterface):
         project_id = self._get_project_id(username, repository)
 
         if project_id:
+            request = '{0}/projects/{1}/issues'.format(self.api_url,
+                                                       project_id)
+            state = '?state=all' if show_all else '?state=opened'
+
+            request += state
+
             response_issues = self.requester.get_request(
                 request,
                 extra_headers=auth_token_header
             )
             labels_info = self._get_labels(project_id, auth_token_header)
 
-            project_issues = list(filter(
-                lambda i: i['project_id'] == project_id, response_issues
-            ))
-
-            for issue in project_issues:
+            for issue in response_issues:
                 if get_description:
                     description = issue['description']
 
@@ -120,13 +116,15 @@ class Gitlab(RemoteRepoInterface):
         :return: a dictionary with the title and the body message of each issue
             id.
         """
-        request = '{0}/issues'.format(self.api_url)
         issues_descriptions = []
         not_found_issues = []
 
         if issue_numbers:
             project_id = self._get_project_id(username, repository)
             auth_token_header = {'PRIVATE-TOKEN': self.auth_token}
+            request = '{0}/projects/{1}/issues'.format(self.api_url,
+                                                      project_id)
+
             response_issues = self.requester.get_request(
                 request,
                 extra_headers=auth_token_header
