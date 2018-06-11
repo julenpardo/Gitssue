@@ -202,7 +202,7 @@ class GitlabTest(unittest.TestCase):
                 'color': 'f0f0f0',
             }
         ]
-        actual = gitlab._create_label_list(1, {}, input_issues)
+        actual = gitlab._create_label_list({}, input_issues, mocked_return)
 
         self.assertEqual(expected, actual)
 
