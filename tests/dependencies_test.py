@@ -15,6 +15,7 @@ class DependenciesTest(unittest.TestCase):
         get_remote_domain_mock.return_value = 'github.com'
 
         dependencies = Dependencies()
+        dependencies.instantiate_remote_instance()
 
         self.assertIsInstance(dependencies.remote, Github)
 
@@ -25,6 +26,7 @@ class DependenciesTest(unittest.TestCase):
         with mock.patch('gitssue.config.config_reader.get_config') as \
                 config_mock:
             dependencies = Dependencies()
+            dependencies.instantiate_remote_instance()
 
         self.assertIsInstance(dependencies.remote, Gitlab)
 
@@ -35,5 +37,6 @@ class DependenciesTest(unittest.TestCase):
         with mock.patch('gitssue.config.config_reader.get_config') as \
                 config_mock:
             dependencies = Dependencies()
+            dependencies.instantiate_remote_instance()
 
         self.assertIsInstance(dependencies.remote, Bitbucket)
