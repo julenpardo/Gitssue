@@ -262,3 +262,15 @@ class BitbucketTest(unittest.TestCase):
         actual= bitbucket.parse_request_exception(exception)
 
         self.assertEqual(expected, actual)
+
+    def test_parse_request_exception_invalid_credentials(self):
+        exception_code = 401
+        input_exception = UnsuccessfulHttpRequestException(exception_code, {})
+
+        requester_mock = mock.Mock()
+        bitbucket = Bitbucket(requester_mock, credentials={})
+
+        expected = "Invalid credentials. Check your '.gitssuerc' config file."
+        actual = bitbucket.parse_request_exception(input_exception)
+
+        self.assertEqual(expected, actual)

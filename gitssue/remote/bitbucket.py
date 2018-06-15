@@ -23,6 +23,10 @@ class Bitbucket(RemoteRepoInterface):
         :param username: the user owning the repository.
         :param repository: the repository to look the issues at.
         :param show_all: show also closed issues.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
         :return: a dictionary id:label format.
         """
         request = '{0}/repositories/{1}/{2}/issues'.format(
@@ -53,9 +57,18 @@ class Bitbucket(RemoteRepoInterface):
         """
         Gets the specified issues, with the descriptions.
 
+        In this case, the UnsuccessfulHttpRequestException is handled here and
+        not in the controller, because it expects the not_found_issues as
+        return value, since it may happen that we have both found and not found
+        issues.
+
         :param username: the user owning the repository.
         :param repository: the repository to look the issues at.
         :param issue_numbers: the issue identifier(s).
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
         :return: a dictionary with the title and the body message of each issue
             id.
         """
@@ -99,6 +112,10 @@ class Bitbucket(RemoteRepoInterface):
         :param username: the user owning the repository.
         :param repository: the repository to look the issues at.
         :param issue_number: the issue number to query the comments to.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
         """
         request = '{0}/repositories/{1}/{2}/issues/{3}/comments'.format(
             self.API_URL, username, repository, issue_number
@@ -134,7 +151,6 @@ class Bitbucket(RemoteRepoInterface):
         special cases, e.g. when we try to get the comments of an issue
         that doesn't exist.
 
-        @TODO: make messages more specific.
         :param exception: (UnsuccessfulRequestException) The exception object
             generated in the request.
         :param issue_numbers: the issue number(s) that weren't found in the
@@ -143,7 +159,10 @@ class Bitbucket(RemoteRepoInterface):
         """
         message = 'An error occurred in the request.'
 
-        if exception.code == 404 and issue_numbers:
+        if exception.code == 401:
+            message = "Invalid credentials. Check your '.gitssuerc' config " \
+                + "file."
+        elif exception.code == 404 and issue_numbers:
             message = "The following issue(s) couldn't be found: {0}".\
                 format(', '.join(issue_numbers))
 

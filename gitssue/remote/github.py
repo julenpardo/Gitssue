@@ -22,6 +22,10 @@ class Github(RemoteRepoInterface):
         :param username: the user owning the repository.
         :param repository: the repository to look the issues at.
         :param show_all: show also closed issues.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
         :return: a dictionary id:label format.
         """
         request = '{0}/repos/{1}/{2}/issues'.format(
@@ -62,6 +66,10 @@ class Github(RemoteRepoInterface):
         :param username: the user owning the repository.
         :param repository: the repository to look the issues at.
         :param issue_numbers: the issue identifier(s).
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
         :return: a dictionary with the title and the body message of each issue
             id.
         """
@@ -103,6 +111,10 @@ class Github(RemoteRepoInterface):
         :param username: the user owning the repository.
         :param repository: the repository to look the issues at.
         :param issue_number: the issue number to query the comments to.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
         """
 
         request = '{0}/repos/{1}/{2}/issues/{3}/comments'.format(
@@ -147,7 +159,6 @@ class Github(RemoteRepoInterface):
         special cases,
         e.g., when the API limit is hit.
 
-        @TODO: make messages more specific.
         :param exception: (UnsuccessfulRequestException) The exception object
             generated in the request.
         :param issue_numbers: the issue number(s) that weren't found in the

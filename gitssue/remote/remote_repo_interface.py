@@ -25,6 +25,10 @@ class RemoteRepoInterface(metaclass=ABCMeta):
         :param username: the user owning the repository.
         :param repository: the repository to look the issues at.
         :param show_all: show also closed issues.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
         :return: a dictionary id:label format.
         """
         pass
@@ -34,9 +38,18 @@ class RemoteRepoInterface(metaclass=ABCMeta):
         """
         Gets the specified issues, with the descriptions.
 
+        In this case, the UnsuccessfulHttpRequestException is handled here and
+        not in the controller, because it expects the not_found_issues as
+        return value, since it may happen that we have both found and not found
+        issues.
+
         :param username: the user owning the repository.
         :param repository: the repository to look the issues at.
         :param issue_numbers: the issue identifier(s).
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
         :return: a dictionary with the title and the body message of each
             issue id.
         """
@@ -49,6 +62,10 @@ class RemoteRepoInterface(metaclass=ABCMeta):
         :param username: the user owning the repository.
         :param repository: the repository to look the issues at.
         :param issue_number: the issue number to query the comments to.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
         :return: the comments.
         """
 
