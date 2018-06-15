@@ -13,7 +13,7 @@ class Bitbucket(RemoteRepoInterface):
     API_URL = 'https://api.bitbucket.org/{0}'.format(API_VERSION)
 
     def __init__(self, requester, credentials):
-        super(Bitbucket, self).__init__(requester, credentials.get('github', {}))
+        super(Bitbucket, self).__init__(requester, credentials=credentials)
 
     def get_issue_list(self, username, repository, show_all=False,
                        get_description=False):
@@ -30,7 +30,7 @@ class Bitbucket(RemoteRepoInterface):
         )
 
         issue_list = []
-        response_issues = self.requester.get_request(request)
+        response_issues = self.requester.get_request(request, self.credentials)
 
         if response_issues:
             for issue in response_issues['values']:
@@ -66,7 +66,7 @@ class Bitbucket(RemoteRepoInterface):
         issue_list = []
         not_found_issues = []
 
-        response_issues = self.requester.get_request(request)
+        response_issues = self.requester.get_request(request, self.credentials)
 
         if response_issues:
             filtered_issues = list(filter(
@@ -105,7 +105,8 @@ class Bitbucket(RemoteRepoInterface):
         )
 
         issue_comments = []
-        response_comments = self.requester.get_request(request)
+        response_comments = self.requester.get_request(request,
+                                                       self.credentials)
 
         if response_comments:
             for comment in response_comments['values']:

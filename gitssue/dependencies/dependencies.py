@@ -32,7 +32,8 @@ class Dependencies:
             remote = Github(self.requester, credentials=credentials)
 
         elif remote_domain == 'bitbucket.org':
-            remote = Bitbucket(self.requester, config_reader.get_config())
+            credentials = config.get('bitbucket.org', {})
+            remote = Bitbucket(self.requester, credentials=credentials)
 
         else:
             auth_token = config[remote_domain]['token']
