@@ -10,13 +10,10 @@ class Gitlab(RemoteRepoInterface):
     """
 
     _API_VERSION = 'v4'
-    _API_URL = 'https://gitlab.com/api/{0}'.format(_API_VERSION)
 
-    def __init__(self, requester, credentials):
-        super(Gitlab, self).__init__(
-            requester,
-            auth_token=credentials['gitlab']['token']
-        )
+    def __init__(self, requester, credentials, domain):
+        super(Gitlab, self).__init__(requester, auth_token=credentials)
+        self.api_url = 'https://{0}/api/{1}'.format(domain, self._API_VERSION)
 
     def get_issue_list(self, username, repository, show_all=False,
                        get_description=False):
@@ -26,33 +23,39 @@ class Gitlab(RemoteRepoInterface):
         :param username: the user owning the repository.
         :param repository: the repository to look the issues at.
         :param show_all: show also closed issues.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
         :return: a dictionary id:label format.
         """
-        request = '{0}/issues'.format(self._API_URL)
-
-        if show_all:
-            request += '?state=all'
-
         auth_token_header = {'PRIVATE-TOKEN': self.auth_token}
-        response_issues = self.requester.get_request(
-            request,
-            extra_headers=auth_token_header
-        )
 
         issue_list = []
         description = ''
+        project_id = self._get_project_id(username, repository)
 
-        if response_issues:
-            project_id = self._get_project_id(username, repository)
+        if project_id:
+            request = '{0}/projects/{1}/issues'.format(self.api_url,
+                                                       project_id)
+            state = '?state=all' if show_all else '?state=opened'
+
+            request += state
+
+            response_issues = self.requester.get_request(
+                request,
+                extra_headers=auth_token_header
+            )
+            labels_info = self._get_labels(project_id, auth_token_header)
 
             for issue in response_issues:
                 if get_description:
                     description = issue['description']
 
                 issue_labels = self._create_label_list(
-                    project_id,
                     auth_token_header,
-                    issue
+                    issue,
+                    labels_info
                 )
 
                 issue_list.append({
@@ -66,7 +69,7 @@ class Gitlab(RemoteRepoInterface):
 
     def _get_labels(self, project_id, auth_token_header):
         labels_request = '{0}/projects/{1}/labels'.format(
-            self._API_URL,
+            self.api_url,
             project_id
         )
 
@@ -77,12 +80,8 @@ class Gitlab(RemoteRepoInterface):
 
         return labels_info
 
-    def _create_label_list(self, project_id, auth_token_header, issue):
+    def _create_label_list(self, auth_token_header, issue, labels_info):
         issue_labels = []
-        labels_info = self._get_labels(
-            project_id,
-            auth_token_header
-        )
 
         for label in issue['labels']:
             color = '#ffffff'
@@ -99,46 +98,60 @@ class Gitlab(RemoteRepoInterface):
         return issue_labels
 
     def _get_project_id(self, username, repository):
+        auth_token_header = {'PRIVATE-TOKEN': self.auth_token}
         project_request = '{0}/projects/{1}%2F{2}'.format(
-            self._API_URL,
+            self.api_url,
             username,
             repository
         )
 
-        project = self.requester.get_request(project_request)
+        project = self.requester.get_request(project_request,
+                                             extra_headers=auth_token_header)
 
-        return project['id']
+        return project.get('id')
 
     def get_issues_description(self, username, repository, issue_numbers):
         """
         Gets the specified issues, with the descriptions.
 
+        In this case, the UnsuccessfulHttpRequestException is handled here and
+        not in the controller, because it expects the not_found_issues as
+        return value, since it may happen that we have both found and not found
+        issues.
+
         :param username: the user owning the repository.
         :param repository: the repository to look the issues at.
         :param issue_numbers: the issue identifier(s).
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
         :return: a dictionary with the title and the body message of each issue
             id.
         """
-        request = '{0}/issues'.format(self._API_URL)
         issues_descriptions = []
         not_found_issues = []
 
         if issue_numbers:
             project_id = self._get_project_id(username, repository)
             auth_token_header = {'PRIVATE-TOKEN': self.auth_token}
+            request = '{0}/projects/{1}/issues'.format(self.api_url,
+                                                      project_id)
+
             response_issues = self.requester.get_request(
                 request,
                 extra_headers=auth_token_header
             )
+            labels_info = self._get_labels(project_id, auth_token_header)
 
             for issue in response_issues:
                 issue_id = str(issue['iid'])
 
                 if issue_id in issue_numbers:
                     issue_labels = self._create_label_list(
-                        project_id,
                         auth_token_header,
-                        issue
+                        issue,
+                        labels_info
                     )
 
                     issue_description = {
@@ -163,13 +176,17 @@ class Gitlab(RemoteRepoInterface):
         :param username: the user owning the repository.
         :param repository: the repository to look the issues at.
         :param issue_number: the issue number to query the comments to.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
         """
         request = '{0}/projects/{1}/issues/{2}/notes'
         issue_comments = []
 
         if issue_number:
             project_id = self._get_project_id(username, repository)
-            request = request.format(self._API_URL, project_id, issue_number)
+            request = request.format(self.api_url, project_id, issue_number)
 
             auth_token_header = {'PRIVATE-TOKEN': self.auth_token}
             response_comments = self.requester.get_request(
@@ -202,7 +219,6 @@ class Gitlab(RemoteRepoInterface):
         Parses the generated exception during the request, necessary for
         special cases, e.g., when the API limit is hit.
 
-        TODO: make messages more specific.
         :param exception: (UnsuccessfulRequestException) The exception object
             generated in the request.
         :param issue_numbers: the issue number(s) that weren't found in the
@@ -210,5 +226,12 @@ class Gitlab(RemoteRepoInterface):
         :return: The error message that will be displayed to the user.
         """
         message = 'An error occurred in the request.'
+
+        if exception.code == 401:
+            message = "Invalid auth token. Check your '.gitssuerc' config " \
+                + "file."
+        elif exception.code == 404 and issue_numbers:
+            message = "The following issue(s) couldn't be found: {0}".\
+                format(', '.join(issue_numbers))
 
         return message

@@ -1,25 +1,29 @@
-#### Steps for making a release
+# Steps for making a release
 
+1.  Edit `setup.py` with release tag.
 
-1. Edit `setup.py` with release tag.
+2.  Generate RST documentation:
 
-2. Generate RST documentation:
+```
+pandoc --from=markdown --to=rst --output=README.rst README.md
+```
 
-  ```
-  pandoc --from=markdown --to=rst --output=README.rst README.md
-  ```
+3.  Build:
 
-3. Build:
+```
+python setup.py sdist
+```
 
-  ```
-  python setup.py sdist
-  ```
+4.  Upload Gitssue.egg-info/PKG-INFO to pypi.
 
-4. Upload Gitssue.egg-info/PKG-INFO to pypi.
+5.  Upload the release:
 
-5. Upload the release:
+```
+twine upload -r pypi dist/Gitssue-<VERSION>.tar.gz
+```
 
-  ```
-  twine upload -r pypi dist/Gitssue-<VERSION>.tar.gz
-  ```
-  
+(For test.pypi.org):
+
+```
+twine upload --repository-url https://test.pypi.org/legacy/ dist/Gitssue-<VERSION>.tar.gz
+```

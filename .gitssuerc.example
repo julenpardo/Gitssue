@@ -1,6 +1,13 @@
-[github]
+[github.com]
 username = your-github-username
 password = your-strong-github-password
 
-[gitlab]
+[bitbucket.org]
+username = your-bitbucket-username
+password = your-strong-bitbucket-password
+
+[gitlab.com]
+token = access-token
+
+[self.hosted.gitlab.com]
 token = access-token

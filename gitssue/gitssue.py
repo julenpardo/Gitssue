@@ -12,7 +12,7 @@ from cement.ext.ext_argparse import ArgparseController, expose
 from gitssue.dependencies.dependencies import Dependencies
 from gitssue.controller.controller import Controller
 
-GITSSUE_VERSION = '1.2'
+GITSSUE_VERSION = '1.3'
 
 
 class BaseController(ArgparseController):

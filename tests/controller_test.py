@@ -40,16 +40,31 @@ class ControllerTest(unittest.TestCase):
     mocked_request_parse_request_exception_return = None
     requester_mock = None
 
+    def dummy(self):
+        return None
+
     def setUp(self):
         self.controller = Controller(Dependencies())
         self.controller.deps.printer.color_printer = DummyColorPrinter()
 
-        mocked_return = "origin git@github.com:julenpardo/Gitssue.git (fetch)"
-        shell_wrapper_mock = mock.Mock()
-        self.mocked_shell_wrapper_execute_command_return = mocked_return
-        shell_wrapper_mock.execute_command = self.mock_shell_wrapper_execute_command
+        shell_wrapper_mock = self._create_shell_wrapper_mock()
         self.controller.deps.shell = shell_wrapper_mock
         self.controller.deps.git_wrapper = GitWrapper(shell_wrapper_mock)
+        self.controller.deps.instantiate_remote_instance()
+
+
+    def _create_shell_wrapper_mock(self):
+        def side_effect(*args, **kwargs):
+            if args[0] == 'git remote --verbose':
+                return  "origin git@github.com:julenpardo/Gitssue.git (fetch)"
+            elif args[0] == 'git config --get remote.origin.url':
+                return 'git@github.com:julenpardo/gitssue.git'
+
+        shell_wrapper_mock = mock.Mock()
+        shell_wrapper_mock.execute_command.side_effect = side_effect
+
+        return shell_wrapper_mock
+
 
     def mock_remote_get_issue_list(self, username, repo, all=False, desc=False):
         if self.requester_mock is not None:
@@ -130,7 +145,6 @@ class ControllerTest(unittest.TestCase):
         temp_stdout = StringIO()
         with contextlib.redirect_stdout(temp_stdout):
             self.controller.list()
-            pass
 
         actual = temp_stdout.getvalue().strip()
 
@@ -186,6 +200,7 @@ class ControllerTest(unittest.TestCase):
 
         original_shell = self.controller.deps.shell
         self.controller.deps.shell = shell_wrapper_mock
+        self.controller.deps.git_wrapper = GitWrapper(shell_wrapper_mock)
 
         expected = 'Error\n'
         expected += 'More than one remote was detected. Gitssue does not offer support for this yet.'
@@ -193,7 +208,6 @@ class ControllerTest(unittest.TestCase):
         temp_stdout = StringIO()
         with contextlib.redirect_stdout(temp_stdout):
             self.controller.list()
-            pass
 
         self.controller.deps.shell = original_shell
 
@@ -235,7 +249,7 @@ class ControllerTest(unittest.TestCase):
 
         actual = temp_stdout.getvalue().strip()
 
-        #self.assertEqual(expected, actual)
+        self.assertEqual(expected, actual)
 
     def test_desc_request_error(self):
         expected = 'Mocked exception'
@@ -255,7 +269,6 @@ class ControllerTest(unittest.TestCase):
         temp_stdout = StringIO()
         with contextlib.redirect_stdout(temp_stdout):
             self.controller.desc('1')  # We need a number to pass the first condition.
-            pass
 
         actual = temp_stdout.getvalue().strip().splitlines()[1]
 
@@ -307,6 +320,7 @@ class ControllerTest(unittest.TestCase):
 
         original_shell = self.controller.deps.shell
         self.controller.deps.shell = shell_wrapper_mock
+        self.controller.deps.git_wrapper = GitWrapper(shell_wrapper_mock)
 
         expected = 'Error\n'
         expected += 'More than one remote was detected. Gitssue does not offer support for this yet.'
@@ -314,7 +328,6 @@ class ControllerTest(unittest.TestCase):
         temp_stdout = StringIO()
         with contextlib.redirect_stdout(temp_stdout):
             self.controller.desc(None)
-            pass
 
         self.controller.deps.shell = original_shell
 
@@ -328,7 +341,6 @@ class ControllerTest(unittest.TestCase):
         temp_stdout = StringIO()
         with contextlib.redirect_stdout(temp_stdout):
             self.controller.desc(input)
-            pass
 
         expected = 'Error\n'
         expected += 'Issue number(s) must be number(s).'
@@ -401,6 +413,7 @@ class ControllerTest(unittest.TestCase):
 
         original_shell = self.controller.deps.shell
         self.controller.deps.shell = shell_wrapper_mock
+        self.controller.deps.git_wrapper = GitWrapper(shell_wrapper_mock)
 
         expected = 'Error\n'
         expected += 'More than one remote was detected. Gitssue does not offer support for this yet.'

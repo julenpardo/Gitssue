@@ -7,6 +7,7 @@ from gitssue.printer.colorconsole_color_printer import ColorConsoleColorPrinter
 from gitssue.printer.printer import Printer
 from gitssue.remote.github import Github
 from gitssue.remote.gitlab import Gitlab
+from gitssue.remote.bitbucket import Bitbucket
 from gitssue.config import config_reader
 
 
@@ -16,18 +17,26 @@ class Dependencies:
     """
 
     def __init__(self):
-        self.inject_dependencies()
-
-    def inject_dependencies(self):
         self.shell = ShellWrapper()
         self.git_wrapper = GitWrapper(self.shell)
         self.requester = Requests()
         self.color_printer = ColorConsoleColorPrinter()
         self.printer = Printer(self.color_printer)
 
-        remote_url = self.git_wrapper.get_remote_url()
+    def instantiate_remote_instance(self):
+        remote_domain = self.git_wrapper.get_remote_domain()
+        config = config_reader.get_config()
 
-        if 'github.com' in remote_url:
-            self.remote = Github(self.requester, config_reader.get_config())
+        if remote_domain == 'github.com':
+            credentials = config.get('github.com', {})
+            remote = Github(self.requester, credentials=credentials)
+
+        elif remote_domain == 'bitbucket.org':
+            credentials = config.get('bitbucket.org', {})
+            remote = Bitbucket(self.requester, credentials=credentials)
+
         else:
-            self.remote = Gitlab(self.requester, config_reader.get_config())
+            auth_token = config[remote_domain]['token']
+            remote = Gitlab(self.requester, auth_token, remote_domain)
+
+        self.remote = remote

@@ -46,7 +46,8 @@ class Requests(RequestInterface):
 
         if response.status_code != 200:
             raise UnsuccessfulHttpRequestException(
-                response.status_code, response.headers)
+                response.status_code, response.headers
+            )
 
         response_object = json.loads(response.text)
         response.close()
