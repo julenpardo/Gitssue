@@ -16,6 +16,7 @@ class Controller:
 
     def __init__(self, dependencies):
         self.deps = dependencies
+        dependencies.instantiate_remote_instance()
 
     def list(self, show_all=False, description=False):
         """

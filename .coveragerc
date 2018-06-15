@@ -6,6 +6,8 @@ omit =
     gitssue/gitssue.py
     *_interface.py
     gitssue/remote/dummy.py
+    gitssue/__init__.py
+    gitssue/*/__init__.py
 
 [html]
 directory = reports/coverage/

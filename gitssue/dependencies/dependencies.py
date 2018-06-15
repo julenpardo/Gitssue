@@ -17,20 +17,14 @@ class Dependencies:
     """
 
     def __init__(self):
-        self.inject_dependencies()
-
-    def inject_dependencies(self):
         self.shell = ShellWrapper()
         self.git_wrapper = GitWrapper(self.shell)
         self.requester = Requests()
         self.color_printer = ColorConsoleColorPrinter()
         self.printer = Printer(self.color_printer)
 
+    def instantiate_remote_instance(self):
         remote_domain = self.git_wrapper.get_remote_domain()
-
-        self.remote = self.get_remote_instance(remote_domain)
-
-    def get_remote_instance(self, remote_domain):
         config = config_reader.get_config()
 
         if remote_domain == 'github.com':
@@ -44,4 +38,4 @@ class Dependencies:
             auth_token = config[remote_domain]['token']
             remote = Gitlab(self.requester, auth_token, remote_domain)
 
-        return remote
+        self.remote = remote
