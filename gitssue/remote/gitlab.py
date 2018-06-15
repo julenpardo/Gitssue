@@ -23,6 +23,10 @@ class Gitlab(RemoteRepoInterface):
         :param username: the user owning the repository.
         :param repository: the repository to look the issues at.
         :param show_all: show also closed issues.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
         :return: a dictionary id:label format.
         """
         auth_token_header = {'PRIVATE-TOKEN': self.auth_token}
@@ -110,9 +114,18 @@ class Gitlab(RemoteRepoInterface):
         """
         Gets the specified issues, with the descriptions.
 
+        In this case, the UnsuccessfulHttpRequestException is handled here and
+        not in the controller, because it expects the not_found_issues as
+        return value, since it may happen that we have both found and not found
+        issues.
+
         :param username: the user owning the repository.
         :param repository: the repository to look the issues at.
         :param issue_numbers: the issue identifier(s).
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
         :return: a dictionary with the title and the body message of each issue
             id.
         """
@@ -163,6 +176,10 @@ class Gitlab(RemoteRepoInterface):
         :param username: the user owning the repository.
         :param repository: the repository to look the issues at.
         :param issue_number: the issue number to query the comments to.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
         """
         request = '{0}/projects/{1}/issues/{2}/notes'
         issue_comments = []
@@ -202,7 +219,6 @@ class Gitlab(RemoteRepoInterface):
         Parses the generated exception during the request, necessary for
         special cases, e.g., when the API limit is hit.
 
-        TODO: make messages more specific.
         :param exception: (UnsuccessfulRequestException) The exception object
             generated in the request.
         :param issue_numbers: the issue number(s) that weren't found in the
@@ -210,5 +226,12 @@ class Gitlab(RemoteRepoInterface):
         :return: The error message that will be displayed to the user.
         """
         message = 'An error occurred in the request.'
+
+        if exception.code == 401:
+            message = "Invalid auth token. Check your '.gitssuerc' config " \
+                + "file."
+        elif exception.code == 404 and issue_numbers:
+            message = "The following issue(s) couldn't be found: {0}".\
+                format(', '.join(issue_numbers))
 
         return message
