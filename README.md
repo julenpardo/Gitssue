@@ -7,7 +7,7 @@
 
 Manage your Github, Gitlab or Bitbucket issues from the command line.
 
-Built on [Cement Framework](http://builtoncement.com/).
+Built on [Click](https://github.com/pallets/click).
 
 ![img/demo.gif](img/demo.gif)
 

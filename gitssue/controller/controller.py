@@ -10,7 +10,6 @@ class Controller:
     request in question, and call the printer to show it.
     """
 
-    _ISSUE_NUMBER_FORMAT_ERROR = 'Issue number(s) must be number(s).'
     _MANY_ORIGINS_ERROR = 'More than one remote was detected. Gitssue does ' \
         'not offer support for this yet.'
 
@@ -67,40 +66,35 @@ class Controller:
         if len(usernames_and_repo) == 1:
             username, repo = usernames_and_repo[0]
 
-            if not all(number.isdigit() for number in issue_numbers):
-                self.deps.printer.print_error(self._ISSUE_NUMBER_FORMAT_ERROR)
-            elif issue_numbers:
-                try:
-                    issues, not_found_issues = self.deps.remote\
-                        .get_issues_description(
-                            username,
-                            repo,
-                            issue_numbers,
-                        )
+            try:
+                issues, not_found_issues = self.deps.remote\
+                    .get_issues_description(
+                        username,
+                        repo,
+                        issue_numbers,
+                    )
 
-                    if not_found_issues:
-                        error = "The following issues couldn't be found: {0}".\
-                            format(', '.join(not_found_issues))
-                except UnsuccessfulHttpRequestException as \
-                        unsuccessful_http_request:
-                    error = self.deps.remote.parse_request_exception(
-                        unsuccessful_http_request)
-                except RequestException as request_exception:
-                    error = 'A connection error occurred:\n'
-                    error += str(request_exception)
+                if not_found_issues:
+                    error = "The following issues couldn't be found: {0}".\
+                        format(', '.join(not_found_issues))
+            except UnsuccessfulHttpRequestException as \
+                    unsuccessful_http_request:
+                error = self.deps.remote.parse_request_exception(
+                    unsuccessful_http_request)
+            except RequestException as request_exception:
+                error = 'A connection error occurred:\n'
+                error += str(request_exception)
 
-                if issues:
-                    self.deps.printer.print_issue_list_with_desc(issues)
-                if error:
-                    self.deps.printer.print_error(error)
-            else:
-                show_help = True
+            if issues:
+                self.deps.printer.print_issue_list_with_desc(issues)
+            if error:
+                self.deps.printer.print_error(error)
         else:
             self.deps.printer.print_error(self._MANY_ORIGINS_ERROR)
 
         return show_help
 
-    def thread(self, issue_number):
+    def comments(self, issue_number):
         """
         Prints the comment thread of the given issue.
         It's not necessary to check if the "issue_number" is given because in
@@ -114,30 +108,27 @@ class Controller:
         if len(usernames_and_repo) == 1:
             username, repo = usernames_and_repo[0]
 
-            if not issue_number.isdigit():
-                self.deps.printer.print_error(self._ISSUE_NUMBER_FORMAT_ERROR)
-            else:
-                try:
-                    comment_thread = self.deps.remote.get_issue_comments(
-                        username,
-                        repo,
-                        issue_number,
-                    )
-                except UnsuccessfulHttpRequestException as \
-                        unsuccessful_http_request:
-                    error = self.deps.remote.parse_request_exception(
-                        unsuccessful_http_request,
-                        [issue_number],
-                    )
-                except RequestException as request_exception:
-                    error = 'A connection error occurred:\n'
-                    error += str(request_exception)
+            try:
+                comment_thread = self.deps.remote.get_issue_comments(
+                    username,
+                    repo,
+                    issue_number,
+                )
+            except UnsuccessfulHttpRequestException as \
+                    unsuccessful_http_request:
+                error = self.deps.remote.parse_request_exception(
+                    unsuccessful_http_request,
+                    [issue_number],
+                )
+            except RequestException as request_exception:
+                error = 'A connection error occurred:\n'
+                error += str(request_exception)
 
-                if not error:
-                    self.deps.printer.print_issue_comment_thread(
-                        comment_thread)
-                else:
-                    self.deps.printer.print_error(error)
+            if not error:
+                self.deps.printer.print_issue_comment_thread(
+                    comment_thread)
+            else:
+                self.deps.printer.print_error(error)
 
         else:
             self.deps.printer.print_error(self._MANY_ORIGINS_ERROR)
