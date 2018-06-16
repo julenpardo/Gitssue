@@ -335,26 +335,6 @@ class ControllerTest(unittest.TestCase):
 
         self.assertEqual(expected, actual)
 
-    def test_desc_invalid_issue_numbers(self):
-        input = 'This is not a number, I think.'
-
-        temp_stdout = StringIO()
-        with contextlib.redirect_stdout(temp_stdout):
-            self.controller.desc(input)
-
-        expected = 'Error\n'
-        expected += 'Issue number(s) must be number(s).'
-        actual = temp_stdout.getvalue().strip()
-
-        self.assertEqual(expected, actual)
-
-    def test_desc_no_issue_number(self):
-        input = []
-
-        expected_true = self.controller.desc(input)
-
-        self.assertTrue(expected_true)
-
     def test_thread(self):
         mocked_return = [
             {
@@ -384,22 +364,8 @@ class ControllerTest(unittest.TestCase):
 
         temp_stdout = StringIO()
         with contextlib.redirect_stdout(temp_stdout):
-            self.controller.thread('1')  # We need a number to pass the condition.
+            self.controller.comments('1')  # We need a number to pass the condition.
 
-        actual = temp_stdout.getvalue().strip()
-
-        self.assertEqual(expected, actual)
-
-    def test_thread_invalid_issue_number(self):
-        input = 'This is not a number, I think.'
-
-        temp_stdout = StringIO()
-        with contextlib.redirect_stdout(temp_stdout):
-            self.controller.thread(input)
-            pass
-
-        expected = 'Error\n'
-        expected += 'Issue number(s) must be number(s).'
         actual = temp_stdout.getvalue().strip()
 
         self.assertEqual(expected, actual)
@@ -420,7 +386,7 @@ class ControllerTest(unittest.TestCase):
 
         temp_stdout = StringIO()
         with contextlib.redirect_stdout(temp_stdout):
-            self.controller.thread(None)
+            self.controller.comments(None)
             pass
 
         self.controller.deps.shell = original_shell
@@ -446,7 +412,7 @@ class ControllerTest(unittest.TestCase):
 
         temp_stdout = StringIO()
         with contextlib.redirect_stdout(temp_stdout):
-            self.controller.thread('1')  # We need a number to pass the first condition.
+            self.controller.comments('1')  # We need a number to pass the first condition.
             pass
 
         actual = temp_stdout.getvalue().strip().splitlines()[1]
@@ -463,7 +429,7 @@ class ControllerTest(unittest.TestCase):
         temp_stdout = StringIO()
 
         with contextlib.redirect_stdout(temp_stdout):
-            self.controller.thread('1')
+            self.controller.comments('1')
 
         expected = 'A connection error occurred:'
         actual = temp_stdout.getvalue().strip().splitlines()[1]

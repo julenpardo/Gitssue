@@ -37,7 +37,7 @@ def list(all, desc):
 
 
 @click.command(help='Get description of specified issue(s).')
-@click.argument('issues', nargs=-1)
+@click.argument('issues', nargs=-1, type=click.INT)
 @click.pass_context
 def desc(context, issues):
     if len(issues) == 0:
@@ -50,7 +50,7 @@ def desc(context, issues):
 @click.command(help='Get the comments of specified issue.')
 @click.argument('issue', nargs=1, type=click.INT)
 def comments(issue):
-    controller.thread(issue)
+    controller.comments(issue)
 
 
 @click.command(help='Shows the API rate information (remaining requests, reset'
