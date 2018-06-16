@@ -10,9 +10,10 @@ class RequestInterface(metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def get_request(self, request, credentials={}, extra_headers={}):
+    def request(self, method, request, credentials=None, extra_headers=None,
+                json_payload=None):
         """
-        Executes a GET request.
+        Executes a request.
 
         :param request: the GET request to execute.
         :return: response response.

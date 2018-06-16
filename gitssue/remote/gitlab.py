@@ -205,6 +205,22 @@ class Gitlab(RemoteRepoInterface):
 
         return issue_comments
 
+    def close_issues(self, username, repository, issue_numbers):
+        """
+        Closes the specified issues.
+
+        @TODO: implement.
+
+        :param username: the user owning the repository.
+        :param repository: the repository to look the issues at.
+        :param issue: the issues to close.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
+        """
+        pass
+
     def get_rate_information(self):
         """
         The Gitlab API doesn't have a rate limit, so we return everything as

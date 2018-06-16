@@ -70,6 +70,21 @@ class RemoteRepoInterface(metaclass=ABCMeta):
         """
 
     @abstractmethod
+    def close_issues(self, username, repository, issue_numbers):
+        """
+        Closes the specified issue.
+
+        :param username: the user owning the repository.
+        :param repository: the repository to look the issues at.
+        :param issue_numbers: the issues to close.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
+        """
+        pass
+
+    @abstractmethod
     def get_rate_information(self):
         """
         Gets the API rate information (remaining requests, reset time, etc.).

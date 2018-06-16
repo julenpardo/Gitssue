@@ -9,10 +9,10 @@ class GithubTest(unittest.TestCase):
 
     mocked_request_response = None
 
-    def mock_get_request(self, request, credentials={}):
+    def mock_request(self, method, request, credentials={}):
         return self.mocked_request_response
 
-    def mock_get_request_with_error(self, request, credentials={}):
+    def mock_request_with_error(self, method, request, credentials={}):
         return False
 
     def test_get_issue_list(self):
@@ -33,7 +33,7 @@ class GithubTest(unittest.TestCase):
         ]
         self.mocked_request_response = mocked_return
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
         github = Github(requester_mock, credentials={})
 
         expected = self.mocked_request_response
@@ -49,7 +49,7 @@ class GithubTest(unittest.TestCase):
 
     def test_get_issue_list_error_request(self):
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request_with_error
+        requester_mock.request = self.mock_request_with_error
 
         github = Github(requester_mock, credentials={})
 
@@ -65,7 +65,7 @@ class GithubTest(unittest.TestCase):
         }
         self.mocked_request_response = mocked_return
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
         github = Github(requester_mock, credentials={})
 
         expected = self.mocked_request_response
@@ -86,7 +86,7 @@ class GithubTest(unittest.TestCase):
 
     def test_get_issues_description_error_request(self):
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request_with_error
+        requester_mock.request = self.mock_request_with_error
 
         github = Github(requester_mock, credentials={})
 
@@ -97,7 +97,7 @@ class GithubTest(unittest.TestCase):
 
     def test_get_issues_description_not_found_issue(self):
         requester_mock = mock.Mock()
-        requester_mock.get_request.side_effect = UnsuccessfulHttpRequestException(404, {})
+        requester_mock.request.side_effect = UnsuccessfulHttpRequestException(404, {})
 
         github = Github(requester_mock, credentials={})
 
@@ -109,7 +109,7 @@ class GithubTest(unittest.TestCase):
 
     def test_get_issues_description_other_error(self):
         requester_mock = mock.Mock()
-        requester_mock.get_request.side_effect = UnsuccessfulHttpRequestException(500, {})
+        requester_mock.request.side_effect = UnsuccessfulHttpRequestException(500, {})
 
         github = Github(requester_mock, credentials={})
 
@@ -132,7 +132,7 @@ class GithubTest(unittest.TestCase):
         ]
         self.mocked_request_response = mocked_return
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
 
         github = Github(requester_mock, credentials={})
 
@@ -160,7 +160,7 @@ class GithubTest(unittest.TestCase):
         mocked_return = []
         self.mocked_request_response = mocked_return
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
 
         github = Github(requester_mock, credentials={})
 
@@ -256,7 +256,7 @@ class GithubTest(unittest.TestCase):
 
         self.mocked_request_response = mocked_return
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
 
         github = Github(requester_mock, credentials={})
 
@@ -267,3 +267,14 @@ class GithubTest(unittest.TestCase):
         actual = github.get_rate_information()
 
         self.assertEqual(expected, actual)
+
+    def test_close_comments(self):
+        pass
+
+    def test_close_comments_exception_authentication(self):
+        """401"""
+        pass
+
+    def test_close_comments_exception_issue_not_found(self):
+        """404"""
+        pass

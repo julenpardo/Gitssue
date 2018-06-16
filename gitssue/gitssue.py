@@ -59,7 +59,19 @@ def rate_info():
     controller.rate_information()
 
 
+@click.command(help='Close specified issue(s).')
+@click.argument('issues', nargs=-1, type=click.INT)
+@click.pass_context
+def close(context, issues):
+    if len(issues) == 0:
+        print('Usage: gitssue close [OPTIONS] [issue [issue ...]]\n')
+        print('Error: Missing argument "issue".')
+        context.exit(2)
+    controller.close(issues)
+
+
 cli.add_command(list)
 cli.add_command(desc)
 cli.add_command(comments)
+cli.add_command(close)
 cli.add_command(rate_info)
