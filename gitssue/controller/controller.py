@@ -162,7 +162,9 @@ class Controller:
 
             if not_found_issues:
                 error = "The following issues couldn't be found: {0}".\
-                    format(', '.join(not_found_issues))
+                    format(', '.join(
+                        str(i) for i in not_found_issues
+                    ))
 
             self.deps.printer.print_closed_issues(closed_issues)
 

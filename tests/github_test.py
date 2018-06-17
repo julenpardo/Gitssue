@@ -9,7 +9,8 @@ class GithubTest(unittest.TestCase):
 
     mocked_request_response = None
 
-    def mock_request(self, method, request, credentials={}):
+    def mock_request(self, method, request, credentials={}, extra_headers={},
+                     json_payload={}):
         return self.mocked_request_response
 
     def mock_request_with_error(self, method, request, credentials={}):
@@ -269,12 +270,54 @@ class GithubTest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_close_comments(self):
-        pass
+        def side_effect(*args, **kwargs):
+            existing_closed_issues = {
+                1: {
+                    'number': 1,
+                    'title': 'First closed issue',
+                },
+                2: {
+                    'number': 2,
+                    'title': 'Second closed issue',
+                },
+            }
+            request_issue_id = int(args[1][-1:])
+
+            if request_issue_id in existing_closed_issues:
+                return existing_closed_issues[request_issue_id]
+            else:
+                raise UnsuccessfulHttpRequestException(404, {})
+
+        requester_mock = mock.Mock()
+        requester_mock.request.side_effect = side_effect
+
+        input_issues = [1, 2, 3]
+
+        github = Github(requester_mock, credentials={})
+
+        expected = [
+            {
+                'number': 1,
+                'title': 'First closed issue'
+            },
+            {
+                'number': 2,
+                'title': 'Second closed issue'
+            },
+        ], [
+            3
+        ]
+        actual = github.close_issues('username', 'repo', input_issues)
+
+        self.assertEqual(expected, actual)
 
     def test_close_comments_exception_authentication(self):
         """401"""
-        pass
+        requester_mock = mock.Mock()
+        requester_mock.request.side_effect = \
+            UnsuccessfulHttpRequestException(401, {})
 
-    def test_close_comments_exception_issue_not_found(self):
-        """404"""
-        pass
+        github = Github(requester_mock, credentials={})
+
+        with self.assertRaises(UnsuccessfulHttpRequestException):
+            github.close_issues('username', 'repo', [1, 2, 3])
