@@ -16,10 +16,10 @@ class GitlabTest(unittest.TestCase):
 
     mocked_request_response = None
 
-    def mock_get_request(self, request, credentials={}, extra_headers={}):
+    def mock_request(self, method, request, credentials={}, extra_headers={}):
         return self.mocked_request_response
 
-    def mock_get_request_with_error(self, request, credentials={}):
+    def mock_request_with_error(self, request, credentials={}):
         return False
 
     def test_get_issue_list(self):
@@ -47,15 +47,15 @@ class GitlabTest(unittest.TestCase):
                     'color': '#ffffff'
                 }
             ]
-            if args[0].startswith('https://gitlab.com/api/v4/projects/1/issues'):
+            if args[1].startswith('https://gitlab.com/api/v4/projects/1/issues'):
                 return mocked_issue_list
-            elif args[0] == 'https://gitlab.com/api/v4/projects/username%2Frepo':
+            elif args[1] == 'https://gitlab.com/api/v4/projects/username%2Frepo':
                 return project_id
-            elif args[0] == 'https://gitlab.com/api/v4/projects/1/labels':
+            elif args[1] == 'https://gitlab.com/api/v4/projects/1/labels':
                 return labels
 
         requester_mock = mock.Mock()
-        requester_mock.get_request.side_effect = side_effect
+        requester_mock.request.side_effect = side_effect
         gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
         expected = [{
@@ -84,7 +84,7 @@ class GitlabTest(unittest.TestCase):
 
         self.mocked_request_response = mocked_return
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
 
         gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
@@ -95,7 +95,7 @@ class GitlabTest(unittest.TestCase):
 
     def test_get_project_id_project_not_found(self):
         requester_mock = mock.Mock()
-        requester_mock.get_request.side_effect = UnsuccessfulHttpRequestException(404, {})
+        requester_mock.request.side_effect = UnsuccessfulHttpRequestException(404, {})
 
         gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
@@ -115,7 +115,7 @@ class GitlabTest(unittest.TestCase):
 
         self.mocked_request_response = mocked_return
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
 
         gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
@@ -126,7 +126,7 @@ class GitlabTest(unittest.TestCase):
 
     def test_get_labels_auth_token_error(self):
         requester_mock = mock.Mock()
-        requester_mock.get_request.side_effect = UnsuccessfulHttpRequestException(401, {})
+        requester_mock.request.side_effect = UnsuccessfulHttpRequestException(401, {})
 
         gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
@@ -138,7 +138,7 @@ class GitlabTest(unittest.TestCase):
 
         self.mocked_request_response = mocked_return
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
 
         gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
@@ -173,7 +173,7 @@ class GitlabTest(unittest.TestCase):
 
         self.mocked_request_response = mocked_return
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
 
         gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
@@ -231,11 +231,11 @@ class GitlabTest(unittest.TestCase):
                     'color': '#ffffff'
                 }
             ]
-            if args[0] == 'https://gitlab.com/api/v4/projects/1/issues':
+            if args[1] == 'https://gitlab.com/api/v4/projects/1/issues':
                 return mocked_issue_list
-            elif args[0] == 'https://gitlab.com/api/v4/projects/username%2Frepo':
+            elif args[1] == 'https://gitlab.com/api/v4/projects/username%2Frepo':
                 return project_id
-            elif args[0] == 'https://gitlab.com/api/v4/projects/1/labels':
+            elif args[1] == 'https://gitlab.com/api/v4/projects/1/labels':
                 return labels
 
         username = 'username'
@@ -243,7 +243,7 @@ class GitlabTest(unittest.TestCase):
         issue_numbers = ['1', '2', '3']
 
         requester_mock = mock.Mock()
-        requester_mock.get_request.side_effect = side_effect
+        requester_mock.request.side_effect = side_effect
 
         gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
@@ -285,7 +285,7 @@ class GitlabTest(unittest.TestCase):
 
         def side_effect(*args, **kwargs):
             # Mock for get_project_id
-            if args[0] == 'https://gitlab.com/api/v4/projects/username%2Frepo':
+            if args[1] == 'https://gitlab.com/api/v4/projects/username%2Frepo':
                 return project_id
             else:
                 return mocked_issue_list
@@ -295,7 +295,7 @@ class GitlabTest(unittest.TestCase):
         issue_numbers = ['1', '2']
 
         requester_mock = mock.Mock()
-        requester_mock.get_request.side_effect = side_effect
+        requester_mock.request.side_effect = side_effect
 
         gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
@@ -336,9 +336,9 @@ class GitlabTest(unittest.TestCase):
         ]
 
         def side_effect(*args, **kwargs):
-            if args[0] == 'https://gitlab.com/api/v4/projects/username%2Frepo':
+            if args[1] == 'https://gitlab.com/api/v4/projects/username%2Frepo':
                 return project_id
-            elif args[0] == 'https://gitlab.com/api/v4/projects/1/issues/1/notes':
+            elif args[1] == 'https://gitlab.com/api/v4/projects/1/issues/1/notes':
                 return mocked_issue_comments
 
         username = 'username'
@@ -346,7 +346,7 @@ class GitlabTest(unittest.TestCase):
         issue_number = 1
 
         requester_mock = mock.Mock()
-        requester_mock.get_request.side_effect = side_effect
+        requester_mock.request.side_effect = side_effect
 
         gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
@@ -374,7 +374,7 @@ class GitlabTest(unittest.TestCase):
 
         def side_effect(*args, **kwargs):
             # Mock for get_project_id
-            if args[0] == 'https://gitlab.com/api/v4/projects/username%2Frepo':
+            if args[1] == 'https://gitlab.com/api/v4/projects/username%2Frepo':
                 return project_id
             else:
                 return mocked_issue_comments
@@ -384,7 +384,7 @@ class GitlabTest(unittest.TestCase):
         issue_number = 1
 
         requester_mock = mock.Mock()
-        requester_mock.get_request.side_effect = side_effect
+        requester_mock.request.side_effect = side_effect
 
         gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 

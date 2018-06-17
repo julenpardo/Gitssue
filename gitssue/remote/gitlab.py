@@ -41,8 +41,8 @@ class Gitlab(RemoteRepoInterface):
 
             request += state
 
-            response_issues = self.requester.get_request(
-                request, extra_headers=self.auth_token_header
+            response_issues = self.requester.request(
+                'GET', request, extra_headers=self.auth_token_header
             )
             labels_info = self._get_labels(project_id)
 
@@ -66,8 +66,8 @@ class Gitlab(RemoteRepoInterface):
             self.api_url, project_id
         )
 
-        labels_info = self.requester.get_request(
-            labels_request, extra_headers=self.auth_token_header
+        labels_info = self.requester.request(
+            'GET', labels_request, extra_headers=self.auth_token_header
         )
 
         return labels_info
@@ -94,8 +94,8 @@ class Gitlab(RemoteRepoInterface):
             self.api_url, username, repository
         )
 
-        project = self.requester.get_request(
-            project_request, extra_headers=self.auth_token_header
+        project = self.requester.request(
+            'GET', project_request, extra_headers=self.auth_token_header
         )
 
         return project.get('id')
@@ -127,13 +127,13 @@ class Gitlab(RemoteRepoInterface):
             request = '{0}/projects/{1}/issues'.format(self.api_url,
                                                        project_id)
 
-            response_issues = self.requester.get_request(
-                request, extra_headers=self.auth_token_header
+            response_issues = self.requester.request(
+                'GET', request, extra_headers=self.auth_token_header
             )
             labels_info = self._get_labels(project_id)
 
             for issue in response_issues:
-                issue_id = str(issue['iid'])
+                issue_id = issue['iid']
 
                 if issue_id in issue_numbers:
                     issue_labels = self._create_label_list(issue, labels_info)
@@ -150,7 +150,7 @@ class Gitlab(RemoteRepoInterface):
                     issues_descriptions.append(issue_description)
 
             not_found_issues = [issue_number for issue_number in issue_numbers if issue_number not in [
-                str(issue['iid']) for issue in response_issues]]
+                issue['iid'] for issue in response_issues]]
 
         return issues_descriptions, not_found_issues
 
@@ -172,8 +172,8 @@ class Gitlab(RemoteRepoInterface):
             project_id = self._get_project_id(username, repository)
             request = request.format(self.api_url, project_id, issue_number)
 
-            response_comments = self.requester.get_request(
-                request, extra_headers=self.auth_token_header
+            response_comments = self.requester.request(
+                'GET', request, extra_headers=self.auth_token_header
             )
 
             if response_comments:
@@ -230,6 +230,8 @@ class Gitlab(RemoteRepoInterface):
                 + "file."
         elif exception.code == 404 and issue_numbers:
             message = "The following issue(s) couldn't be found: {0}".\
-                format(', '.join(issue_numbers))
+                format(', '.join(
+                    str(i) for i in issue_numbers
+                ))
 
         return message
