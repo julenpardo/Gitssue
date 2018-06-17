@@ -120,10 +120,7 @@ class GitlabTest(unittest.TestCase):
         gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
         expected = mocked_return
-        actual = gitlab._get_labels(
-            project_id=1,
-            auth_token_header=self.TOKEN_HEADER
-        )
+        actual = gitlab._get_labels(project_id=1)
 
         self.assertEqual(expected, actual)
 
@@ -134,7 +131,7 @@ class GitlabTest(unittest.TestCase):
         gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
         with self.assertRaises(UnsuccessfulHttpRequestException):
-            gitlab._get_labels(project_id=1, auth_token_header=self.TOKEN_HEADER)
+            gitlab._get_labels(project_id=1)
 
     def test_get_labels_no_label_found(self):
         mocked_return = []
@@ -146,10 +143,7 @@ class GitlabTest(unittest.TestCase):
         gitlab = Gitlab(requester_mock, self.CREDENTIALS, 'gitlab.com')
 
         expected = []
-        actual = gitlab._get_labels(
-            project_id=1,
-            auth_token_header=self.TOKEN_HEADER
-        )
+        actual = gitlab._get_labels(project_id=1)
 
         self.assertEqual(expected, actual)
 
@@ -193,7 +187,7 @@ class GitlabTest(unittest.TestCase):
                 'color': 'f0f0f0',
             }
         ]
-        actual = gitlab._create_label_list({}, input_issues, mocked_return)
+        actual = gitlab._create_label_list(input_issues, mocked_return)
 
         self.assertEqual(expected, actual)
 
