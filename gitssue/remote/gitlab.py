@@ -191,17 +191,47 @@ class Gitlab(RemoteRepoInterface):
         """
         Closes the specified issues.
 
-        @TODO: implement.
-
         :param username: the user owning the repository.
         :param repository: the repository to look the issues at.
         :param issue: the issues to close.
         :raises requests.RequestException: if an error occurs during the
         request.
         :raises UnsuccessfulHttpRequestException: if the request code is
-        different to 200.
+        different to 200 and 404. The 404 are not thrown because there's no way
+        to know if the 404 is because what it's not found is the repo or the
+        issue. So it may happen that some issues aren't found but others that
+        are.
         """
-        pass
+        closed_issues = []
+        not_found_issues = []
+        project_id = self._get_project_id(username, repository)
+
+        if project_id:
+            base_request = '{0}/projects/{1}/issues/'.format(self.api_url,
+                                                             project_id)
+            payload = {
+                'state_event': 'close',
+            }
+
+            for issue in issue_numbers:
+                request = base_request + str(issue)
+
+                try:
+                    response_issue = self.requester.request(
+                        'PUT', request, extra_headers=self.auth_token_header,
+                        json_payload=payload
+                    )
+                    closed_issues.append({
+                        'number': issue,
+                        'title': response_issue['title'],
+                    })
+                except UnsuccessfulHttpRequestException as http_exception:
+                    if http_exception.code == 404:
+                        not_found_issues.append(issue)
+                    else:
+                        raise
+
+        return closed_issues, not_found_issues
 
     def get_rate_information(self):
         """

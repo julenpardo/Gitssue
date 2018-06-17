@@ -456,3 +456,68 @@ class GitlabTest(unittest.TestCase):
 
         self.assertEqual(expected, actual)
 
+    def test_close_comments(self):
+        def side_effect(*args, **kwargs):
+            project = {'id': 1}
+            existing_closed_issues = {
+                1: {
+                    'number': 1,
+                    'title': 'First closed issue',
+                },
+                2: {
+                    'number': 2,
+                    'title': 'Second closed issue',
+                },
+            }
+
+            if args[1] == 'https://gitlab.com/api/v4/projects/username%2Frepo':
+                return project
+            else:
+                request_issue_id = int(args[1][-1:])
+
+                if request_issue_id in existing_closed_issues:
+                    return existing_closed_issues[request_issue_id]
+                else:
+                    raise UnsuccessfulHttpRequestException(404, {})
+
+        requester_mock = mock.Mock()
+        requester_mock.request.side_effect = side_effect
+
+        input_issues = [1, 2, 3]
+
+        gitlab = Gitlab(requester_mock, {}, 'gitlab.com')
+
+        expected = [
+            {
+                'number': 1,
+                'title': 'First closed issue'
+            },
+            {
+                'number': 2,
+                'title': 'Second closed issue'
+            },
+        ], [
+            3
+        ]
+        actual = gitlab.close_issues('username', 'repo', input_issues)
+
+        self.assertEqual(expected, actual)
+
+    def test_close_comments_exception_authentication(self):
+        """401"""
+        requester_mock = mock.Mock()
+
+        def side_effect(*args, **kwargs):
+            project = {'id': 1}
+
+            if args[1] == 'https://gitlab.com/api/v4/projects/username%2Frepo':
+                return project
+            else:
+                raise UnsuccessfulHttpRequestException(401, {})
+
+        requester_mock.request.side_effect = side_effect
+
+        gitlab = Gitlab(requester_mock, {}, 'gitlab.com')
+
+        with self.assertRaises(UnsuccessfulHttpRequestException):
+            gitlab.close_issues('username', 'repo', [1, 2, 3])
