@@ -507,6 +507,42 @@ class ControllerTest(unittest.TestCase):
 
         self.assertEqual(expected, actual)
 
+    def test_close_connection_error(self):
+        remote_mock = mock.Mock()
+        remote_mock.close_issues.side_effect = RequestException
+        self.controller.deps.remote = remote_mock
+
+        temp_stdout = StringIO()
+
+        with contextlib.redirect_stdout(temp_stdout):
+            self.controller.close([])
+
+        expected = 'A connection error occurred:'
+        actual = temp_stdout.getvalue().strip().splitlines()[2]
+
+        self.assertEqual(expected, actual)
+
+    def test_close_request_error(self):
+        expected = 'Mocked exception'
+
+        remote_mock = mock.Mock()
+
+        self.mocked_request_parse_request_exception_return = expected
+        remote_mock.parse_request_exception = self.mock_remote_parse_request_exception
+        remote_mock.close_issues.side_effect = \
+                UnsuccessfulHttpRequestException(401, {})
+
+        self.controller.deps.remote = remote_mock
+
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            self.controller.close([1])
+
+        actual = temp_stdout.getvalue().strip().splitlines()[2]
+
+        self.assertEqual(expected, actual)
+
+
     def test_close_many_origins(self):
         mocked_shell_wrapper_return = 'origin1 git@github.com:julenpardo/first-remote\n' + \
                                       'origin2 git@github.com:julenpardo/second-remote'
