@@ -9,10 +9,11 @@ class GithubTest(unittest.TestCase):
 
     mocked_request_response = None
 
-    def mock_get_request(self, request, credentials={}):
+    def mock_request(self, method, request, credentials={}, extra_headers={},
+                     json_payload={}):
         return self.mocked_request_response
 
-    def mock_get_request_with_error(self, request, credentials={}):
+    def mock_request_with_error(self, method, request, credentials={}):
         return False
 
     def test_get_issue_list(self):
@@ -33,7 +34,7 @@ class GithubTest(unittest.TestCase):
         ]
         self.mocked_request_response = mocked_return
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
         github = Github(requester_mock, credentials={})
 
         expected = self.mocked_request_response
@@ -49,7 +50,7 @@ class GithubTest(unittest.TestCase):
 
     def test_get_issue_list_error_request(self):
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request_with_error
+        requester_mock.request = self.mock_request_with_error
 
         github = Github(requester_mock, credentials={})
 
@@ -65,7 +66,7 @@ class GithubTest(unittest.TestCase):
         }
         self.mocked_request_response = mocked_return
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
         github = Github(requester_mock, credentials={})
 
         expected = self.mocked_request_response
@@ -86,7 +87,7 @@ class GithubTest(unittest.TestCase):
 
     def test_get_issues_description_error_request(self):
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request_with_error
+        requester_mock.request = self.mock_request_with_error
 
         github = Github(requester_mock, credentials={})
 
@@ -97,7 +98,7 @@ class GithubTest(unittest.TestCase):
 
     def test_get_issues_description_not_found_issue(self):
         requester_mock = mock.Mock()
-        requester_mock.get_request.side_effect = UnsuccessfulHttpRequestException(404, {})
+        requester_mock.request.side_effect = UnsuccessfulHttpRequestException(404, {})
 
         github = Github(requester_mock, credentials={})
 
@@ -109,7 +110,7 @@ class GithubTest(unittest.TestCase):
 
     def test_get_issues_description_other_error(self):
         requester_mock = mock.Mock()
-        requester_mock.get_request.side_effect = UnsuccessfulHttpRequestException(500, {})
+        requester_mock.request.side_effect = UnsuccessfulHttpRequestException(500, {})
 
         github = Github(requester_mock, credentials={})
 
@@ -132,7 +133,7 @@ class GithubTest(unittest.TestCase):
         ]
         self.mocked_request_response = mocked_return
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
 
         github = Github(requester_mock, credentials={})
 
@@ -160,7 +161,7 @@ class GithubTest(unittest.TestCase):
         mocked_return = []
         self.mocked_request_response = mocked_return
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
 
         github = Github(requester_mock, credentials={})
 
@@ -256,7 +257,7 @@ class GithubTest(unittest.TestCase):
 
         self.mocked_request_response = mocked_return
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
 
         github = Github(requester_mock, credentials={})
 
@@ -267,3 +268,56 @@ class GithubTest(unittest.TestCase):
         actual = github.get_rate_information()
 
         self.assertEqual(expected, actual)
+
+    def test_close_comments(self):
+        def side_effect(*args, **kwargs):
+            existing_closed_issues = {
+                1: {
+                    'number': 1,
+                    'title': 'First closed issue',
+                },
+                2: {
+                    'number': 2,
+                    'title': 'Second closed issue',
+                },
+            }
+            request_issue_id = int(args[1][-1:])
+
+            if request_issue_id in existing_closed_issues:
+                return existing_closed_issues[request_issue_id]
+            else:
+                raise UnsuccessfulHttpRequestException(404, {})
+
+        requester_mock = mock.Mock()
+        requester_mock.request.side_effect = side_effect
+
+        input_issues = [1, 2, 3]
+
+        github = Github(requester_mock, credentials={})
+
+        expected = [
+            {
+                'number': 1,
+                'title': 'First closed issue'
+            },
+            {
+                'number': 2,
+                'title': 'Second closed issue'
+            },
+        ], [
+            3
+        ]
+        actual = github.close_issues('username', 'repo', input_issues)
+
+        self.assertEqual(expected, actual)
+
+    def test_close_comments_exception_authentication(self):
+        """401"""
+        requester_mock = mock.Mock()
+        requester_mock.request.side_effect = \
+            UnsuccessfulHttpRequestException(401, {})
+
+        github = Github(requester_mock, credentials={})
+
+        with self.assertRaises(UnsuccessfulHttpRequestException):
+            github.close_issues('username', 'repo', [1, 2, 3])

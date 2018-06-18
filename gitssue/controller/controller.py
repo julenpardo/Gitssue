@@ -76,7 +76,9 @@ class Controller:
 
                 if not_found_issues:
                     error = "The following issues couldn't be found: {0}".\
-                        format(', '.join(not_found_issues))
+                        format(', '.join(
+                            str(i) for i in not_found_issues
+                        ))
             except UnsuccessfulHttpRequestException as \
                     unsuccessful_http_request:
                 error = self.deps.remote.parse_request_exception(
@@ -130,6 +132,46 @@ class Controller:
             else:
                 self.deps.printer.print_error(error)
 
+        else:
+            self.deps.printer.print_error(self._MANY_ORIGINS_ERROR)
+
+    def close(self, issue_numbers):
+        """
+        Closes the specified issues.
+
+        :param issue_numbers: the issues to close.
+        """
+        usernames_and_repo = self.deps.git_wrapper.get_username_and_repo()
+        error = ''
+        closed_issues = []
+        not_found_issues = []
+
+        if len(usernames_and_repo) == 1:
+            username, repo = usernames_and_repo[0]
+
+            try:
+                closed_issues, not_found_issues = self.deps.remote.close_issues(
+                    username, repo, issue_numbers
+                )
+            except UnsuccessfulHttpRequestException as \
+                    unsuccessful_http_request:
+                error = self.deps.remote.parse_request_exception(
+                    unsuccessful_http_request,
+                )
+            except RequestException as request_exception:
+                error = 'A connection error occurred:\n'
+                error += str(request_exception)
+
+            if not_found_issues:
+                error = "The following issues couldn't be found: {0}".\
+                    format(', '.join(
+                        str(i) for i in not_found_issues
+                    ))
+
+            self.deps.printer.print_closed_issues(closed_issues)
+
+            if error:
+                self.deps.printer.print_error(error)
         else:
             self.deps.printer.print_error(self._MANY_ORIGINS_ERROR)
 

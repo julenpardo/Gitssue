@@ -91,6 +91,22 @@ class Printer(PrinterInterface):
         else:
             print('No comment could be found.')
 
+    def print_closed_issues(self, closed_issues):
+        """
+        Prints the closed issues.
+
+        :param closed_issues: the closed issues.
+        """
+        if closed_issues:
+            print('The following issues have been closed:\n')
+
+            for issue in closed_issues:
+                line = '#{0}: {1}\n'.format(issue['number'], issue['title'])
+                print(line)
+        else:
+            print('No issue could be found.')
+
+
     def print_error(self, error):
         """
         Prints an error.

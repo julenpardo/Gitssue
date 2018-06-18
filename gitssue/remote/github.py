@@ -34,7 +34,8 @@ class Github(RemoteRepoInterface):
         if show_all:
             request += '?state=all'
 
-        response_issues = self.requester.get_request(request, self.credentials)
+        response_issues = self.requester.request('GET', request,
+                                                 self.credentials)
 
         issue_list = []
         description = ''
@@ -86,7 +87,7 @@ class Github(RemoteRepoInterface):
                 )
 
                 try:
-                    full_issue = self.requester.get_request(request)
+                    full_issue = self.requester.request('GET', request)
 
                     issue_description = {
                         'number': issue_number,
@@ -108,6 +109,7 @@ class Github(RemoteRepoInterface):
     def get_issue_comments(self, username, repository, issue_number):
         """
         Gets the comments made in the issue ticket.
+
         :param username: the user owning the repository.
         :param repository: the repository to look the issues at.
         :param issue_number: the issue number to query the comments to.
@@ -118,14 +120,12 @@ class Github(RemoteRepoInterface):
         """
 
         request = '{0}/repos/{1}/{2}/issues/{3}/comments'.format(
-            self.API_URL,
-            username,
-            repository,
-            issue_number
+            self.API_URL, username, repository, issue_number
         )
+
         issues_comments = []
 
-        response_comments = self.requester.get_request(request)
+        response_comments = self.requester.request('GET', request)
         if response_comments:
             for comment in response_comments:
                 issues_comments.append({
@@ -137,17 +137,59 @@ class Github(RemoteRepoInterface):
 
         return issues_comments
 
+    def close_issues(self, username, repository, issue_numbers):
+        """
+        Closes the specified issue.
+
+        :param username: the user owning the repository.
+        :param repository: the repository to look the issues at.
+        :param issue: the issue to close.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200 and 404. The 404 are not thrown because there's no way
+        to know if the 404 is because what it's not found is the repo or the
+        issue. So it may happen that some issues aren't found but others that
+        are.
+        """
+        base_request = '{0}/repos/{1}/{2}/issues/'.format(
+            self.API_URL, username, repository
+        )
+        payload = {'state': 'closed'}
+        closed_issues = []
+        not_found_issues = []
+
+        for issue in issue_numbers:
+            request = base_request + str(issue)
+
+            try:
+                response_issue = self.requester.request(
+                    'PATCH', request, self.credentials, json_payload=payload
+                )
+                closed_issues.append({
+                    'number': issue,
+                    'title': response_issue['title'],
+                })
+            except UnsuccessfulHttpRequestException as http_exception:
+                if http_exception.code == 404:
+                    not_found_issues.append(issue)
+                else:
+                    raise
+
+        return closed_issues, not_found_issues
+
     def get_rate_information(self):
         """
         Gets the GitHub API rate information (remaining requests, reset time,
         etc.) requests, the limit is 60 requests/hour. For authenticated ones,
         5000/hour.
+
         :return: remaining request number.
         """
         request = '{0}/rate_limit'.format(self.API_URL)
 
-        rate_information = self.requester.get_request(
-            request, self.credentials)
+        rate_information = self.requester.request('GET', request,
+                                                  self.credentials)
 
         return rate_information['rate']['limit'],\
             rate_information['rate']['remaining'],\

@@ -35,6 +35,7 @@ class ControllerTest(unittest.TestCase):
     mocked_remote_get_issue_list_return = None
     mocked_remote_get_issues_description_return = None
     mocked_remote_get_issue_comments_return = None
+    mocked_remote_close_issues_return = None
     mocked_shell_wrapper_execute_command_return = None
     mocked_request_get_request_return = None
     mocked_request_parse_request_exception_return = None
@@ -83,6 +84,12 @@ class ControllerTest(unittest.TestCase):
             self.requester_mock.get_request(None)
 
         return self.mocked_remote_get_issue_comments_return
+
+    def mock_remote_close_issues(self, username, repo, issues):
+        if self.requester_mock is not None:
+            self.requester_mock.get_request(None)
+
+        return self.mocked_remote_close_issues_return
 
     def mock_shell_wrapper_execute_command(self, command):
         return self.mocked_shell_wrapper_execute_command_return
@@ -433,6 +440,130 @@ class ControllerTest(unittest.TestCase):
 
         expected = 'A connection error occurred:'
         actual = temp_stdout.getvalue().strip().splitlines()[1]
+
+        self.assertEqual(expected, actual)
+
+    def test_close(self):
+        remote_mocked_return = [
+            {
+                'number': 1,
+                'title': 'First clossed issue',
+            },
+            {
+                'number': 2,
+                'title': 'Second closed issue',
+            }
+        ], []
+
+        self.mocked_remote_close_issues_return = remote_mocked_return
+        remote_mock = mock.Mock()
+        remote_mock.close_issues = self.mock_remote_close_issues
+
+        self.controller.deps.remote = remote_mock
+
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            self.controller.close([1, 2])
+
+        expected = 'The following issues have been closed:\n\n' \
+            + '#1: First clossed issue\n\n' \
+            + '#2: Second closed issue'
+
+        actual = temp_stdout.getvalue().strip()
+
+        self.assertEqual(expected, actual)
+
+    def test_close_with_not_found_issues(self):
+        remote_mocked_return = [
+            {
+                'number': 1,
+                'title': 'First clossed issue',
+            },
+            {
+                'number': 2,
+                'title': 'Second closed issue',
+            }
+        ], [
+            3
+        ]
+
+        self.mocked_remote_close_issues_return = remote_mocked_return
+        remote_mock = mock.Mock()
+        remote_mock.close_issues = self.mock_remote_close_issues
+
+        self.controller.deps.remote = remote_mock
+
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            self.controller.close([1, 2, 3])
+
+        expected = 'The following issues have been closed:\n\n' \
+            + '#1: First clossed issue\n\n' \
+            + '#2: Second closed issue\n\n' \
+            + 'Error\n' \
+            + 'The following issues couldn\'t be found: 3'
+
+        actual = temp_stdout.getvalue().strip()
+
+        self.assertEqual(expected, actual)
+
+    def test_close_connection_error(self):
+        remote_mock = mock.Mock()
+        remote_mock.close_issues.side_effect = RequestException
+        self.controller.deps.remote = remote_mock
+
+        temp_stdout = StringIO()
+
+        with contextlib.redirect_stdout(temp_stdout):
+            self.controller.close([])
+
+        expected = 'A connection error occurred:'
+        actual = temp_stdout.getvalue().strip().splitlines()[2]
+
+        self.assertEqual(expected, actual)
+
+    def test_close_request_error(self):
+        expected = 'Mocked exception'
+
+        remote_mock = mock.Mock()
+
+        self.mocked_request_parse_request_exception_return = expected
+        remote_mock.parse_request_exception = self.mock_remote_parse_request_exception
+        remote_mock.close_issues.side_effect = \
+                UnsuccessfulHttpRequestException(401, {})
+
+        self.controller.deps.remote = remote_mock
+
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            self.controller.close([1])
+
+        actual = temp_stdout.getvalue().strip().splitlines()[2]
+
+        self.assertEqual(expected, actual)
+
+
+    def test_close_many_origins(self):
+        mocked_shell_wrapper_return = 'origin1 git@github.com:julenpardo/first-remote\n' + \
+                                      'origin2 git@github.com:julenpardo/second-remote'
+        shell_wrapper_mock = mock.Mock()
+        self.mocked_shell_wrapper_execute_command_return = mocked_shell_wrapper_return
+        shell_wrapper_mock.execute_command = self.mock_shell_wrapper_execute_command
+
+        original_shell = self.controller.deps.shell
+        self.controller.deps.shell = shell_wrapper_mock
+        self.controller.deps.git_wrapper = GitWrapper(shell_wrapper_mock)
+
+        expected = 'Error\n'
+        expected += 'More than one remote was detected. Gitssue does not offer support for this yet.'
+
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            self.controller.close([])
+
+        self.controller.deps.shell = original_shell
+
+        actual = temp_stdout.getvalue().strip()
 
         self.assertEqual(expected, actual)
 
