@@ -32,7 +32,8 @@ class RequestsTest(unittest.TestCase):
         response_mock.configure_mock(**attributes)
         requests_get_mock.return_value = response_mock
 
-        actual = self.requests.request('GET', 'some request')
+        actual = self.requests.request('GET', 'some request', extra_headers={},
+                                       json_payload={})
 
         self.assertEqual(expected, actual)
 
