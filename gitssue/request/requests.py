@@ -1,6 +1,7 @@
 """
 Concrete implementation requests_interface, using "requests" module.
 """
+import logging
 import json
 import requests
 from requests.exceptions import RequestException
@@ -14,7 +15,10 @@ class Requests(RequestInterface):
     Concrete implementation requests_interface, using "requests" module.
     """
 
-    _TIMEOUT = 40.0
+    _TIMEOUT = 5.0
+
+    def __init__(self):
+        self.logger = logging.getLogger('gitssue.request.requests')
 
     def request(self, method, request, credentials=None, extra_headers=None,
                 json_payload=None):
@@ -34,6 +38,7 @@ class Requests(RequestInterface):
 
         if json_payload is not None:
             json_data = json_payload
+            self.logger.debug('Payload: {0}'.format(json_data))
 
         if credentials is not None and 'username' in credentials \
            and 'password' in credentials:
@@ -52,6 +57,10 @@ class Requests(RequestInterface):
             raise
 
         if response.status_code != 200:
+            self.logger.debug('ERROR: HTTP {0}: {1}'.format(
+                response.status_code, response.text
+            ))
+
             raise UnsuccessfulHttpRequestException(
                 response.status_code, response.headers
             )

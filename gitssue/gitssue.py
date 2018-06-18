@@ -10,7 +10,11 @@ sys.path.insert(0, os.getcwd())
 from gitssue.dependencies.dependencies import Dependencies
 from gitssue.controller.controller import Controller
 
-GITSSUE_VERSION = '1.3'
+GITSSUE_VERSION = '1.4.0'
+
+CONTEXT_SETTINGS = {
+    'help_option_names': ['-h', '--help'],
+}
 
 controller = Controller(Dependencies())
 
@@ -21,11 +25,13 @@ def print_version(context, param, value):
     context.exit()
 
 
-@click.group()
-@click.option('--version', is_flag=True, callback=print_version,
+@click.group(context_settings=CONTEXT_SETTINGS)
+@click.option('--version', '-v', is_flag=True, callback=print_version,
               expose_value=False, is_eager=True, help='Show version and exit.')
-def cli():
-    pass
+@click.option('--debug', '-d', is_flag=True, help='Show debug messages.')
+def cli(debug):
+    if debug:
+        controller.enable_debug()
 
 
 @click.command(help='List open issues.')
