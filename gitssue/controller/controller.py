@@ -204,15 +204,17 @@ class Controller:
                 self.deps.remote.create_comment(
                     username, repo, issue, comment
                 )
-            except UnsuccessfulHttpRequestException as \
-                    unsuccessful_http_request:
-                error = 'http error'
+            except UnsuccessfulHttpRequestException as http_error:
+                error = self.deps.remote.parse_request_exception(http_error)
             except RequestException as request_exception:
                 error = 'A connection error occurred:\n'
                 error += str(request_exception)
 
             if error:
                 self.deps.printer.print_error(error)
+            else:
+                self.deps.printer.print_created_comment(issue)
+
         else:
             self.deps.printer.print_error(self._MANY_ORIGINS_ERROR)
 

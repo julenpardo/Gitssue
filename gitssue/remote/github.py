@@ -189,22 +189,16 @@ class Github(RemoteRepoInterface):
         :raises requests.RequestException: if an error occurs during the
         request.
         :raises UnsuccessfulHttpRequestException: if the request code is
-        different to 200.
+        different to 2XX.
         """
         request = '{0}/repos/{1}/{2}/issues/{3}/comments'.format(
             self.API_URL, username, repository, issue
         )
         payload = {'body': comment}
 
-        try:
-            self.requester.request(
-                'POST', request, self.credentials, json_payload=payload
-            )
-        except UnsuccessfulHttpRequestException as http_exception:
-            if http_exception.code == 404:
-                print('404')
-            else:
-                raise
+        self.requester.request(
+            'POST', request, self.credentials, json_payload=payload
+        )
 
     def get_rate_information(self):
         """
@@ -248,10 +242,15 @@ class Github(RemoteRepoInterface):
                 + "file."
         elif exception.code == 404 and issue_numbers:
             message = "The following issue(s) couldn't be found: {0}".\
-                format(', '.join(issue_numbers))
+                format(', '.join(
+                    str(i) for i in issue_numbers
+                ))
         elif exception.code == 404:
-            message = "The repository doesn't exist; or exists but it's " \
-                + "private, and the credentials haven't been set in the " \
-                + "config file. Check the README for more information."
+            message = (
+                "The issue(s) do(es)n't exist; or the repository doesn't "
+                "exist; or it exists but it's private, and the credentials "
+                "haven't been set in the config file. Check the README for "
+                "more information."
+            )
 
         return message
