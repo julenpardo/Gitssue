@@ -1,4 +1,7 @@
 """ Application controller; the one that executes the actions from the CLI. """
+import logging
+import sys
+
 from requests.exceptions import RequestException
 from gitssue.request.unsuccessful_http_request_exception \
     import UnsuccessfulHttpRequestException
@@ -16,6 +19,15 @@ class Controller:
     def __init__(self, dependencies):
         self.deps = dependencies
         dependencies.instantiate_remote_instance()
+
+    def enable_debug(self):
+        logger = logging.getLogger()
+        logger.setLevel(logging.DEBUG)
+        logger_stream_handler = logging.StreamHandler(sys.stdout)
+        logger_stream_handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter('%(levelname)s - %(name)s - %(message)s')
+        logger_stream_handler.setFormatter(formatter)
+        logger.addHandler(logger_stream_handler)
 
     def list(self, show_all=False, description=False):
         """
