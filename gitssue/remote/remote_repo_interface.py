@@ -85,6 +85,21 @@ class RemoteRepoInterface(metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    def create_comment(self, username, repository, issue, comment):
+        """
+        Creates a comment in the specified issue.
+
+        :param username: the user owning the repository.
+        :param repository: the repository to look the issues at.
+        :param issue: the issue to add the comment to.
+        :param comment: the comment to add.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
+        """
+
+    @abstractmethod
     def get_rate_information(self):
         """
         Gets the API rate information (remaining requests, reset time, etc.).

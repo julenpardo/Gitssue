@@ -44,6 +44,17 @@ class PrinterInterface(metaclass=ABCMeta):
 
         :param closed_issues: the closed issues.
         """
+        pass
+
+    @abstractmethod
+    def print_created_comment(self, issue):
+        """
+        Prints the created comment of the specified issue.
+
+        :param issue: the issue the comment has been created for.
+        :param comment: the comment that has been created.
+        """
+        pass
 
     @abstractmethod
     def print_error(self, error):
@@ -64,3 +75,4 @@ class PrinterInterface(metaclass=ABCMeta):
         :param remaining: the remaining requests until the limit.
         :param reset: reset time (Unix timestamp).
         """
+        pass

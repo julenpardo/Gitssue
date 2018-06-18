@@ -106,6 +106,14 @@ class Printer(PrinterInterface):
         else:
             print('No issue could be found.')
 
+    def print_created_comment(self, issue):
+        """
+        Prints the created comment of the specified issue.
+
+        :param issue: the issue the comment has been created for.
+        :param comment: the comment that has been created.
+        """
+        print('The comment has been created for the issue #{0}.'.format(issue))
 
     def print_error(self, error):
         """

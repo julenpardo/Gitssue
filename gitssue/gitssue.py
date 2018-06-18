@@ -59,6 +59,13 @@ def comments(issue):
     controller.comments(issue)
 
 
+@click.command(help='Add a comment to the specified issue.')
+@click.argument('issue', nargs=1, type=click.INT)
+@click.argument('comment', nargs=1, type=click.STRING)
+def comment(issue, comment):
+    controller.comment(issue, comment)
+
+
 @click.command(help='Shows the API rate information (remaining requests, reset'
                     ' time, etc.).')
 def rate_info():
@@ -79,5 +86,6 @@ def close(context, issues):
 cli.add_command(list)
 cli.add_command(desc)
 cli.add_command(comments)
+cli.add_command(comment)
 cli.add_command(close)
 cli.add_command(rate_info)
