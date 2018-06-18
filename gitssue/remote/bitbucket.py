@@ -179,6 +179,21 @@ class Bitbucket(RemoteRepoInterface):
 
         return closed_issues, not_found_issues
 
+    def create_comment(self, username, repository, issue, comment):
+        """
+        Creates a comment in the specified issue.
+
+        :param username: the user owning the repository.
+        :param repository: the repository to look the issues at.
+        :param issue: the issue to add the comment to.
+        :param comment: the comment to add.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
+        """
+        pass
+
     def get_rate_information(self):
         """
         The Bitbucket API doesn't have a rate limit for repository queries, so

@@ -178,6 +178,34 @@ class Github(RemoteRepoInterface):
 
         return closed_issues, not_found_issues
 
+    def create_comment(self, username, repository, issue, comment):
+        """
+        Creates a comment in the specified issue.
+
+        :param username: the user owning the repository.
+        :param repository: the repository to look the issues at.
+        :param issue: the issue to add the comment to.
+        :param comment: the comment to add.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
+        """
+        request = '{0}/repos/{1}/{2}/issues/{3}/comments'.format(
+            self.API_URL, username, repository, issue
+        )
+        payload = {'body': comment}
+
+        try:
+            self.requester.request(
+                'POST', request, self.credentials, json_payload=payload
+            )
+        except UnsuccessfulHttpRequestException as http_exception:
+            if http_exception.code == 404:
+                print('404')
+            else:
+                raise
+
     def get_rate_information(self):
         """
         Gets the GitHub API rate information (remaining requests, reset time,

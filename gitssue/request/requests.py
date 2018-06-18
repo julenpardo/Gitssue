@@ -56,7 +56,7 @@ class Requests(RequestInterface):
         except RequestException:
             raise
 
-        if response.status_code != 200:
+        if not response.ok:
             self.logger.debug('ERROR: HTTP {0}: {1}'.format(
                 response.status_code, response.text
             ))
