@@ -9,10 +9,10 @@ class BitbucketTest(unittest.TestCase):
 
     mocked_request_response = None
 
-    def mock_get_request(self, request, credentials={}, extra_headers={}):
+    def mock_request(self, method, request, credentials={}, extra_headers={}):
         return self.mocked_request_response
 
-    def mock_get_request_with_error(self, request, credentials={}):
+    def mock_request_with_error(self, method, request, credentials={}):
         return False
 
     def test_get_issue_list(self):
@@ -49,7 +49,7 @@ class BitbucketTest(unittest.TestCase):
         }
         self.mocked_request_response = mocked_issue_list
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
         bitbucket = Bitbucket(requester_mock, {})
 
         expected = [
@@ -79,7 +79,7 @@ class BitbucketTest(unittest.TestCase):
 
     def test_get_issues_list_error_request(self):
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request_with_error
+        requester_mock.request = self.mock_request_with_error
 
         bitbucket = Bitbucket(requester_mock, credentials={})
 
@@ -122,7 +122,7 @@ class BitbucketTest(unittest.TestCase):
         }
         self.mocked_request_response = mocked_issue_list
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
         bitbucket = Bitbucket(requester_mock, {})
 
         expected = [
@@ -148,16 +148,16 @@ class BitbucketTest(unittest.TestCase):
                     'color': 'ffffff',
                 }],
             },
-        ], ['4', '15']
+        ], [4, 15]
         actual = bitbucket.get_issues_description(
-            'username', 'repo', ['1', '3', '4', '15']
+            'username', 'repo', [1, 3, 4, 15]
         )
 
         self.assertEqual(expected, actual)
 
     def test_get_issues_description_error_request(self):
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request_with_error
+        requester_mock.request = self.mock_request_with_error
 
         bitbucket = Bitbucket(requester_mock, credentials={})
 
@@ -193,7 +193,7 @@ class BitbucketTest(unittest.TestCase):
         }
         self.mocked_request_response = mocked_issue_list
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
         bitbucket = Bitbucket(requester_mock, {})
 
         expected = [
@@ -216,7 +216,7 @@ class BitbucketTest(unittest.TestCase):
 
     def test_get_issue_comments_error_request(self):
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request_with_error
+        requester_mock.request = self.mock_request_with_error
 
         bitbucket = Bitbucket(requester_mock, credentials={})
 

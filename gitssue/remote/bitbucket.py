@@ -34,7 +34,7 @@ class Bitbucket(RemoteRepoInterface):
         )
 
         issue_list = []
-        response_issues = self.requester.get_request(request, self.credentials)
+        response_issues = self.requester.request('GET', request, self.credentials)
 
         if response_issues:
             for issue in response_issues['values']:
@@ -79,11 +79,13 @@ class Bitbucket(RemoteRepoInterface):
         issue_list = []
         not_found_issues = []
 
-        response_issues = self.requester.get_request(request, self.credentials)
+        response_issues = self.requester.request(
+            'GET', request, self.credentials
+        )
 
         if response_issues:
             filtered_issues = list(filter(
-                lambda issue: str(issue['id']) in issue_numbers,
+                lambda issue: issue['id'] in issue_numbers,
                 response_issues['values']
             ))
 
@@ -122,8 +124,9 @@ class Bitbucket(RemoteRepoInterface):
         )
 
         issue_comments = []
-        response_comments = self.requester.get_request(request,
-                                                       self.credentials)
+        response_comments = self.requester.request(
+            'GET', request, self.credentials
+        )
 
         if response_comments:
             for comment in response_comments['values']:
