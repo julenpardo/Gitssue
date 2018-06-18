@@ -192,7 +192,17 @@ class Bitbucket(RemoteRepoInterface):
         :raises UnsuccessfulHttpRequestException: if the request code is
         different to 200.
         """
-        pass
+        request = '{0}/repositories/{1}/{2}/issues/{3}/comments'.format( self.API_URL, username, repository, issue
+        )
+        payload = {
+            'content': {
+                'raw': comment
+            }
+        }
+
+        self.requester.request(
+            'POST', request, self.credentials, json_payload=payload
+        )
 
     def get_rate_information(self):
         """
@@ -223,5 +233,12 @@ class Bitbucket(RemoteRepoInterface):
         elif exception.code == 404 and issue_numbers:
             message = "The following issue(s) couldn't be found: {0}".\
                 format(', '.join(issue_numbers))
+        elif exception.code == 404:
+            message = (
+                "The issue(s) do(es)n't exist; or the repository doesn't "
+                "exist; or it exists but it's private, and the credentials "
+                "haven't been set in the config file. Check the README for "
+                "more information."
+            )
 
         return message
