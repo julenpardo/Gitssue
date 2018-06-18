@@ -420,13 +420,30 @@ class GitlabTest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_parse_request_exception_generic_error(self):
-        exception = UnsuccessfulHttpRequestException(404, {})
+        exception = UnsuccessfulHttpRequestException(403, {})
 
         requester_mock = mock.Mock()
         gitlab = Gitlab(requester_mock, credentials={}, domain='gitlab.com')
 
         expected = 'An error occurred in the request.'
         actual= gitlab.parse_request_exception(exception)
+
+        self.assertEqual(expected, actual)
+
+    def test_parse_request_repo_not_found(self):
+        exception_code = 404
+        input_exception = UnsuccessfulHttpRequestException(exception_code, {})
+
+        requester_mock = mock.Mock()
+        github = Gitlab(requester_mock, credentials={}, domain='gitlab.com')
+
+        expected = (
+            "The issue(s) do(es)n't exist; or the repository doesn't "
+            "exist; or it exists but it's private, and the credentials "
+            "haven't been set in the config file. Check the README for "
+            "more information."
+        )
+        actual = github.parse_request_exception(input_exception)
 
         self.assertEqual(expected, actual)
 
@@ -521,3 +538,13 @@ class GitlabTest(unittest.TestCase):
 
         with self.assertRaises(UnsuccessfulHttpRequestException):
             gitlab.close_issues('username', 'repo', [1, 2, 3])
+
+    def test_create_comment(self):
+        requester_mock = mock.Mock()
+
+        gitlab = Gitlab(requester_mock, credentials={}, domain='gitlab.com')
+
+        try:
+            gitlab.create_comment('username', 'repo', 1, 'comment')
+        except:
+            self.fail('Unexpected exception')

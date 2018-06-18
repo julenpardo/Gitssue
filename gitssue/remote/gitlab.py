@@ -246,7 +246,17 @@ class Gitlab(RemoteRepoInterface):
         :raises UnsuccessfulHttpRequestException: if the request code is
         different to 200.
         """
-        pass
+        project_id = self._get_project_id(username, repository)
+
+        request = '{0}/projects/{1}/issues/{2}/notes'.format(
+            self.api_url, project_id, issue
+        )
+        payload = {'body': comment}
+
+        self.requester.request(
+            'POST', request, extra_headers=self.auth_token_header,
+            json_payload=payload
+        )
 
     def get_rate_information(self):
         """
@@ -278,5 +288,12 @@ class Gitlab(RemoteRepoInterface):
                 format(', '.join(
                     str(i) for i in issue_numbers
                 ))
+        elif exception.code == 404:
+            message = (
+                "The issue(s) do(es)n't exist; or the repository doesn't "
+                "exist; or it exists but it's private, and the credentials "
+                "haven't been set in the config file. Check the README for "
+                "more information."
+            )
 
         return message
