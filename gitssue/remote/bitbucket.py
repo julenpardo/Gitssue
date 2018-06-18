@@ -153,7 +153,31 @@ class Bitbucket(RemoteRepoInterface):
         :raises UnsuccessfulHttpRequestException: if the request code is
         different to 200.
         """
-        pass
+        base_request = '{0}/repositories/{1}/{2}/issues/'.format(
+            self.API_URL, username, repository
+        )
+        payload = {'state': 'closed'}
+        closed_issues = []
+        not_found_issues = []
+
+        for issue in issue_numbers:
+            request = base_request + str(issue)
+
+            try:
+                response_issue = self.requester.request(
+                    'PUT', request, self.credentials, json_payload=payload
+                )
+                closed_issues.append({
+                    'number': issue,
+                    'title': response_issue['title'],
+                })
+            except UnsuccessfulHttpRequestException as http_exception:
+                if http_exception.code == 404:
+                    not_found_issues.append(issue)
+                else:
+                    raise
+
+        return closed_issues, not_found_issues
 
     def get_rate_information(self):
         """
