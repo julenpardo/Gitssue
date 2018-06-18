@@ -594,3 +594,76 @@ class ControllerTest(unittest.TestCase):
         actual = temp_stdout.getvalue().strip().splitlines()[1]
 
         self.assertEqual(expected, actual)
+
+    def test_create_comment(self):
+        remote_mock = mock.Mock()
+
+        self.controller.deps.remote = remote_mock
+
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            self.controller.comment(17, 'comment')
+
+        expected = 'The comment has been created for the issue #17.'
+        actual = temp_stdout.getvalue().strip()
+
+        self.assertEqual(expected, actual)
+
+    def test_comment_connection_error(self):
+        remote_mock = mock.Mock()
+        remote_mock.create_comment.side_effect = RequestException
+        self.controller.deps.remote = remote_mock
+
+        temp_stdout = StringIO()
+
+        with contextlib.redirect_stdout(temp_stdout):
+            self.controller.comment(1, 'comment')
+
+        expected = 'A connection error occurred:'
+        actual = temp_stdout.getvalue().strip().splitlines()[1]
+
+        self.assertEqual(expected, actual)
+
+    def test_comment_request_error(self):
+        expected = 'Mocked exception'
+
+        remote_mock = mock.Mock()
+
+        self.mocked_request_parse_request_exception_return = expected
+        remote_mock.parse_request_exception = self.mock_remote_parse_request_exception
+        remote_mock.create_comment.side_effect = \
+                UnsuccessfulHttpRequestException(401, {})
+
+        self.controller.deps.remote = remote_mock
+
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            self.controller.comment(1, 'comment')
+
+        actual = temp_stdout.getvalue().strip().splitlines()[1]
+
+        self.assertEqual(expected, actual)
+
+    def test_comment_many_origins(self):
+        mocked_shell_wrapper_return = 'origin1 git@github.com:julenpardo/first-remote\n' + \
+                                      'origin2 git@github.com:julenpardo/second-remote'
+        shell_wrapper_mock = mock.Mock()
+        self.mocked_shell_wrapper_execute_command_return = mocked_shell_wrapper_return
+        shell_wrapper_mock.execute_command = self.mock_shell_wrapper_execute_command
+
+        original_shell = self.controller.deps.shell
+        self.controller.deps.shell = shell_wrapper_mock
+        self.controller.deps.git_wrapper = GitWrapper(shell_wrapper_mock)
+
+        expected = 'Error\n'
+        expected += 'More than one remote was detected. Gitssue does not offer support for this yet.'
+
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            self.controller.comment(1, 'comment')
+
+        self.controller.deps.shell = original_shell
+
+        actual = temp_stdout.getvalue().strip()
+
+        self.assertEqual(expected, actual)

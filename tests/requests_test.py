@@ -25,6 +25,7 @@ class RequestsTest(unittest.TestCase):
         }
 
         attributes = {
+            'ok': True,
             'status_code': 200,
             'text': mocked_return,
             'close.return_value': None,
@@ -42,6 +43,7 @@ class RequestsTest(unittest.TestCase):
         response_mock = mock.Mock()
 
         attributes = {
+            'ok': False,
             'status_code': 404,
             'headers': {'header_key': 'header_value'}
         }

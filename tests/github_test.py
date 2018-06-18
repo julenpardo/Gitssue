@@ -238,9 +238,12 @@ class GithubTest(unittest.TestCase):
         requester_mock = mock.Mock()
         github = Github(requester_mock, credentials={})
 
-        expected = "The repository doesn't exist; or exists but it's private, and the "\
-                      + "credentials haven't been set in the config file. Check the README "\
-                      + "for more information."
+        expected = (
+            "The issue(s) do(es)n't exist; or the repository doesn't "
+            "exist; or it exists but it's private, and the credentials "
+            "haven't been set in the config file. Check the README for "
+            "more information."
+        )
         actual = github.parse_request_exception(input_exception)
 
         self.assertEqual(expected, actual)
@@ -321,3 +324,13 @@ class GithubTest(unittest.TestCase):
 
         with self.assertRaises(UnsuccessfulHttpRequestException):
             github.close_issues('username', 'repo', [1, 2, 3])
+
+    def test_create_comment(self):
+        requester_mock = mock.Mock()
+
+        github = Github(requester_mock, credentials={})
+
+        try:
+            github.create_comment('username', 'repo', 1, 'comment')
+        except:
+            self.fail('Unexpected exception')

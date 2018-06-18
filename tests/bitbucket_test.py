@@ -253,12 +253,28 @@ class BitbucketTest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_parse_request_exception_generic_error(self):
-        exception = UnsuccessfulHttpRequestException(404, {})
+        exception = UnsuccessfulHttpRequestException(403, {})
 
         requester_mock = mock.Mock()
         bitbucket = Bitbucket(requester_mock, credentials={})
 
         expected = 'An error occurred in the request.'
+        actual = bitbucket.parse_request_exception(exception)
+
+        self.assertEqual(expected, actual)
+
+    def test_parse_request_exception_issue_or_repo_not_found(self):
+        exception = UnsuccessfulHttpRequestException(404, {})
+
+        requester_mock = mock.Mock()
+        bitbucket = Bitbucket(requester_mock, credentials={})
+
+        expected = (
+            "The issue(s) do(es)n't exist; or the repository doesn't "
+            "exist; or it exists but it's private, and the credentials "
+            "haven't been set in the config file. Check the README for "
+            "more information."
+        )
         actual = bitbucket.parse_request_exception(exception)
 
         self.assertEqual(expected, actual)
@@ -327,3 +343,14 @@ class BitbucketTest(unittest.TestCase):
 
         with self.assertRaises(UnsuccessfulHttpRequestException):
             bitbucket.close_issues('username', 'repo', [1, 2, 3])
+
+    def test_create_comment(self):
+        """401"""
+        requester_mock = mock.Mock()
+
+        bitbucket = Bitbucket(requester_mock, credentials={})
+
+        try:
+            bitbucket.create_comment('username', 'repository', 1, 'comment')
+        except:
+            self.fail('Unexpected exception')
