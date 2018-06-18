@@ -76,7 +76,9 @@ class Controller:
 
                 if not_found_issues:
                     error = "The following issues couldn't be found: {0}".\
-                        format(', '.join(not_found_issues))
+                        format(', '.join(
+                            str(i) for i in not_found_issues
+                        ))
             except UnsuccessfulHttpRequestException as \
                     unsuccessful_http_request:
                 error = self.deps.remote.parse_request_exception(
