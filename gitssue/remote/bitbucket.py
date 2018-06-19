@@ -11,6 +11,7 @@ class Bitbucket(RemoteRepoInterface):
 
     API_VERSION = '2.0'
     API_URL = 'https://api.bitbucket.org/{0}'.format(API_VERSION)
+    ALLOWED_ISSUE_KINDS = ('bug', 'enhancement', 'proposal', 'task')
 
     def __init__(self, requester, credentials):
         super(Bitbucket, self).__init__(requester, credentials=credentials)
@@ -213,14 +214,31 @@ class Bitbucket(RemoteRepoInterface):
         :param repository: the repository to look the issues at.
         :param title: the issue title.
         :param body: the issue body.
-        :param labels: list of labels to associate with the issue.
+        :param labels: the label (a value defined in self.ALLOWED_ISSUE_KINDS).
         :param milestone: milestone number to associate the issue with.
         :raises requests.RequestException: if an error occurs during the
         request.
         :raises UnsuccessfulHttpRequestException: if the request code is
         different to 200.
         """
-        pass
+        request = '{0}/repositories/{1}/{2}/issues'.format(
+            self.API_URL, username, repository
+        )
+        payload = {
+            'title': title,
+            'content': {
+                'raw': body,
+            },
+        }
+
+        if labels:
+            payload['kind'] = labels[0]
+
+        response_issue = self.requester.request(
+            'POST', request, self.credentials, json_payload=payload
+        )
+
+        return response_issue['id']
 
     def get_rate_information(self):
         """
