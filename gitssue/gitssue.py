@@ -48,6 +48,8 @@ def validate_issue_labels_bitbucket(context, parameter, value):
                     + ', '.join(allowed_values)
                 )
 
+    return value
+
 
 @click.group(context_settings=CONTEXT_SETTINGS)
 @click.option('--version', '-v', is_flag=True, callback=print_version,

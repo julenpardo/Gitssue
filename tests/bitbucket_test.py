@@ -9,7 +9,8 @@ class BitbucketTest(unittest.TestCase):
 
     mocked_request_response = None
 
-    def mock_request(self, method, request, credentials={}, extra_headers={}):
+    def mock_request(self, method, request, credentials={}, extra_headers={},
+                     json_payload={}):
         return self.mocked_request_response
 
     def mock_request_with_error(self, method, request, credentials={}):
@@ -354,3 +355,36 @@ class BitbucketTest(unittest.TestCase):
             bitbucket.create_comment('username', 'repository', 1, 'comment')
         except:
             self.fail('Unexpected exception')
+
+    def test_create_issue(self):
+        mocked_return = {
+            'id': 73,
+        }
+
+        self.mocked_request_response = mocked_return
+        requester_mock = mock.Mock()
+        requester_mock.request = self.mock_request
+
+        bitbucket = Bitbucket(requester_mock, credentials={})
+
+        expected = 73
+        actual = bitbucket.create_issue('username', 'repo', 'title', 'body')
+
+        self.assertEqual(expected, actual)
+
+    def test_create_issue_with_label(self):
+        mocked_return = {
+            'id': 24,
+        }
+
+        self.mocked_request_response = mocked_return
+        requester_mock = mock.Mock()
+        requester_mock.request = self.mock_request
+
+        bitbucket = Bitbucket(requester_mock, credentials={})
+
+        expected = 24
+        actual = bitbucket.create_issue('username', 'repo', 'title', 'body',
+                                        ['enhancement'])
+
+        self.assertEqual(expected, actual)
