@@ -218,6 +218,39 @@ class Controller:
         else:
             self.deps.printer.print_error(self._MANY_ORIGINS_ERROR)
 
+    def create(self, title, body='', labels=None, milestone=0):
+        """
+        Creates an issue.
+
+        :param issue: the issue to add the comment to.
+        :param comment: the comment to add.
+        """
+        usernames_and_repo = self.deps.git_wrapper.get_username_and_repo()
+        error = ''
+
+        if len(usernames_and_repo) == 1:
+            username, repo = usernames_and_repo[0]
+
+            try:
+                created_issue_number = self.deps.remote.create_issue(
+                    username, repo, title, body, labels, milestone
+                )
+            except UnsuccessfulHttpRequestException as http_error:
+                error = self.deps.remote.parse_request_exception(
+                    http_error, milestone=milestone
+                )
+            except RequestException as request_exception:
+                error = 'A connection error occurred:\n'
+                error += str(request_exception)
+
+            if error:
+                self.deps.printer.print_error(error)
+            else:
+                self.deps.printer.print_created_issue(created_issue_number)
+
+        else:
+            self.deps.printer.print_error(self._MANY_ORIGINS_ERROR)
+
     def rate_information(self):
         """
         Prints the API rate information (remaining requests, reset time, etc.).

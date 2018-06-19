@@ -57,6 +57,15 @@ class PrinterInterface(metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    def print_created_issue(self, number):
+        """
+        Prints the created issue.
+
+        :param number: the issue number.
+        """
+        pass
+
+    @abstractmethod
     def print_error(self, error):
         """
         Prints an error.
