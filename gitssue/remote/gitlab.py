@@ -258,6 +258,41 @@ class Gitlab(RemoteRepoInterface):
             json_payload=payload
         )
 
+    def create_issue(self, username, repository, title, body='', labels=None,
+                     milestone=0):
+        """
+        Creates an issue.
+
+        :param username: the user owning the repository.
+        :param repository: the repository to look the issues at.
+        :param title: the issue title.
+        :param body: the issue body.
+        :param labels: list of labels to associate with the issue.
+        :param milestone: milestone number to associate the issue with.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
+        """
+        project_id = self._get_project_id(username, repository)
+
+        request = '{0}/projects/{1}/issues'.format(
+            self.api_url, project_id
+        )
+        payload = {
+            'title': title,
+            'description': body,
+            'labels': ','.join(labels) if labels else '',
+            'milestone': milestone,
+        }
+
+        response_issue = self.requester.request(
+            'POST', request, extra_headers=self.auth_token_header,
+            json_payload=payload
+        )
+
+        return response_issue['iid']
+
     def get_rate_information(self):
         """
         The Gitlab API doesn't have a rate limit, so we return everything as

@@ -248,6 +248,18 @@ class GithubTest(unittest.TestCase):
 
         self.assertEqual(expected, actual)
 
+    def test_parse_request_invalid_milestone(self):
+        exception_code = 422
+        input_exception = UnsuccessfulHttpRequestException(exception_code, {})
+
+        requester_mock = mock.Mock()
+        github = Github(requester_mock, credentials={})
+
+        expected = 'The milestone number 54 is invalid.'
+        actual = github.parse_request_exception(input_exception, milestone=54)
+
+        self.assertEqual(expected, actual)
+
     def test_get_rate_information(self):
         current_timestamp = time.time()
         mocked_return = {
@@ -334,3 +346,39 @@ class GithubTest(unittest.TestCase):
             github.create_comment('username', 'repo', 1, 'comment')
         except:
             self.fail('Unexpected exception')
+
+    def test_create_issue(self):
+        mocked_return = {
+            'number': 24,
+            'title': 'created issue title',
+        }
+
+        self.mocked_request_response = mocked_return
+        requester_mock = mock.Mock()
+        requester_mock.request = self.mock_request
+
+        github = Github(requester_mock, credentials={})
+
+        expected = 24
+        actual = github.create_issue('username', 'repo', 'title', 'body',
+                                     ['label 1', 'label 2'])
+
+        self.assertEqual(expected, actual)
+
+    def test_create_issue_with_milestone(self):
+        mocked_return = {
+            'number': 34,
+            'title': 'created issue title',
+        }
+
+        self.mocked_request_response = mocked_return
+        requester_mock = mock.Mock()
+        requester_mock.request = self.mock_request
+
+        github = Github(requester_mock, credentials={})
+
+        expected = 34
+        actual = github.create_issue('username', 'repo', 'title', 'body',
+                                     ['label 1', 'label 2'], milestone=5)
+
+        self.assertEqual(expected, actual)

@@ -7,6 +7,7 @@ import click
 
 sys.path.insert(0, os.getcwd())
 
+from gitssue import remote
 from gitssue.dependencies.dependencies import Dependencies
 from gitssue.controller.controller import Controller
 
@@ -18,11 +19,36 @@ CONTEXT_SETTINGS = {
 
 controller = Controller(Dependencies())
 
+
 def print_version(context, param, value):
     if not value or context.resilient_parsing:
         return
     print('Gitssue {0}'.format(GITSSUE_VERSION))
     context.exit()
+
+
+def validate_issue_labels_bitbucket(context, parameter, value):
+    """
+    Bitbucket doesn't actually have issue "label" concept, but "kind", a fixed
+    list of values defined in gitssue.remote.bitbucket.Bitbucket.ALLOWED_ISSUE_KINDS.
+    So this validator may raise an error just if the remote object is an
+    instance of Bitbucket class.
+    """
+    if isinstance(controller.deps.remote, remote.bitbucket.Bitbucket):
+        if value:
+            if len(value) > 1:
+                raise click.BadParameter('Bitbucket only accepts one label.')
+
+            label = value[0]
+            allowed_values = remote.bitbucket.Bitbucket.ALLOWED_ISSUE_KINDS
+
+            if label not in allowed_values:
+                raise click.BadParameter(
+                    'Bitbucket only allows the following label names: '
+                    + ', '.join(allowed_values)
+                )
+
+    return value
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
@@ -66,6 +92,20 @@ def comment(issue, comment):
     controller.comment(issue, comment)
 
 
+@click.command(help='Create an issue.')
+@click.argument('title', nargs=1, type=click.STRING)
+@click.option('--body', '-b', nargs=1, type=click.STRING, default='',
+              help='The body of the issue.')
+@click.option('--label', '-l', multiple=True, type=click.STRING,
+              callback=validate_issue_labels_bitbucket, help='Labels to '
+              'associate with this issue (multiple labels options allowed).')
+@click.option('--milestone', '-m', nargs=1, type=click.INT, default=0,
+              help='The number the milestone to associate the issue with '
+              '(ignored for Bitbucket issues).')
+def create(title, body, label, milestone):
+    controller.create(title, body, label, milestone)
+
+
 @click.command(help='Shows the API rate information (remaining requests, reset'
                     ' time, etc.).')
 def rate_info():
@@ -87,5 +127,6 @@ cli.add_command(list)
 cli.add_command(desc)
 cli.add_command(comments)
 cli.add_command(comment)
+cli.add_command(create)
 cli.add_command(close)
 cli.add_command(rate_info)

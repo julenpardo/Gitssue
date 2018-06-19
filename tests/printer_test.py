@@ -251,3 +251,14 @@ class PrinterTest(unittest.TestCase):
         actual = temp_stdout.getvalue().strip()
 
         self.assertEqual(expected, actual)
+
+    def test_print_created_issue(self):
+        temp_stdout = StringIO()
+
+        with contextlib.redirect_stdout(temp_stdout):
+            self.printer.print_created_issue(41)
+
+        expected = 'The issue has been created as #41.'
+        actual = temp_stdout.getvalue().strip()
+
+        self.assertEqual(expected, actual)

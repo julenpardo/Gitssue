@@ -115,6 +115,14 @@ class Printer(PrinterInterface):
         """
         print('The comment has been created for the issue #{0}.'.format(issue))
 
+    def print_created_issue(self, issue):
+        """
+        Prints the created issue.
+
+        :param number: the issue number.
+        """
+        print('The issue has been created as #{0}.'.format(issue))
+
     def print_error(self, error):
         """
         Prints an error.
