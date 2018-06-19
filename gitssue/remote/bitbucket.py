@@ -11,6 +11,7 @@ class Bitbucket(RemoteRepoInterface):
 
     API_VERSION = '2.0'
     API_URL = 'https://api.bitbucket.org/{0}'.format(API_VERSION)
+    ALLOWED_ISSUE_KINDS = ('bug', 'enhancement', 'proposal', 'task')
 
     def __init__(self, requester, credentials):
         super(Bitbucket, self).__init__(requester, credentials=credentials)
