@@ -548,3 +548,27 @@ class GitlabTest(unittest.TestCase):
             gitlab.create_comment('username', 'repo', 1, 'comment')
         except:
             self.fail('Unexpected exception')
+
+    def test_create_issue(self):
+        def side_effect(*args, **kwargs):
+            project = {'id': 1}
+            created_issue = {
+                'iid': 58
+            }
+
+            if args[1] == 'https://gitlab.com/api/v4/projects/username%2Frepo':
+                return project
+            else:
+                return created_issue
+
+        requester_mock = mock.Mock()
+        requester_mock.request.side_effect = side_effect
+
+        input_issues = [1, 2, 3]
+
+        gitlab = Gitlab(requester_mock, {}, 'gitlab.com')
+
+        expected = 58
+        actual = gitlab.create_issue('username', 'repo', 'title', 'body')
+
+        self.assertEqual(expected, actual)
