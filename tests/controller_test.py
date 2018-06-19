@@ -36,6 +36,7 @@ class ControllerTest(unittest.TestCase):
     mocked_remote_get_issues_description_return = None
     mocked_remote_get_issue_comments_return = None
     mocked_remote_close_issues_return = None
+    mocked_remote_create_issue_return = None
     mocked_shell_wrapper_execute_command_return = None
     mocked_request_get_request_return = None
     mocked_request_parse_request_exception_return = None
@@ -91,13 +92,21 @@ class ControllerTest(unittest.TestCase):
 
         return self.mocked_remote_close_issues_return
 
+    def mock_remote_create_issue(self, username, repo, title, body='',
+                                 labels=None, milestone=0):
+        if self.requester_mock is not None:
+            self.requester_mock.get_request(None)
+
+        return self.mocked_remote_create_issue_return
+
     def mock_shell_wrapper_execute_command(self, command):
         return self.mocked_shell_wrapper_execute_command_return
 
     def mock_request_get_request(self, request):
         return self.mocked_request_get_request_return
 
-    def mock_remote_parse_request_exception(self, exception, issue_numbers=()):
+    def mock_remote_parse_request_exception(self, exception, issue_numbers=(),
+                                            milestone=0):
         return self.mocked_request_parse_request_exception_return
 
     def mock_remote_get_rate_information(self):
@@ -664,6 +673,83 @@ class ControllerTest(unittest.TestCase):
 
         self.controller.deps.shell = original_shell
 
+        actual = temp_stdout.getvalue().strip()
+
+        self.assertEqual(expected, actual)
+
+    def test_create_many_origins(self):
+        mocked_shell_wrapper_return = 'origin1 git@github.com:julenpardo/first-remote\n' + \
+                                      'origin2 git@github.com:julenpardo/second-remote'
+        shell_wrapper_mock = mock.Mock()
+        self.mocked_shell_wrapper_execute_command_return = mocked_shell_wrapper_return
+        shell_wrapper_mock.execute_command = self.mock_shell_wrapper_execute_command
+
+        original_shell = self.controller.deps.shell
+        self.controller.deps.shell = shell_wrapper_mock
+        self.controller.deps.git_wrapper = GitWrapper(shell_wrapper_mock)
+
+        expected = 'Error\n'
+        expected += 'More than one remote was detected. Gitssue does not offer support for this yet.'
+
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            self.controller.create('title', 'body')
+
+        self.controller.deps.shell = original_shell
+
+        actual = temp_stdout.getvalue().strip()
+
+        self.assertEqual(expected, actual)
+
+    def test_create_connection_error(self):
+        remote_mock = mock.Mock()
+        remote_mock.create_issue.side_effect = RequestException
+        self.controller.deps.remote = remote_mock
+
+        temp_stdout = StringIO()
+
+        with contextlib.redirect_stdout(temp_stdout):
+            self.controller.create('title', 'body')
+
+        expected = 'A connection error occurred:'
+        actual = temp_stdout.getvalue().strip().splitlines()[1]
+
+        self.assertEqual(expected, actual)
+
+    def test_create_request_error(self):
+        expected = 'Mocked exception'
+
+        remote_mock = mock.Mock()
+
+        self.mocked_request_parse_request_exception_return = expected
+        remote_mock.parse_request_exception = self.mock_remote_parse_request_exception
+        remote_mock.create_issue.side_effect = \
+                UnsuccessfulHttpRequestException(401, {})
+
+        self.controller.deps.remote = remote_mock
+
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            self.controller.create('title', 'body', milestone=1)
+
+        actual = temp_stdout.getvalue().strip().splitlines()[1]
+
+        self.assertEqual(expected, actual)
+
+    def test_create_issue(self):
+        mocked_return = 41
+
+        remote_mock = mock.Mock()
+        self.mocked_remote_create_issue_return = mocked_return
+        remote_mock.create_issue = self.mock_remote_create_issue
+
+        self.controller.deps.remote = remote_mock
+
+        temp_stdout = StringIO()
+        with contextlib.redirect_stdout(temp_stdout):
+            self.controller.create('title', 'body')
+
+        expected = 'The issue has been created as #41.'
         actual = temp_stdout.getvalue().strip()
 
         self.assertEqual(expected, actual)

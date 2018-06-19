@@ -98,6 +98,26 @@ class RemoteRepoInterface(metaclass=ABCMeta):
         :raises UnsuccessfulHttpRequestException: if the request code is
         different to 200.
         """
+        pass
+
+    @abstractmethod
+    def create_issue(self, username, repository, title, body='', labels=None,
+                     milestone=False):
+        """
+        Creates an issue.
+
+        :param username: the user owning the repository.
+        :param repository: the repository to look the issues at.
+        :param title: the issue title.
+        :param body: the issue body.
+        :param labels: list of labels to associate with the issue.
+        :param milestone: milestone number to associate the issue with.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
+        """
+        pass
 
     @abstractmethod
     def get_rate_information(self):

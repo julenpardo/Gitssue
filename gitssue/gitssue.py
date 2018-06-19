@@ -65,6 +65,17 @@ def comments(issue):
 def comment(issue, comment):
     controller.comment(issue, comment)
 
+@click.command(help='Create an issue.')
+@click.argument('title', nargs=1, type=click.STRING)
+@click.option('--body', '-b', nargs=1, type=click.STRING, default='',
+              help='The body of the issue.')
+@click.option('--label', '-l', multiple=True, type=click.STRING, help='Labels '
+              'to associate with this issue (multiple labels options allowed).')
+@click.option('--milestone', '-m', nargs=1, type=click.INT, default=0,
+              help='The number the milestone to associate the issue with.')
+def create(title, body, label, milestone):
+    controller.create(title, body, label, milestone)
+
 
 @click.command(help='Shows the API rate information (remaining requests, reset'
                     ' time, etc.).')
@@ -87,5 +98,6 @@ cli.add_command(list)
 cli.add_command(desc)
 cli.add_command(comments)
 cli.add_command(comment)
+cli.add_command(create)
 cli.add_command(close)
 cli.add_command(rate_info)

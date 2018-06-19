@@ -204,6 +204,24 @@ class Bitbucket(RemoteRepoInterface):
             'POST', request, self.credentials, json_payload=payload
         )
 
+    def create_issue(self, username, repository, title, body='', labels=None,
+                     milestone=0):
+        """
+        Creates an issue.
+
+        :param username: the user owning the repository.
+        :param repository: the repository to look the issues at.
+        :param title: the issue title.
+        :param body: the issue body.
+        :param labels: list of labels to associate with the issue.
+        :param milestone: milestone number to associate the issue with.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
+        """
+        pass
+
     def get_rate_information(self):
         """
         The Bitbucket API doesn't have a rate limit for repository queries, so

@@ -200,6 +200,42 @@ class Github(RemoteRepoInterface):
             'POST', request, self.credentials, json_payload=payload
         )
 
+    def create_issue(self, username, repository, title, body='', labels=None,
+                     milestone=0):
+        """
+        Creates an issue.
+
+        :param username: the user owning the repository.
+        :param repository: the repository to look the issues at.
+        :param title: the issue title.
+        :param body: the issue body.
+        :param labels: list of labels to associate with the issue.
+        :param milestone: milestone number to associate the issue with.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
+        """
+        request = '{0}/repos/{1}/{2}/issues'.format(
+            self.API_URL, username, repository
+        )
+
+        payload = {
+            'title': title,
+            'body': body,
+            'labels': labels if labels else [],
+        }
+
+        if milestone:
+            payload['milestone'] = milestone
+
+        response_issue = self.requester.request(
+            'POST', request, self.credentials, json_payload=payload
+        )
+
+        return response_issue['number']
+
+
     def get_rate_information(self):
         """
         Gets the GitHub API rate information (remaining requests, reset time,
@@ -217,7 +253,7 @@ class Github(RemoteRepoInterface):
             rate_information['rate']['remaining'],\
             rate_information['rate']['reset']
 
-    def parse_request_exception(self, exception, issue_numbers=()):
+    def parse_request_exception(self, exception, issue_numbers=(), milestone=0):
         """
         Parses the generated exception during the request, necessary for
         special cases,
@@ -252,5 +288,7 @@ class Github(RemoteRepoInterface):
                 "haven't been set in the config file. Check the README for "
                 "more information."
             )
+        elif exception.code == 422 and milestone:
+            message = 'The milestone number {0} is invalid.'.format(milestone)
 
         return message
