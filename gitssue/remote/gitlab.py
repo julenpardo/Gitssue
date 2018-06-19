@@ -274,7 +274,24 @@ class Gitlab(RemoteRepoInterface):
         :raises UnsuccessfulHttpRequestException: if the request code is
         different to 200.
         """
-        pass
+        project_id = self._get_project_id(username, repository)
+
+        request = '{0}/projects/{1}/issues'.format(
+            self.api_url, project_id
+        )
+        payload = {
+            'title': title,
+            'description': body,
+            'labels': ','.join(labels) if labels else '',
+            'milestone': milestone,
+        }
+
+        response_issue = self.requester.request(
+            'POST', request, extra_headers=self.auth_token_header,
+            json_payload=payload
+        )
+
+        return response_issue['iid']
 
     def get_rate_information(self):
         """
