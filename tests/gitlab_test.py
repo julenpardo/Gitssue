@@ -419,60 +419,6 @@ class GitlabTest(unittest.TestCase):
 
         self.assertEqual(expected, actual)
 
-    def test_parse_request_exception_generic_error(self):
-        exception = UnsuccessfulHttpRequestException(403, {})
-
-        requester_mock = mock.Mock()
-        gitlab = Gitlab(requester_mock, credentials={}, domain='gitlab.com')
-
-        expected = 'An error occurred in the request.'
-        actual= gitlab.parse_request_exception(exception)
-
-        self.assertEqual(expected, actual)
-
-    def test_parse_request_repo_not_found(self):
-        exception_code = 404
-        input_exception = UnsuccessfulHttpRequestException(exception_code, {})
-
-        requester_mock = mock.Mock()
-        github = Gitlab(requester_mock, credentials={}, domain='gitlab.com')
-
-        expected = (
-            "The issue(s) do(es)n't exist; or the repository doesn't "
-            "exist; or it exists but it's private, and the credentials "
-            "haven't been set in the config file. Check the README for "
-            "more information."
-        )
-        actual = github.parse_request_exception(input_exception)
-
-        self.assertEqual(expected, actual)
-
-    def test_parse_request_exception_invalid_credentials(self):
-        exception_code = 401
-        input_exception = UnsuccessfulHttpRequestException(exception_code, {})
-
-        requester_mock = mock.Mock()
-        gitlab = Gitlab(requester_mock, credentials={}, domain='gitlab.com')
-
-        expected = "Invalid auth token. Check your '.gitssuerc' config file."
-        actual = gitlab.parse_request_exception(input_exception)
-
-        self.assertEqual(expected, actual)
-
-    def test_parse_request_exception_issue_not_found(self):
-        exception = UnsuccessfulHttpRequestException(404, {})
-
-        requester_mock = mock.Mock()
-        gitlab = Gitlab(requester_mock, credentials={}, domain='gitlab.com')
-
-        input_issues = ['4', '71']
-
-        expected = "The following issue(s) couldn't be found: {0}".\
-            format(', '.join(input_issues))
-        actual = gitlab.parse_request_exception(exception, input_issues)
-
-        self.assertEqual(expected, actual)
-
     def test_close_comments(self):
         def side_effect(*args, **kwargs):
             project = {'id': 1}
@@ -570,5 +516,17 @@ class GitlabTest(unittest.TestCase):
 
         expected = 58
         actual = gitlab.create_issue('username', 'repo', 'title', 'body')
+
+        self.assertEqual(expected, actual)
+
+    def test_parse_request_super(self):
+        exception_code = 401
+        input_exception = UnsuccessfulHttpRequestException(exception_code, {})
+
+        requester_mock = mock.Mock()
+        gitlab = Gitlab(requester_mock, credentials={}, domain='gitlab.com')
+
+        expected = Gitlab.HTTP_ERROR_MESSAGES[401]
+        actual = gitlab.parse_request_exception(input_exception)
 
         self.assertEqual(expected, actual)

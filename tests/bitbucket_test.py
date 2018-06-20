@@ -239,59 +239,6 @@ class BitbucketTest(unittest.TestCase):
 
         self.assertEqual(expected, actual)
 
-    def test_parse_request_exception_issue_not_found(self):
-        exception = UnsuccessfulHttpRequestException(404, {})
-
-        requester_mock = mock.Mock()
-        bitbucket = Bitbucket(requester_mock, credentials={})
-
-        input_issues = ['4', '71']
-
-        expected = "The following issue(s) couldn't be found: {0}".\
-            format(', '.join(input_issues))
-        actual = bitbucket.parse_request_exception(exception, input_issues)
-
-        self.assertEqual(expected, actual)
-
-    def test_parse_request_exception_generic_error(self):
-        exception = UnsuccessfulHttpRequestException(403, {})
-
-        requester_mock = mock.Mock()
-        bitbucket = Bitbucket(requester_mock, credentials={})
-
-        expected = 'An error occurred in the request.'
-        actual = bitbucket.parse_request_exception(exception)
-
-        self.assertEqual(expected, actual)
-
-    def test_parse_request_exception_issue_or_repo_not_found(self):
-        exception = UnsuccessfulHttpRequestException(404, {})
-
-        requester_mock = mock.Mock()
-        bitbucket = Bitbucket(requester_mock, credentials={})
-
-        expected = (
-            "The issue(s) do(es)n't exist; or the repository doesn't "
-            "exist; or it exists but it's private, and the credentials "
-            "haven't been set in the config file. Check the README for "
-            "more information."
-        )
-        actual = bitbucket.parse_request_exception(exception)
-
-        self.assertEqual(expected, actual)
-
-    def test_parse_request_exception_invalid_credentials(self):
-        exception_code = 401
-        input_exception = UnsuccessfulHttpRequestException(exception_code, {})
-
-        requester_mock = mock.Mock()
-        bitbucket = Bitbucket(requester_mock, credentials={})
-
-        expected = "Invalid credentials. Check your '.gitssuerc' config file."
-        actual = bitbucket.parse_request_exception(input_exception)
-
-        self.assertEqual(expected, actual)
-
     def test_close_comments(self):
         def side_effect(*args, **kwargs):
             existing_closed_issues = {
@@ -386,5 +333,17 @@ class BitbucketTest(unittest.TestCase):
         expected = 24
         actual = bitbucket.create_issue('username', 'repo', 'title', 'body',
                                         ['enhancement'])
+
+        self.assertEqual(expected, actual)
+
+    def test_parse_request_super(self):
+        exception_code = 403
+        input_exception = UnsuccessfulHttpRequestException(exception_code, {})
+
+        requester_mock = mock.Mock()
+        bitbucket = Bitbucket(requester_mock, credentials={})
+
+        expected = Bitbucket.HTTP_ERROR_MESSAGES[403]
+        actual = bitbucket.parse_request_exception(input_exception)
 
         self.assertEqual(expected, actual)
