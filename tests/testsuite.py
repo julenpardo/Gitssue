@@ -1,3 +1,5 @@
+import sys
+
 import unittest
 from unittest import makeSuite
 
@@ -35,4 +37,6 @@ def suite():
 if __name__ == '__main__':
     suite = suite()
     runner = unittest.TextTestRunner()
-    runner.run(suite)
+    success = not runner.run(suite).wasSuccessful()
+
+    sys.exit(success)
