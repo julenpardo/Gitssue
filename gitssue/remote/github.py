@@ -253,7 +253,7 @@ class Github(RemoteRepoInterface):
             rate_information['rate']['remaining'],\
             rate_information['rate']['reset']
 
-    def parse_request_exception(self, exception, issue_numbers=(), milestone=0):
+    def parse_request_exception(self, exception, milestone=0):
         """
         Parses the generated exception during the request, necessary for
         special cases,
@@ -261,8 +261,6 @@ class Github(RemoteRepoInterface):
 
         :param exception: (UnsuccessfulRequestException) The exception object
             generated in the request.
-        :param issue_numbers: the issue number(s) that weren't found in the
-            request.
         :return: The error message that will be displayed to the user.
         """
         message = 'An error occurred in the request.'
@@ -273,22 +271,9 @@ class Github(RemoteRepoInterface):
         if rate_limit_hit:
             message = 'GitHub API limit was reached. Read more about this at '\
                       + 'https://developer.github.com/v3/#rate-limiting'
-        elif exception.code == 401:
-            message = "Invalid credentials. Check your '.gitssuerc' config " \
-                + "file."
-        elif exception.code == 404 and issue_numbers:
-            message = "The following issue(s) couldn't be found: {0}".\
-                format(', '.join(
-                    str(i) for i in issue_numbers
-                ))
-        elif exception.code == 404:
-            message = (
-                "The issue(s) do(es)n't exist; or the repository doesn't "
-                "exist; or it exists but it's private, and the credentials "
-                "haven't been set in the config file. Check the README for "
-                "more information."
-            )
         elif exception.code == 422 and milestone:
             message = 'The milestone number {0} is invalid.'.format(milestone)
+        else:
+            message = super().parse_request_exception(exception, milestone)
 
         return message
