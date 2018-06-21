@@ -66,6 +66,15 @@ class PrinterInterface(metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    def print_not_found_issues(self, issues):
+        """
+        Prints the not found issues.
+
+        :param issues: the not found issue numbers.
+        """
+        pass
+
+    @abstractmethod
     def print_error(self, error):
         """
         Prints an error.

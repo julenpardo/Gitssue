@@ -65,7 +65,9 @@ def cli(debug):
 @click.option('--desc', '-d', is_flag=True,
               help='Get description of the issues.')
 def list(all, desc):
-    controller.list(all, desc)
+    status = controller.list(all, desc)
+
+    sys.exit(status)
 
 
 @click.command(help='Get description of specified issue(s).')
@@ -76,20 +78,26 @@ def desc(context, issues):
         print('Usage: gitssue desc [OPTIONS] [issue [issue ...]]\n')
         print('Error: Missing argument "issue".')
         context.exit(2)
-    controller.desc(issues)
+    status = controller.desc(issues)
+
+    sys.exit(status)
 
 
 @click.command(help='Get the comments of specified issue.')
 @click.argument('issue', nargs=1, type=click.INT)
 def comments(issue):
-    controller.comments(issue)
+    status = controller.comments(issue)
+
+    sys.exit(status)
 
 
 @click.command(help='Add a comment to the specified issue.')
 @click.argument('issue', nargs=1, type=click.INT)
 @click.argument('comment', nargs=1, type=click.STRING)
 def comment(issue, comment):
-    controller.comment(issue, comment)
+    status = controller.comment(issue, comment)
+
+    sys.exit(status)
 
 
 @click.command(help='Create an issue.')
@@ -103,7 +111,9 @@ def comment(issue, comment):
               help='The number the milestone to associate the issue with '
               '(ignored for Bitbucket issues).')
 def create(title, body, label, milestone):
-    controller.create(title, body, label, milestone)
+    status = controller.create(title, body, label, milestone)
+
+    sys.exit(status)
 
 
 @click.command(help='Shows the API rate information (remaining requests, reset'
@@ -120,7 +130,9 @@ def close(context, issues):
         print('Usage: gitssue close [OPTIONS] [issue [issue ...]]\n')
         print('Error: Missing argument "issue".')
         context.exit(2)
-    controller.close(issues)
+    status = controller.close(issues)
+
+    sys.exit(status)
 
 
 cli.add_command(list)

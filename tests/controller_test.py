@@ -323,7 +323,7 @@ class ControllerTest(unittest.TestCase):
 
         expected = "The following issues couldn't be found: {0}".\
             format(', '.join(not_found_issues))
-        actual = temp_stdout.getvalue().strip().splitlines()[1]
+        actual = temp_stdout.getvalue().strip().splitlines()[0]
 
         self.assertEqual(expected, actual)
 
