@@ -38,6 +38,7 @@ class Controller:
         """
         usernames_and_repo = self.deps.git_wrapper.get_username_and_repo()
         error = ''
+        status = 1
 
         if len(usernames_and_repo) == 1:
             try:
@@ -48,6 +49,8 @@ class Controller:
                     show_all,
                     description,
                 )
+
+                status = 0
             except TypeError:
                 error = 'No issue could be found.'
             except UnsuccessfulHttpRequestException as \
@@ -65,6 +68,8 @@ class Controller:
         else:
             self.deps.printer.print_error(self._MANY_ORIGINS_ERROR)
 
+        return status
+
     def desc(self, issue_numbers):
         """
         Prints the description of the given issue numbers.
@@ -72,8 +77,8 @@ class Controller:
         """
         usernames_and_repo = self.deps.git_wrapper.get_username_and_repo()
         error = ''
-        show_help = False
         issues = False
+        status = 1
 
         if len(usernames_and_repo) == 1:
             username, repo = usernames_and_repo[0]
@@ -86,11 +91,12 @@ class Controller:
                         issue_numbers,
                     )
 
+                if issues:
+                    self.deps.printer.print_issue_list_with_desc(issues)
                 if not_found_issues:
-                    error = "The following issues couldn't be found: {0}".\
-                        format(', '.join(
-                            str(i) for i in not_found_issues
-                        ))
+                    self.deps.printer.print_not_found_issues(not_found_issues)
+
+                status = 0 if issues else 1
             except UnsuccessfulHttpRequestException as \
                     unsuccessful_http_request:
                 error = self.deps.remote.parse_request_exception(
@@ -99,14 +105,12 @@ class Controller:
                 error = 'A connection error occurred:\n'
                 error += str(request_exception)
 
-            if issues:
-                self.deps.printer.print_issue_list_with_desc(issues)
             if error:
                 self.deps.printer.print_error(error)
         else:
             self.deps.printer.print_error(self._MANY_ORIGINS_ERROR)
 
-        return show_help
+        return status
 
     def comments(self, issue_number):
         """
@@ -118,6 +122,7 @@ class Controller:
         """
         usernames_and_repo = self.deps.git_wrapper.get_username_and_repo()
         error = ''
+        status = 1
 
         if len(usernames_and_repo) == 1:
             username, repo = usernames_and_repo[0]
@@ -128,11 +133,12 @@ class Controller:
                     repo,
                     issue_number,
                 )
+
+                status = 0 if comment_thread else 1
             except UnsuccessfulHttpRequestException as \
                     unsuccessful_http_request:
                 error = self.deps.remote.parse_request_exception(
                     unsuccessful_http_request,
-                    [issue_number],
                 )
             except RequestException as request_exception:
                 error = 'A connection error occurred:\n'
@@ -140,12 +146,15 @@ class Controller:
 
             if not error:
                 self.deps.printer.print_issue_comment_thread(
-                    comment_thread)
+                    comment_thread
+                )
             else:
                 self.deps.printer.print_error(error)
 
         else:
             self.deps.printer.print_error(self._MANY_ORIGINS_ERROR)
+
+        return status
 
     def close(self, issue_numbers):
         """
@@ -157,6 +166,7 @@ class Controller:
         error = ''
         closed_issues = []
         not_found_issues = []
+        status = 1
 
         if len(usernames_and_repo) == 1:
             username, repo = usernames_and_repo[0]
@@ -165,6 +175,8 @@ class Controller:
                 closed_issues, not_found_issues = self.deps.remote.close_issues(
                     username, repo, issue_numbers
                 )
+
+                status = 0 if closed_issues else 1
             except UnsuccessfulHttpRequestException as \
                     unsuccessful_http_request:
                 error = self.deps.remote.parse_request_exception(
@@ -187,6 +199,8 @@ class Controller:
         else:
             self.deps.printer.print_error(self._MANY_ORIGINS_ERROR)
 
+        return status
+
     def comment(self, issue, comment):
         """
         Adds a comment to the specified issue.
@@ -196,6 +210,7 @@ class Controller:
         """
         usernames_and_repo = self.deps.git_wrapper.get_username_and_repo()
         error = ''
+        status = 1
 
         if len(usernames_and_repo) == 1:
             username, repo = usernames_and_repo[0]
@@ -204,6 +219,8 @@ class Controller:
                 self.deps.remote.create_comment(
                     username, repo, issue, comment
                 )
+
+                status = 0
             except UnsuccessfulHttpRequestException as http_error:
                 error = self.deps.remote.parse_request_exception(http_error)
             except RequestException as request_exception:
@@ -218,6 +235,8 @@ class Controller:
         else:
             self.deps.printer.print_error(self._MANY_ORIGINS_ERROR)
 
+        return status
+
     def create(self, title, body='', labels=None, milestone=0):
         """
         Creates an issue.
@@ -227,6 +246,7 @@ class Controller:
         """
         usernames_and_repo = self.deps.git_wrapper.get_username_and_repo()
         error = ''
+        status = 1
 
         if len(usernames_and_repo) == 1:
             username, repo = usernames_and_repo[0]
@@ -235,6 +255,8 @@ class Controller:
                 created_issue_number = self.deps.remote.create_issue(
                     username, repo, title, body, labels, milestone
                 )
+
+                status = 0
             except UnsuccessfulHttpRequestException as http_error:
                 error = self.deps.remote.parse_request_exception(
                     http_error, milestone=milestone
@@ -250,6 +272,8 @@ class Controller:
 
         else:
             self.deps.printer.print_error(self._MANY_ORIGINS_ERROR)
+
+        return status
 
     def rate_information(self):
         """

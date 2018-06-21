@@ -11,6 +11,19 @@ class RemoteRepoInterface(metaclass=ABCMeta):
     to implement.
     """
 
+    HTTP_ERROR_MESSAGES = {
+        401: 'Authentication error: no credentials/auth token were provided, '
+             'or they are invalid. Check your .gitssuerc file and the '
+             'documentation.',
+        403: 'Permission error: you are not authorized to do that. Check your '
+             'credentials/auth token in your .gitssuerc, and your permissions '
+             'in the remote repository.',
+        404: 'The issue(s) do(es)n\'t exist; or the repository doesn\'t '
+             'exist; or it exists but it\'s private, and the credentials '
+             'haven\'t been set in the config file. Check your .gitssuerc and '
+             'the documentation.',
+    }
+
     def __init__(self, requester, credentials='', auth_token=''):
         self.requester = requester
         self.credentials = credentials
@@ -127,11 +140,9 @@ class RemoteRepoInterface(metaclass=ABCMeta):
         """
         pass
 
-    @abstractmethod
-    def parse_request_exception(self, exception):
+    def parse_request_exception(self, exception, milestone=0):
         """
-        Handles the error occurred during the request.
+        Parses the error occurred during the request.
         :param exception:
-        :return:
         """
-        pass
+        return self.HTTP_ERROR_MESSAGES[exception.code]

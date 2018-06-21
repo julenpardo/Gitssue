@@ -144,8 +144,6 @@ class Bitbucket(RemoteRepoInterface):
         """
         Closes the specified issues.
 
-        @TODO: implement.
-
         :param username: the user owning the repository.
         :param repository: the repository to look the issues at.
         :param issues: the issue numbers to close.
@@ -249,32 +247,9 @@ class Bitbucket(RemoteRepoInterface):
         """
         return -1, -1, -1
 
-    def parse_request_exception(self, exception, issue_numbers=()):
+    def parse_request_exception(self, exception, milestone=0):
         """
-        Parses the generated exception during the request, necessary for
-        special cases, e.g. when we try to get the comments of an issue
-        that doesn't exist.
-
-        :param exception: (UnsuccessfulRequestException) The exception object
-            generated in the request.
-        :param issue_numbers: the issue number(s) that weren't found in the
-            request.
-        :return: The error message that will be displayed to the user.
+        Parses the error occurred during the request.
+        :param exception:
         """
-        message = 'An error occurred in the request.'
-
-        if exception.code == 401:
-            message = "Invalid credentials. Check your '.gitssuerc' config " \
-                + "file."
-        elif exception.code == 404 and issue_numbers:
-            message = "The following issue(s) couldn't be found: {0}".\
-                format(', '.join(issue_numbers))
-        elif exception.code == 404:
-            message = (
-                "The issue(s) do(es)n't exist; or the repository doesn't "
-                "exist; or it exists but it's private, and the credentials "
-                "haven't been set in the config file. Check the README for "
-                "more information."
-            )
-
-        return message
+        return super().parse_request_exception(exception, milestone)

@@ -123,6 +123,18 @@ class Printer(PrinterInterface):
         """
         print('The issue has been created as #{0}.'.format(issue))
 
+    def print_not_found_issues(self, issues):
+        """
+        Prints the not found issues.
+
+        :param issues: the not found issue numbers.
+        """
+        message = "The following issues couldn't be found: {0}".format(
+            ', '.join(str(issue) for issue in issues)
+        )
+
+        print(message)
+
     def print_error(self, error):
         """
         Prints an error.

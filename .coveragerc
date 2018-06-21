@@ -4,10 +4,13 @@ source = gitssue/
 omit =
     gitssue/__main__.py
     gitssue/gitssue.py
-    *_interface.py
-    gitssue/remote/dummy.py
     gitssue/__init__.py
     gitssue/*/__init__.py
+
+[report]
+exclude_lines=
+    pragma: no cover
+    @abstractmethod
 
 [html]
 directory = reports/coverage/

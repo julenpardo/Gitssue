@@ -185,69 +185,6 @@ class GithubTest(unittest.TestCase):
 
         self.assertEqual(expected, actual)
 
-    def test_parse_request_exception_404(self):
-        exception_code = 404
-        exception_headers = {
-            'X-RateLimit-Remaining': 100
-        }
-        input_exception = UnsuccessfulHttpRequestException(exception_code, exception_headers)
-        not_found_issues = ['1', '2', '3']
-
-        requester_mock = mock.Mock()
-        github = Github(requester_mock, credentials={})
-
-        expected = "The following issue(s) couldn't be found: {0}".\
-            format(', '.join(not_found_issues))
-
-        actual = github.parse_request_exception(input_exception, not_found_issues)
-
-        self.assertEqual(expected, actual)
-
-    def test_parse_request_exception_other_exception(self):
-        exception_code = 403
-        exception_headers = {
-            'X-RateLimit-Remaining': 1
-        }
-        input_exception = UnsuccessfulHttpRequestException(exception_code, exception_headers)
-
-        requester_mock = mock.Mock()
-        github = Github(requester_mock, credentials={})
-
-        expected = 'An error occurred in the request.'
-        actual = github.parse_request_exception(input_exception)
-
-        self.assertEqual(expected, actual)
-
-    def test_parse_request_exception_invalid_credentials(self):
-        exception_code = 401
-        input_exception = UnsuccessfulHttpRequestException(exception_code, {})
-
-        requester_mock = mock.Mock()
-        github = Github(requester_mock, credentials={})
-
-        expected = "Invalid credentials. Check your '.gitssuerc' config file."
-        actual = github.parse_request_exception(input_exception)
-
-        self.assertEqual(expected, actual)
-
-
-    def test_parse_request_repo_not_found(self):
-        exception_code = 404
-        input_exception = UnsuccessfulHttpRequestException(exception_code, {})
-
-        requester_mock = mock.Mock()
-        github = Github(requester_mock, credentials={})
-
-        expected = (
-            "The issue(s) do(es)n't exist; or the repository doesn't "
-            "exist; or it exists but it's private, and the credentials "
-            "haven't been set in the config file. Check the README for "
-            "more information."
-        )
-        actual = github.parse_request_exception(input_exception)
-
-        self.assertEqual(expected, actual)
-
     def test_parse_request_invalid_milestone(self):
         exception_code = 422
         input_exception = UnsuccessfulHttpRequestException(exception_code, {})
@@ -256,6 +193,18 @@ class GithubTest(unittest.TestCase):
         github = Github(requester_mock, credentials={})
 
         expected = 'The milestone number 54 is invalid.'
+        actual = github.parse_request_exception(input_exception, milestone=54)
+
+        self.assertEqual(expected, actual)
+
+    def test_parse_request_super(self):
+        exception_code = 404
+        input_exception = UnsuccessfulHttpRequestException(exception_code, {})
+
+        requester_mock = mock.Mock()
+        github = Github(requester_mock, credentials={})
+
+        expected = Github.HTTP_ERROR_MESSAGES[404]
         actual = github.parse_request_exception(input_exception, milestone=54)
 
         self.assertEqual(expected, actual)
