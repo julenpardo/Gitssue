@@ -1,8 +1,8 @@
-# Gitssue [![PyPI version](https://badge.fury.io/py/Gitssue.svg)](https://badge.fury.io/py/Gitssue)
+# Gitssue [![PyPI version](https://badge.fury.io/py/Gitssue.svg)](https://badge.fury.io/py/Gitssue) ![Python versions](https://img.shields.io/badge/python-3.4%2C%203.5%2C%203.6%2C%203.7--dev-blue.svg)
 
 [![Build Status](https://api.travis-ci.org/julenpardo/Gitssue.svg?branch=dev)](https://travis-ci.org/julenpardo/Gitssue)
 [![Coverage Status](https://coveralls.io/repos/github/julenpardo/Gitssue/badge.svg?branch=dev)](https://coveralls.io/github/julenpardo/Gitssue?branch=dev)
-![Python versions](https://img.shields.io/badge/python-3.4%2C%203.5%2C%203.6%2C%203.7--dev-blue.svg)
+[![Downloads](http://pepy.tech/badge/gitssue)](http://pepy.tech/project/gitssue)
 ![License](https://img.shields.io/badge/license-GPLv3-blue.svg)
 
 Manage your Github, Gitlab or Bitbucket issues from the command line.
@@ -20,10 +20,8 @@ Built on [Click](https://github.com/pallets/click).
 * Get issues descriptions.
 * Get comment thread of the issue.
 * Show tags of each issue, with its colors.
-
-## Limitations
-
-* No "write" operations (i.e. make a comment, open or close issues, etc.).
+* Open and close issues.
+* Add comments to issues.
 
 ## Installation
 
@@ -33,8 +31,8 @@ Just with `pip3`:
 pip3 install gitssue
 ```
 
-That's it! You can already execute `gitssue` in your shell. You don't have to
-specify the link to the tracker or the remote type (Github, Gitlab or
+That's it! You can already execute `gitssue` in your git directory. You don't
+have to specify the link to the tracker or the remote type (Github, Gitlab or
 Bitbucket); it's already done by Gitssue.
 
 ## Configuration

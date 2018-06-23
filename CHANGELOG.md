@@ -19,3 +19,11 @@ Initial release.
 * Bitbucket support.
 * Gitlab requests optimiziation.
 * Request error messages improvement.
+
+# v2.0.0
+
+* Migrate to Click framework.
+* Command for creating issues.
+* Command for closing issues.
+* Command for adding comments to issues.
+* Option for debugging.

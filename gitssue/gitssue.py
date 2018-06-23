@@ -12,7 +12,7 @@ from gitssue.dependencies.dependencies import Dependencies
 from gitssue.controller.controller import Controller
 from gitssue.git.repo_not_found_exception import RepoNotFoundException
 
-GITSSUE_VERSION = '1.4.0'
+GITSSUE_VERSION = '2.0.0'
 
 CONTEXT_SETTINGS = {
     'help_option_names': ['-h', '--help'],

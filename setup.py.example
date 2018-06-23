@@ -30,7 +30,7 @@ setup(
     keywords='git issue development bug-tracking',
     packages=find_packages(exclude=['img', 'tests']),
     install_requires=[
-        'cement',
+        'click',
         'requests',
         'colorconsole',
     ],
@@ -39,12 +39,12 @@ setup(
     data_files={},
     entry_points={
         'console_scripts': [
-            'gitssue = gitssue.gitssue:main'
+            'gitssue = gitssue.gitssue:cli'
         ]
     },
     console_scripts={
         'console_scripts': [
-            'gitssue = gitssue.gitssue:main'
+            'gitssue = gitssue.gitssue:cli'
         ]
     },
 )
