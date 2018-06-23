@@ -11,6 +11,7 @@ class Bitbucket(RemoteRepoInterface):
 
     API_VERSION = '2.0'
     API_URL = 'https://api.bitbucket.org/{0}'.format(API_VERSION)
+    ALLOWED_ISSUE_KINDS = ('bug', 'enhancement', 'proposal', 'task')
 
     def __init__(self, requester, credentials):
         super(Bitbucket, self).__init__(requester, credentials=credentials)
@@ -34,7 +35,7 @@ class Bitbucket(RemoteRepoInterface):
         )
 
         issue_list = []
-        response_issues = self.requester.get_request(request, self.credentials)
+        response_issues = self.requester.request('GET', request, self.credentials)
 
         if response_issues:
             for issue in response_issues['values']:
@@ -79,11 +80,13 @@ class Bitbucket(RemoteRepoInterface):
         issue_list = []
         not_found_issues = []
 
-        response_issues = self.requester.get_request(request, self.credentials)
+        response_issues = self.requester.request(
+            'GET', request, self.credentials
+        )
 
         if response_issues:
             filtered_issues = list(filter(
-                lambda issue: str(issue['id']) in issue_numbers,
+                lambda issue: issue['id'] in issue_numbers,
                 response_issues['values']
             ))
 
@@ -122,8 +125,9 @@ class Bitbucket(RemoteRepoInterface):
         )
 
         issue_comments = []
-        response_comments = self.requester.get_request(request,
-                                                       self.credentials)
+        response_comments = self.requester.request(
+            'GET', request, self.credentials
+        )
 
         if response_comments:
             for comment in response_comments['values']:
@@ -136,6 +140,104 @@ class Bitbucket(RemoteRepoInterface):
 
         return issue_comments
 
+    def close_issues(self, username, repository, issue_numbers):
+        """
+        Closes the specified issues.
+
+        :param username: the user owning the repository.
+        :param repository: the repository to look the issues at.
+        :param issues: the issue numbers to close.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
+        """
+        base_request = '{0}/repositories/{1}/{2}/issues/'.format(
+            self.API_URL, username, repository
+        )
+        payload = {'state': 'closed'}
+        closed_issues = []
+        not_found_issues = []
+
+        for issue in issue_numbers:
+            request = base_request + str(issue)
+
+            try:
+                response_issue = self.requester.request(
+                    'PUT', request, self.credentials, json_payload=payload
+                )
+                closed_issues.append({
+                    'number': issue,
+                    'title': response_issue['title'],
+                })
+            except UnsuccessfulHttpRequestException as http_exception:
+                if http_exception.code == 404:
+                    not_found_issues.append(issue)
+                else:
+                    raise
+
+        return closed_issues, not_found_issues
+
+    def create_comment(self, username, repository, issue, comment):
+        """
+        Creates a comment in the specified issue.
+
+        :param username: the user owning the repository.
+        :param repository: the repository to look the issues at.
+        :param issue: the issue to add the comment to.
+        :param comment: the comment to add.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
+        """
+        request = '{0}/repositories/{1}/{2}/issues/{3}/comments'.format( self.API_URL, username, repository, issue
+        )
+        payload = {
+            'content': {
+                'raw': comment
+            }
+        }
+
+        self.requester.request(
+            'POST', request, self.credentials, json_payload=payload
+        )
+
+    def create_issue(self, username, repository, title, body='', labels=None,
+                     milestone=0):
+        """
+        Creates an issue.
+
+        :param username: the user owning the repository.
+        :param repository: the repository to look the issues at.
+        :param title: the issue title.
+        :param body: the issue body.
+        :param labels: the label (a value defined in self.ALLOWED_ISSUE_KINDS).
+        :param milestone: milestone number to associate the issue with.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
+        """
+        request = '{0}/repositories/{1}/{2}/issues'.format(
+            self.API_URL, username, repository
+        )
+        payload = {
+            'title': title,
+            'content': {
+                'raw': body,
+            },
+        }
+
+        if labels:
+            payload['kind'] = labels[0]
+
+        response_issue = self.requester.request(
+            'POST', request, self.credentials, json_payload=payload
+        )
+
+        return response_issue['id']
+
     def get_rate_information(self):
         """
         The Bitbucket API doesn't have a rate limit for repository queries, so
@@ -145,25 +247,9 @@ class Bitbucket(RemoteRepoInterface):
         """
         return -1, -1, -1
 
-    def parse_request_exception(self, exception, issue_numbers=()):
+    def parse_request_exception(self, exception, milestone=0):
         """
-        Parses the generated exception during the request, necessary for
-        special cases, e.g. when we try to get the comments of an issue
-        that doesn't exist.
-
-        :param exception: (UnsuccessfulRequestException) The exception object
-            generated in the request.
-        :param issue_numbers: the issue number(s) that weren't found in the
-            request.
-        :return: The error message that will be displayed to the user.
+        Parses the error occurred during the request.
+        :param exception:
         """
-        message = 'An error occurred in the request.'
-
-        if exception.code == 401:
-            message = "Invalid credentials. Check your '.gitssuerc' config " \
-                + "file."
-        elif exception.code == 404 and issue_numbers:
-            message = "The following issue(s) couldn't be found: {0}".\
-                format(', '.join(issue_numbers))
-
-        return message
+        return super().parse_request_exception(exception, milestone)

@@ -10,8 +10,8 @@ class RequestsTest(unittest.TestCase):
     def setUp(self):
         self.requests = Requests()
 
-    @mock.patch('requests.get')
-    def test_get_request(self, requests_get_mock):
+    @mock.patch('requests.request')
+    def test_request(self, requests_get_mock):
         response_mock = mock.Mock()
         mocked_return = """
             {
@@ -25,6 +25,7 @@ class RequestsTest(unittest.TestCase):
         }
 
         attributes = {
+            'ok': True,
             'status_code': 200,
             'text': mocked_return,
             'close.return_value': None,
@@ -32,15 +33,17 @@ class RequestsTest(unittest.TestCase):
         response_mock.configure_mock(**attributes)
         requests_get_mock.return_value = response_mock
 
-        actual = self.requests.get_request('some request')
+        actual = self.requests.request('GET', 'some request', extra_headers={},
+                                       json_payload={})
 
         self.assertEqual(expected, actual)
 
-    @mock.patch('requests.get')
-    def test_get_request_status_not_200(self, requests_get_mock):
+    @mock.patch('requests.request')
+    def test_request_status_not_200(self, requests_get_mock):
         response_mock = mock.Mock()
 
         attributes = {
+            'ok': False,
             'status_code': 404,
             'headers': {'header_key': 'header_value'}
         }
@@ -48,17 +51,17 @@ class RequestsTest(unittest.TestCase):
         requests_get_mock.return_value = response_mock
 
         with self.assertRaises(UnsuccessfulHttpRequestException):
-            self.requests.get_request('some request')
+            self.requests.request('GET', 'some request')
 
-    @mock.patch('requests.get')
-    def test_get_request_request_exception(self, requests_get_mock):
+    @mock.patch('requests.request')
+    def test_request_request_exception(self, requests_get_mock):
         requests_get_mock.side_effect = RequestException
 
         with self.assertRaises(RequestException):
-            self.requests.get_request('some request')
+            self.requests.request('GET', 'some request')
 
-    @mock.patch('requests.get')
-    def test_get_request_with_authentication(self, requests_get_mock):
+    @mock.patch('requests.request')
+    def test_request_with_authentication(self, requests_get_mock):
         response_mock = mock.Mock()
         mocked_return = """
             {
@@ -83,6 +86,6 @@ class RequestsTest(unittest.TestCase):
             'username': 'whatever',
             'password': 'whatever',
         }
-        actual = self.requests.get_request('some request', credentials)
+        actual = self.requests.request('GET', 'some request', credentials)
 
         self.assertEqual(expected, actual)

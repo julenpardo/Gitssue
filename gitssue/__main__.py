@@ -5,7 +5,8 @@ import os
 
 sys.path.insert(0, os.getcwd())
 
-from gitssue.gitssue import Gitssue
+from gitssue import gitssue
 
-with Gitssue() as app:
-    app.run()
+
+if __name__ == '__main__':
+    gitssue.cli()

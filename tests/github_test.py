@@ -9,10 +9,11 @@ class GithubTest(unittest.TestCase):
 
     mocked_request_response = None
 
-    def mock_get_request(self, request, credentials={}):
+    def mock_request(self, method, request, credentials={}, extra_headers={},
+                     json_payload={}):
         return self.mocked_request_response
 
-    def mock_get_request_with_error(self, request, credentials={}):
+    def mock_request_with_error(self, method, request, credentials={}):
         return False
 
     def test_get_issue_list(self):
@@ -33,7 +34,7 @@ class GithubTest(unittest.TestCase):
         ]
         self.mocked_request_response = mocked_return
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
         github = Github(requester_mock, credentials={})
 
         expected = self.mocked_request_response
@@ -49,7 +50,7 @@ class GithubTest(unittest.TestCase):
 
     def test_get_issue_list_error_request(self):
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request_with_error
+        requester_mock.request = self.mock_request_with_error
 
         github = Github(requester_mock, credentials={})
 
@@ -65,7 +66,7 @@ class GithubTest(unittest.TestCase):
         }
         self.mocked_request_response = mocked_return
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
         github = Github(requester_mock, credentials={})
 
         expected = self.mocked_request_response
@@ -86,7 +87,7 @@ class GithubTest(unittest.TestCase):
 
     def test_get_issues_description_error_request(self):
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request_with_error
+        requester_mock.request = self.mock_request_with_error
 
         github = Github(requester_mock, credentials={})
 
@@ -97,7 +98,7 @@ class GithubTest(unittest.TestCase):
 
     def test_get_issues_description_not_found_issue(self):
         requester_mock = mock.Mock()
-        requester_mock.get_request.side_effect = UnsuccessfulHttpRequestException(404, {})
+        requester_mock.request.side_effect = UnsuccessfulHttpRequestException(404, {})
 
         github = Github(requester_mock, credentials={})
 
@@ -109,7 +110,7 @@ class GithubTest(unittest.TestCase):
 
     def test_get_issues_description_other_error(self):
         requester_mock = mock.Mock()
-        requester_mock.get_request.side_effect = UnsuccessfulHttpRequestException(500, {})
+        requester_mock.request.side_effect = UnsuccessfulHttpRequestException(500, {})
 
         github = Github(requester_mock, credentials={})
 
@@ -132,7 +133,7 @@ class GithubTest(unittest.TestCase):
         ]
         self.mocked_request_response = mocked_return
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
 
         github = Github(requester_mock, credentials={})
 
@@ -160,7 +161,7 @@ class GithubTest(unittest.TestCase):
         mocked_return = []
         self.mocked_request_response = mocked_return
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
 
         github = Github(requester_mock, credentials={})
 
@@ -184,63 +185,27 @@ class GithubTest(unittest.TestCase):
 
         self.assertEqual(expected, actual)
 
-    def test_parse_request_exception_404(self):
-        exception_code = 404
-        exception_headers = {
-            'X-RateLimit-Remaining': 100
-        }
-        input_exception = UnsuccessfulHttpRequestException(exception_code, exception_headers)
-        not_found_issues = ['1', '2', '3']
-
-        requester_mock = mock.Mock()
-        github = Github(requester_mock, credentials={})
-
-        expected = "The following issue(s) couldn't be found: {0}".\
-            format(', '.join(not_found_issues))
-
-        actual = github.parse_request_exception(input_exception, not_found_issues)
-
-        self.assertEqual(expected, actual)
-
-    def test_parse_request_exception_other_exception(self):
-        exception_code = 403
-        exception_headers = {
-            'X-RateLimit-Remaining': 1
-        }
-        input_exception = UnsuccessfulHttpRequestException(exception_code, exception_headers)
-
-        requester_mock = mock.Mock()
-        github = Github(requester_mock, credentials={})
-
-        expected = 'An error occurred in the request.'
-        actual = github.parse_request_exception(input_exception)
-
-        self.assertEqual(expected, actual)
-
-    def test_parse_request_exception_invalid_credentials(self):
-        exception_code = 401
+    def test_parse_request_invalid_milestone(self):
+        exception_code = 422
         input_exception = UnsuccessfulHttpRequestException(exception_code, {})
 
         requester_mock = mock.Mock()
         github = Github(requester_mock, credentials={})
 
-        expected = "Invalid credentials. Check your '.gitssuerc' config file."
-        actual = github.parse_request_exception(input_exception)
+        expected = 'The milestone number 54 is invalid.'
+        actual = github.parse_request_exception(input_exception, milestone=54)
 
         self.assertEqual(expected, actual)
 
-
-    def test_parse_request_repo_not_found(self):
+    def test_parse_request_super(self):
         exception_code = 404
         input_exception = UnsuccessfulHttpRequestException(exception_code, {})
 
         requester_mock = mock.Mock()
         github = Github(requester_mock, credentials={})
 
-        expected = "The repository doesn't exist; or exists but it's private, and the "\
-                      + "credentials haven't been set in the config file. Check the README "\
-                      + "for more information."
-        actual = github.parse_request_exception(input_exception)
+        expected = Github.HTTP_ERROR_MESSAGES[404]
+        actual = github.parse_request_exception(input_exception, milestone=54)
 
         self.assertEqual(expected, actual)
 
@@ -256,7 +221,7 @@ class GithubTest(unittest.TestCase):
 
         self.mocked_request_response = mocked_return
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
 
         github = Github(requester_mock, credentials={})
 
@@ -265,5 +230,104 @@ class GithubTest(unittest.TestCase):
             mocked_return['rate']['reset']
 
         actual = github.get_rate_information()
+
+        self.assertEqual(expected, actual)
+
+    def test_close_comments(self):
+        def side_effect(*args, **kwargs):
+            existing_closed_issues = {
+                1: {
+                    'number': 1,
+                    'title': 'First closed issue',
+                },
+                2: {
+                    'number': 2,
+                    'title': 'Second closed issue',
+                },
+            }
+            request_issue_id = int(args[1][-1:])
+
+            if request_issue_id in existing_closed_issues:
+                return existing_closed_issues[request_issue_id]
+            else:
+                raise UnsuccessfulHttpRequestException(404, {})
+
+        requester_mock = mock.Mock()
+        requester_mock.request.side_effect = side_effect
+
+        input_issues = [1, 2, 3]
+
+        github = Github(requester_mock, credentials={})
+
+        expected = [
+            {
+                'number': 1,
+                'title': 'First closed issue'
+            },
+            {
+                'number': 2,
+                'title': 'Second closed issue'
+            },
+        ], [
+            3
+        ]
+        actual = github.close_issues('username', 'repo', input_issues)
+
+        self.assertEqual(expected, actual)
+
+    def test_close_comments_exception_authentication(self):
+        """401"""
+        requester_mock = mock.Mock()
+        requester_mock.request.side_effect = \
+            UnsuccessfulHttpRequestException(401, {})
+
+        github = Github(requester_mock, credentials={})
+
+        with self.assertRaises(UnsuccessfulHttpRequestException):
+            github.close_issues('username', 'repo', [1, 2, 3])
+
+    def test_create_comment(self):
+        requester_mock = mock.Mock()
+
+        github = Github(requester_mock, credentials={})
+
+        try:
+            github.create_comment('username', 'repo', 1, 'comment')
+        except:
+            self.fail('Unexpected exception')
+
+    def test_create_issue(self):
+        mocked_return = {
+            'number': 24,
+            'title': 'created issue title',
+        }
+
+        self.mocked_request_response = mocked_return
+        requester_mock = mock.Mock()
+        requester_mock.request = self.mock_request
+
+        github = Github(requester_mock, credentials={})
+
+        expected = 24
+        actual = github.create_issue('username', 'repo', 'title', 'body',
+                                     ['label 1', 'label 2'])
+
+        self.assertEqual(expected, actual)
+
+    def test_create_issue_with_milestone(self):
+        mocked_return = {
+            'number': 34,
+            'title': 'created issue title',
+        }
+
+        self.mocked_request_response = mocked_return
+        requester_mock = mock.Mock()
+        requester_mock.request = self.mock_request
+
+        github = Github(requester_mock, credentials={})
+
+        expected = 34
+        actual = github.create_issue('username', 'repo', 'title', 'body',
+                                     ['label 1', 'label 2'], milestone=5)
 
         self.assertEqual(expected, actual)

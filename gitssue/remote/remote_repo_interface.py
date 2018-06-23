@@ -11,6 +11,19 @@ class RemoteRepoInterface(metaclass=ABCMeta):
     to implement.
     """
 
+    HTTP_ERROR_MESSAGES = {
+        401: 'Authentication error: no credentials/auth token were provided, '
+             'or they are invalid. Check your .gitssuerc file and the '
+             'documentation.',
+        403: 'Permission error: you are not authorized to do that. Check your '
+             'credentials/auth token in your .gitssuerc, and your permissions '
+             'in the remote repository.',
+        404: 'The issue(s) do(es)n\'t exist; or the repository doesn\'t '
+             'exist; or it exists but it\'s private, and the credentials '
+             'haven\'t been set in the config file. Check your .gitssuerc and '
+             'the documentation.',
+    }
+
     def __init__(self, requester, credentials='', auth_token=''):
         self.requester = requester
         self.credentials = credentials
@@ -70,6 +83,56 @@ class RemoteRepoInterface(metaclass=ABCMeta):
         """
 
     @abstractmethod
+    def close_issues(self, username, repository, issue_numbers):
+        """
+        Closes the specified issue.
+
+        :param username: the user owning the repository.
+        :param repository: the repository to look the issues at.
+        :param issue_numbers: the issues to close.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
+        """
+        pass
+
+    @abstractmethod
+    def create_comment(self, username, repository, issue, comment):
+        """
+        Creates a comment in the specified issue.
+
+        :param username: the user owning the repository.
+        :param repository: the repository to look the issues at.
+        :param issue: the issue to add the comment to.
+        :param comment: the comment to add.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
+        """
+        pass
+
+    @abstractmethod
+    def create_issue(self, username, repository, title, body='', labels=None,
+                     milestone=False):
+        """
+        Creates an issue.
+
+        :param username: the user owning the repository.
+        :param repository: the repository to look the issues at.
+        :param title: the issue title.
+        :param body: the issue body.
+        :param labels: list of labels to associate with the issue.
+        :param milestone: milestone number to associate the issue with.
+        :raises requests.RequestException: if an error occurs during the
+        request.
+        :raises UnsuccessfulHttpRequestException: if the request code is
+        different to 200.
+        """
+        pass
+
+    @abstractmethod
     def get_rate_information(self):
         """
         Gets the API rate information (remaining requests, reset time, etc.).
@@ -77,11 +140,9 @@ class RemoteRepoInterface(metaclass=ABCMeta):
         """
         pass
 
-    @abstractmethod
-    def parse_request_exception(self, exception):
+    def parse_request_exception(self, exception, milestone=0):
         """
-        Handles the error occurred during the request.
+        Parses the error occurred during the request.
         :param exception:
-        :return:
         """
-        pass
+        return self.HTTP_ERROR_MESSAGES[exception.code]

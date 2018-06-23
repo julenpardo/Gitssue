@@ -68,6 +68,22 @@ class GitWrapperTest(unittest.TestCase):
 
         self.assertEqual(expected, actual)
 
+    def test_get_username_and_repo_https(self):
+        """
+        Test getting the username and repository name for the current repository.
+        """
+        mocked_return = "origin https://github.com/julenpardo/Gitssue.git (fetch)"
+        shell_wrapper_mock = mock.Mock()
+        self.mock_response = mocked_return
+        shell_wrapper_mock.execute_command = self.mock_execute_command
+        expected = [['julenpardo', 'Gitssue']]
+
+        git_wrapper = GitWrapper(shell_wrapper_mock)
+
+        actual = git_wrapper.get_username_and_repo()
+
+        self.assertEqual(expected, actual)
+
     def test_get_username_and_repo_invalid_repo(self):
         """
         Simulate an unexpected return value by the shell wrapper, which would be

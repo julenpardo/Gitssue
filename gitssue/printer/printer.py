@@ -91,6 +91,50 @@ class Printer(PrinterInterface):
         else:
             print('No comment could be found.')
 
+    def print_closed_issues(self, closed_issues):
+        """
+        Prints the closed issues.
+
+        :param closed_issues: the closed issues.
+        """
+        if closed_issues:
+            print('The following issues have been closed:\n')
+
+            for issue in closed_issues:
+                line = '#{0}: {1}\n'.format(issue['number'], issue['title'])
+                print(line)
+        else:
+            print('No issue could be found.')
+
+    def print_created_comment(self, issue):
+        """
+        Prints the created comment of the specified issue.
+
+        :param issue: the issue the comment has been created for.
+        :param comment: the comment that has been created.
+        """
+        print('The comment has been created for the issue #{0}.'.format(issue))
+
+    def print_created_issue(self, issue):
+        """
+        Prints the created issue.
+
+        :param number: the issue number.
+        """
+        print('The issue has been created as #{0}.'.format(issue))
+
+    def print_not_found_issues(self, issues):
+        """
+        Prints the not found issues.
+
+        :param issues: the not found issue numbers.
+        """
+        message = "The following issues couldn't be found: {0}".format(
+            ', '.join(str(issue) for issue in issues)
+        )
+
+        print(message)
+
     def print_error(self, error):
         """
         Prints an error.

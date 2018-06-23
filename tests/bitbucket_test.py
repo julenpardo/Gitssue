@@ -9,10 +9,11 @@ class BitbucketTest(unittest.TestCase):
 
     mocked_request_response = None
 
-    def mock_get_request(self, request, credentials={}, extra_headers={}):
+    def mock_request(self, method, request, credentials={}, extra_headers={},
+                     json_payload={}):
         return self.mocked_request_response
 
-    def mock_get_request_with_error(self, request, credentials={}):
+    def mock_request_with_error(self, method, request, credentials={}):
         return False
 
     def test_get_issue_list(self):
@@ -49,7 +50,7 @@ class BitbucketTest(unittest.TestCase):
         }
         self.mocked_request_response = mocked_issue_list
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
         bitbucket = Bitbucket(requester_mock, {})
 
         expected = [
@@ -79,7 +80,7 @@ class BitbucketTest(unittest.TestCase):
 
     def test_get_issues_list_error_request(self):
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request_with_error
+        requester_mock.request = self.mock_request_with_error
 
         bitbucket = Bitbucket(requester_mock, credentials={})
 
@@ -122,7 +123,7 @@ class BitbucketTest(unittest.TestCase):
         }
         self.mocked_request_response = mocked_issue_list
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
         bitbucket = Bitbucket(requester_mock, {})
 
         expected = [
@@ -148,16 +149,16 @@ class BitbucketTest(unittest.TestCase):
                     'color': 'ffffff',
                 }],
             },
-        ], ['4', '15']
+        ], [4, 15]
         actual = bitbucket.get_issues_description(
-            'username', 'repo', ['1', '3', '4', '15']
+            'username', 'repo', [1, 3, 4, 15]
         )
 
         self.assertEqual(expected, actual)
 
     def test_get_issues_description_error_request(self):
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request_with_error
+        requester_mock.request = self.mock_request_with_error
 
         bitbucket = Bitbucket(requester_mock, credentials={})
 
@@ -193,7 +194,7 @@ class BitbucketTest(unittest.TestCase):
         }
         self.mocked_request_response = mocked_issue_list
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request
+        requester_mock.request = self.mock_request
         bitbucket = Bitbucket(requester_mock, {})
 
         expected = [
@@ -216,7 +217,7 @@ class BitbucketTest(unittest.TestCase):
 
     def test_get_issue_comments_error_request(self):
         requester_mock = mock.Mock()
-        requester_mock.get_request = self.mock_get_request_with_error
+        requester_mock.request = self.mock_request_with_error
 
         bitbucket = Bitbucket(requester_mock, credentials={})
 
@@ -238,39 +239,111 @@ class BitbucketTest(unittest.TestCase):
 
         self.assertEqual(expected, actual)
 
-    def test_parse_request_exception_issue_not_found(self):
-        exception = UnsuccessfulHttpRequestException(404, {})
+    def test_close_comments(self):
+        def side_effect(*args, **kwargs):
+            existing_closed_issues = {
+                1: {
+                    'number': 1,
+                    'title': 'First closed issue',
+                },
+                2: {
+                    'number': 2,
+                    'title': 'Second closed issue',
+                },
+            }
+            request_issue_id = int(args[1][-1:])
+
+            if request_issue_id in existing_closed_issues:
+                return existing_closed_issues[request_issue_id]
+            else:
+                raise UnsuccessfulHttpRequestException(404, {})
 
         requester_mock = mock.Mock()
+        requester_mock.request.side_effect = side_effect
+
+        input_issues = [1, 2, 3]
+
         bitbucket = Bitbucket(requester_mock, credentials={})
 
-        input_issues = ['4', '71']
-
-        expected = "The following issue(s) couldn't be found: {0}".\
-            format(', '.join(input_issues))
-        actual= bitbucket.parse_request_exception(exception, input_issues)
+        expected = [
+            {
+                'number': 1,
+                'title': 'First closed issue'
+            },
+            {
+                'number': 2,
+                'title': 'Second closed issue'
+            },
+        ], [
+            3
+        ]
+        actual = bitbucket.close_issues('username', 'repo', input_issues)
 
         self.assertEqual(expected, actual)
 
-    def test_parse_request_exception_generic_error(self):
-        exception = UnsuccessfulHttpRequestException(404, {})
-
+    def test_close_comments_exception_authentication(self):
+        """401"""
         requester_mock = mock.Mock()
+        requester_mock.request.side_effect = \
+            UnsuccessfulHttpRequestException(401, {})
+
         bitbucket = Bitbucket(requester_mock, credentials={})
 
-        expected = 'An error occurred in the request.'
-        actual= bitbucket.parse_request_exception(exception)
+        with self.assertRaises(UnsuccessfulHttpRequestException):
+            bitbucket.close_issues('username', 'repo', [1, 2, 3])
+
+    def test_create_comment(self):
+        """401"""
+        requester_mock = mock.Mock()
+
+        bitbucket = Bitbucket(requester_mock, credentials={})
+
+        try:
+            bitbucket.create_comment('username', 'repository', 1, 'comment')
+        except:
+            self.fail('Unexpected exception')
+
+    def test_create_issue(self):
+        mocked_return = {
+            'id': 73,
+        }
+
+        self.mocked_request_response = mocked_return
+        requester_mock = mock.Mock()
+        requester_mock.request = self.mock_request
+
+        bitbucket = Bitbucket(requester_mock, credentials={})
+
+        expected = 73
+        actual = bitbucket.create_issue('username', 'repo', 'title', 'body')
 
         self.assertEqual(expected, actual)
 
-    def test_parse_request_exception_invalid_credentials(self):
-        exception_code = 401
+    def test_create_issue_with_label(self):
+        mocked_return = {
+            'id': 24,
+        }
+
+        self.mocked_request_response = mocked_return
+        requester_mock = mock.Mock()
+        requester_mock.request = self.mock_request
+
+        bitbucket = Bitbucket(requester_mock, credentials={})
+
+        expected = 24
+        actual = bitbucket.create_issue('username', 'repo', 'title', 'body',
+                                        ['enhancement'])
+
+        self.assertEqual(expected, actual)
+
+    def test_parse_request_super(self):
+        exception_code = 403
         input_exception = UnsuccessfulHttpRequestException(exception_code, {})
 
         requester_mock = mock.Mock()
         bitbucket = Bitbucket(requester_mock, credentials={})
 
-        expected = "Invalid credentials. Check your '.gitssuerc' config file."
+        expected = Bitbucket.HTTP_ERROR_MESSAGES[403]
         actual = bitbucket.parse_request_exception(input_exception)
 
         self.assertEqual(expected, actual)

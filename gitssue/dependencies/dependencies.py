@@ -36,7 +36,7 @@ class Dependencies:
             remote = Bitbucket(self.requester, credentials=credentials)
 
         else:
-            auth_token = config[remote_domain]['token']
+            auth_token = config.get(remote_domain, {}).get('token')
             remote = Gitlab(self.requester, auth_token, remote_domain)
 
         self.remote = remote

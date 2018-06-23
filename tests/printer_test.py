@@ -19,7 +19,6 @@ class DummyColorPrinter(ColorPrinterInterface):
         label_string = label_string[:-1]
         print(label_string)
 
-
 class PrinterTest(unittest.TestCase):
 
     def setUp(self):
@@ -238,6 +237,28 @@ class PrinterTest(unittest.TestCase):
                 unlimited
             )
 
+        actual = temp_stdout.getvalue().strip()
+
+        self.assertEqual(expected, actual)
+
+    def test_print_created_comment(self):
+        temp_stdout = StringIO()
+
+        with contextlib.redirect_stdout(temp_stdout):
+            self.printer.print_created_comment(27)
+
+        expected = 'The comment has been created for the issue #27.'
+        actual = temp_stdout.getvalue().strip()
+
+        self.assertEqual(expected, actual)
+
+    def test_print_created_issue(self):
+        temp_stdout = StringIO()
+
+        with contextlib.redirect_stdout(temp_stdout):
+            self.printer.print_created_issue(41)
+
+        expected = 'The issue has been created as #41.'
         actual = temp_stdout.getvalue().strip()
 
         self.assertEqual(expected, actual)
