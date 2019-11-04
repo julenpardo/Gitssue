@@ -1,4 +1,4 @@
 # Just the 'top' dependencies, without sub-dependencies, and also test dependencies.
 click==6.7
 colorconsole==0.7.2
-requests==2.13.0
+requests==2.20.0
